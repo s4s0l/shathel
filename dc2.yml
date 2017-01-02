@@ -1,0 +1,11 @@
+version: 2
+services:
+  cli:
+    image: cli
+    command: /hosthome/sasol/Projects/shathel-swarm/app.groovy
+    ports:
+      - 8080
+    volumes:
+      - /hosthome:/hosthome
+    labels:
+       io.rancher.scheduler.global: 'true'

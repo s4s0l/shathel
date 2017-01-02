@@ -52,7 +52,7 @@ docker-machine ssh ${CLUSTER_NAME}-manager-1 docker service create \
 
 printf "\n\n------------------------------------\n"
 echo "To connect to your cluster..."
-echo 'eval $(docker-machine env manager-1)'
-echo 'docker-machine use ${CLUSTER_NAME}-manager-1'
+echo 'eval $(docker-machine env ${CLUSTER_NAME}-manager-1)'
+echo 'or: docker-machine use ${CLUSTER_NAME}-manager-1'
 echo "To visualize your cluster..."
 echo "Open a browser to http://${manager_ip}:9000/"

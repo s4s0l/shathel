@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 if [[ ( -z ${1} ) ]]; then
-    echo "Usage: swarm-cluster-destroy.sh"
+    echo "Usage: swarm-cluster-docker.sh CLUSTER_NAME docker_oprions...."
     exit 1
 fi
 CLUSTER_NAME=$1

@@ -56,3 +56,28 @@ docker service create \
 /swarm-cluster-docker.sh test build -t cli ./boot-cli/
 
 
+testować tak:
+for i in {1..100}; do curl http://20.20.20.103:3001; echo "" ; sleep 1;  done
+
+========================================RANCHER:
+docker-
+
+
+docker-machine create -d virtualbox r-one
+docker-machine create -d virtualbox r-two
+docker-machine use one
+
+docker run -d --restart=always --name=rancher-server -p 8080:8080 rancher/server
+
+aby mi to działąło to musiałem zmienić że host ma labelkę 12, oraz że tylko jeden manager jest potrzebny
+
+
+./rancher-cluster-create.sh test 3
+
+rancher-cluster-docker.sh test build -t cli ./boot-cli/
+
+curl rancher-metadata < pobranie metadanych serwisu
+
+===============================================
+
+w EXtra jest przykład proxy do repo i repo samego w sobie

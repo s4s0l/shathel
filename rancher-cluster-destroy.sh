@@ -6,4 +6,4 @@ if [[ ( -z ${1} ) ]]; then
 fi
 CLUSTER_NAME=$1
 
-docker-machine rm -f $(docker-machine ls -q | grep ${CLUSTER_NAME})
+docker-machine rm -f $(docker-machine ls -q | grep r-${CLUSTER_NAME}-node)
