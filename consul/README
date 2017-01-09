@@ -1,0 +1,4 @@
+./swarm-cluster-create.sh consul 1 2
+
+
+start-cluster.sh
