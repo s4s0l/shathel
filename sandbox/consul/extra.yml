@@ -1,0 +1,17 @@
+version: "3"
+services:
+  u:
+    image: ianneub/network-tools
+    command: /bin/bash -c "until false; do ping uclient; sleep 1; done"
+    networks:
+      - ubuntu_default
+      - 00shathel_network
+    deploy:
+      placement:
+            constraints: [node.role == manager]
+
+networks:
+  ubuntu_default:
+    external: true
+  00shathel_network:
+        external: true

@@ -1,0 +1,11 @@
+version: "3"
+services:
+  bootcli:
+    image: 20.20.20.178:4000/bootcli:latest
+    command:
+    volumes:
+      - /hosthome:/hosthome
+    deploy:
+      placement:
+            constraints: [node.role == manager]
+

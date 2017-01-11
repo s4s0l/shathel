@@ -19,7 +19,7 @@ for n in $(seq 1  ${NUMBER_OF_NODES}) ; do
     docker-machine ssh r-${CLUSTER_NAME}-node-${n} sudo mount -r /mnt/sda1/var/lib/rancher /var/lib/rancher
 done
 eval $(docker-machine env r-${CLUSTER_NAME}-node-1)
-docker run -d --restart=always --name=rancher-server -p 8080:8080 rancher/server
+docker run -d --restart=always --name=rancher-server -p 8080:8080 rancher/server:v1.4.0-rc1
 
 printf "\n\n------------------------------------\n"
 echo "To connect to your cluster..."

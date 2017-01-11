@@ -1,0 +1,29 @@
+version: "3"
+services:
+  u:
+    image: ianneub/network-tools
+    command: /bin/bash -c "until false; do ping consul; sleep 1; done"
+    networks:
+      - default
+      - 00shathel_network
+    deploy:
+      placement:
+            constraints: [node.role == manager]
+  uclient:
+      image: consul
+      environment:
+        - 'CONSUL_BIND_INTERFACE=eth0'
+        - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}'
+      command: agent -retry-join=consul -rejoin
+      networks:
+            - default
+            - 00shathel_network
+      deploy:
+        mode: replicated
+        replicas: 1
+        placement:
+           constraints: [node.role == manager]
+
+networks:
+  00shathel_network:
+    external: true

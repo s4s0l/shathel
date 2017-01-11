@@ -1,0 +1,35 @@
+====deployment w swarm mode:
+
+
+to nic nie robi bo podpiecie tego zmienia klolejnosc interfejsow
+
+docker stack deploy --compose-file ./network.yml 00shathel
+
+export CONSUL_CLUSTER_SIZE=2
+
+docker stack deploy --compose-file ./consul.yml consul
+
+docker stack deploy --compose-file ./ubuntu.yml ubuntu
+
+docker stack deploy --compose-file ./extra.yml extra
+
+docker stack rm extra && docker stack rm ubuntu && docker stack rm consul && docker stack rm 00shathel
+
+
+======osobne compose files:
+
+export CONSUL_CLUSTER_SIZE=1
+docker-compose -p 00shathel -f network.yml up -d
+docker-compose -p consul -f consul.yml up -d
+docker-compose -p ubuntu -f ubuntu.yml up -d
+docker-compose -p extra -f extra.yml up -d
+
+
+docker-compose -p extra -f extra.yml down && \
+    docker-compose -p ubuntu -f ubuntu.yml down && \
+    docker-compose -p consul -f consul.yml down && \
+    docker-compose -p 00shathel -f network.yml down
+
+== jeden scalony
+ZAKOMENTOWAC NETWORKI!!!
+docker-compose -p combined -f consul.yml -f ubuntu.yml up -d
