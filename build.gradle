@@ -14,6 +14,10 @@ buildscript {
 }
 
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+}
+
 group 'org.s4s0l.shathel'
 subprojects {
     apply plugin: 'groovy'
@@ -31,7 +35,8 @@ subprojects {
         projectId = "${group}.shathel"
         githubRepository = "s4s0l/shathel"
     }
-
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
     repositories {
         jcenter()
@@ -51,7 +56,6 @@ subprojects {
         compile 'commons-io:commons-io:2.3'
         testCompile 'io.rest-assured:rest-assured:3.0.1'
         testCompile 'junit:junit'
-        testCompile "io.franzbecker:gradle-lombok:1.7"
         testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
             // Conflicting module versions: 2.4.4 vs. 2.4.1
             exclude group: 'org.codehaus.groovy'
