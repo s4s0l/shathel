@@ -1,0 +1,18 @@
+description = "Gradle plugin for packaging shathel stacks"
+ext {
+    displayName = "Gradle Shathel Plugin"
+}
+
+apply from: '../gradle/bintray.gradle'
+apply from: '../gradle/plugin.gradle'
+
+
+repositories {
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+}
+dependencies {
+    testCompile gradleTestKit()
+}
+

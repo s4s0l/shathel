@@ -1,0 +1,47 @@
+
+
+apply plugin: 'com.gradle.plugin-publish'
+project.ext.set('gradle.publish.key', System.getenv('GRADLE_PORTAL_KEY'))
+project.ext.set('gradle.publish.secret', System.getenv('GRADLE_PORTAL_SECRET'))
+pluginBundle {
+    website = "${project.websiteUrl}"
+    vcsUrl = "${project.vcsUrl}"
+    description = "${project.description}"
+    tags = project.tags
+    plugins {
+        dockerComposePlugin {
+            id = "${project.projectId}"
+            displayName = "${project.displayName}"
+        }
+    }
+}
+
+
+
+/************************************************************************************
+ * Settings needed for GradlePluginFunctionalSpecification based tests
+ * TODO move it with above classes to separate plugin for writing plugins
+ */
+
+ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
+plugins.withType(MavenPlugin) {
+    install {
+        repositories {
+            mavenDeployer {
+                repository(url: localRepoUrl.toURI())
+            }
+        }
+    }
+}
+tasks.withType(Test) {
+    environment "GRADLE_USER_HOME", gradle.gradleUserHomeDir
+    environment "PROJECT_VERSION", project.version
+    environment "LOCAL_REPO", localRepoUrl.absolutePath
+    environment "LOCAL_BUILD_DIR", rootProject.buildDir.absolutePath
+    dependsOn install
+    testLogging {
+        exceptionFormat 'full'
+    }
+}
+/**
+ ***********************************************************************************/

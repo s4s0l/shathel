@@ -1,0 +1,27 @@
+version: 1
+shathel-solution:
+  name: XXXXXX
+  environments:
+    DEV:
+      type: combined
+      rebuild: true #oznacza ze bedzeimy rebuildowac wszystko???
+    ITG:
+      type: compose
+    TEST:
+      type: vbox
+      nodes:
+        manager: 1
+        worker: 2
+    UAT:
+      type: digitalocean
+      nodes:
+        manager: 3
+        worker: 0
+    PROD:
+      type: digitalocean
+      nodes:
+        manager: 3
+        worker: 0
+
+
+

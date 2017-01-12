@@ -1,0 +1,3 @@
+include 'shathel-commons'
+include 'shathel-gradle-plugin'
+include 'shathel-deployer'

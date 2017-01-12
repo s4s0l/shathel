@@ -1,0 +1,65 @@
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+
+/************************************************************************************
+ * Packaging section
+ */
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: [groovydoc]) {
+    classifier 'javadoc'
+    from groovydoc.destinationDir
+}
+tasks.withType(Jar) {
+    manifest {
+        attributes(
+                "Manifest-Version": "1.0",
+                "Gradle-Version": "${gradle.gradleVersion}",
+                "Extension-Name": "${archivesBaseName}",
+                "Build-Jdk": "${JavaVersion.current().toString()}",
+                "Url": "${websiteUrl}",
+                "Name": "${projectId}".replaceAll("\\.", "/"),
+                "Specification-Title": "Shathel Stack Deployer",
+                "Specification-Vendor": "${organization}",
+                "Specification-Version": "${version}",
+                "Implementation-Vendor": "${organization}",
+                "Implementation-Title": "${group}.${archivesBaseName}",
+                "Implementation-Version": "${version}",
+                "License": "${license}",
+        )
+    }
+    from("LICENSE") {
+        into "META-INF"
+    }
+}
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    configurations = ['archives']
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = "${project.archivesBaseName}"
+        desc = "${project.description}"
+        userOrg = "${project.organization}"
+        licenses = ["${project.license}"]
+        vcsUrl = "${project.vcsUrl}"
+        websiteUrl = "${project.websiteUrl}"
+        issueTrackerUrl = "${project.issueTrackerUrl}"
+        githubRepo = "${project.githubRepository}" //Optional Github repository
+        githubReleaseNotesFile = 'README.md'
+        labels = project.tags
+        version {
+            name = project.version
+            vcsTag = project.version
+        }
+    }
+}

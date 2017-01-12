@@ -1,0 +1,20 @@
+version: '2'
+services:
+  me:
+    image: projectGroup_ProjectId:version
+    command: [--app1.someProperty=propertyValue --cluster_size=${SHATHEL_ENV_QUORUM_SIZE}]
+    ports:
+#    ! this means we want to expose it to the world
+     - 3210:8080!
+  other:
+    image: projectGroup_appp:version:app2
+    command: [--app1.someProperty=propertyValue --cluster_size=${SHATHEL_ENV_CLUSTER_SIZE}]
+    build: {context: ./projectGroup_ProjectId, dockerfile: Dockerfile}
+    ports:
+#    this will be exposed to internal network/behind firewall
+     - 8080
+  dummy:
+    image: ubuntu
+    deploy:
+      mode: global
+

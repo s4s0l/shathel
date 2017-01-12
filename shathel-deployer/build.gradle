@@ -1,0 +1,6 @@
+description = "Automated tool for deploying shathel packages to docker machine swarm cluster"
+ext {
+    displayName = "Shathel Deployer"
+}
+
+apply from: '../gradle/bintray.gradle'

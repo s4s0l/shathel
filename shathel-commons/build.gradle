@@ -1,0 +1,6 @@
+description = "Shathel common libraries"
+ext {
+    displayName = "Shathel Commons"
+}
+
+apply from: '../gradle/bintray.gradle'

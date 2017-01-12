@@ -1,0 +1,26 @@
+version: 1
+shathel-stack:
+  name: thisprojectgroup:projectId
+  version: 1.2.3
+  dependencies:
+    groupId:ProjectId: #mandatory
+      version:
+        expected: 123 #mandatory
+        max: 222
+        min: 12344
+      skipon: [DEV]
+    -
+        ...
+  provisioners:
+    provisioner1:
+      skipon: [DEV] #????
+
+  metadata:
+      some.key.understandable.by.someone.else: value
+      more.keys.like.i.need.vault.password: passwordvalue
+      i.need.password.or.token.to.servicex.in.stack.y: asdf
+  enrichers:
+      enricher1:
+        applyon: all
+      enricher2:
+        applyon: dependant

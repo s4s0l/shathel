@@ -1,0 +1,9 @@
+apply plugin: 'shathel'
+
+
+
+shathel {
+    //plugin will copy src/main/schathel do katalogu tymczasowego
+    //mozna podac dodatkowe katalogi jak np ten z bootckera z dockerami
+    //
+}
