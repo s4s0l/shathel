@@ -1,6 +1,23 @@
 description = "Shathel common libraries"
 ext {
     displayName = "Shathel Commons"
+    aetherVersion="1.0.0.v20140518"
+    mavenVersion="3.1.0"
+    wagonVersion="1.0"
 }
 
 apply from: '../gradle/bintray.gradle'
+
+dependencies{
+    compile "org.eclipse.aether:aether-api:${aetherVersion}"
+    compile "org.eclipse.aether:aether-ant-tasks:${aetherVersion}"
+    compile "org.eclipse.aether:aether-util:${aetherVersion}"
+    compile "org.eclipse.aether:aether-impl:${aetherVersion}"
+    compile "org.eclipse.aether:aether-connector-basic:${aetherVersion}"
+    compile "org.eclipse.aether:aether-transport-file:${aetherVersion}"
+    compile "org.eclipse.aether:aether-transport-http:${aetherVersion}"
+    compile "org.eclipse.aether:aether-transport-wagon:${aetherVersion}"
+    compile "org.apache.maven:maven-aether-provider:${mavenVersion}"
+    compile "org.apache.maven.wagon:wagon-ssh:${wagonVersion}"
+
+}
