@@ -32,7 +32,7 @@ subprojects {
         issueTrackerUrl = "https://github.com/s4s0l/shathel/issues"
         license = "Apache-2.0"
         organization = "sasol-oss"
-        projectId = "${group}.shathel"
+        projectId = "${group}.${project.name}"
         githubRepository = "s4s0l/shathel"
     }
     sourceCompatibility = '1.8'

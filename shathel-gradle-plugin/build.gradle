@@ -1,6 +1,7 @@
 description = "Gradle plugin for packaging shathel stacks"
 ext {
     displayName = "Gradle Shathel Plugin"
+    projectId = "${group}.package"
 }
 
 apply from: '../gradle/bintray.gradle'
