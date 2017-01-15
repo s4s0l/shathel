@@ -4,3 +4,17 @@ ext {
 }
 
 apply from: '../gradle/bintray.gradle'
+
+apply plugin: 'spring-boot'
+
+dependencies {
+    compile 'org.beryx:text-io:1.7.0'
+    compile 'jline:jline:2.14.3'
+    compile ('org.springframework.shell:spring-shell:1.2.0.M1') {
+        //https://github.com/jline/jline2/issues/205
+        exclude group: 'jline'
+    }
+    compile('org.springframework.boot:spring-boot-starter') {
+        exclude group: 'ch.qos.logback'
+    }
+}
