@@ -9,6 +9,7 @@ ext {
 apply from: '../gradle/bintray.gradle'
 
 dependencies{
+
     compile "org.eclipse.aether:aether-api:${aetherVersion}"
     compile "org.eclipse.aether:aether-ant-tasks:${aetherVersion}"
     compile "org.eclipse.aether:aether-util:${aetherVersion}"

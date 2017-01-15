@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import lombok.Builder;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -55,17 +56,49 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
  * http://git.eclipse.org/c/aether/aether-ant.git/plain/src/main/java/org/eclipse/aether/internal/ant/AntRepoSys.java
  */
 public class ShathelMavenRepository {
-
+    @Builder
     public static class ShathelMavenSettings {
-
-        //TODO dodac namiar na repo
-        //TODO dodac namiar na lokalne repo
-        //TODO dodac namiar na settings.xml
 
         private String m2SecuritySetting = "~/.m2/settings-security.xml";
 
+        private String m2Settings = getUserSettingsFile().getAbsolutePath();
+
+        private String localRepo = System.getProperty("maven.repo.local");
+
+        private RemoteRepository repository = new RemoteRepository.Builder("central", "default",
+                "http://repo1.maven.org/maven2/").build();
+
         public String getM2SecuritySetting() {
             return m2SecuritySetting;
+        }
+
+        public String getM2Settings() {
+            return m2Settings;
+        }
+
+        public RemoteRepository getRepository() {
+            return repository;
+        }
+
+        public String getLocalRepo() {
+            return localRepo;
+        }
+
+        public void setM2Settings(String m2Settings) {
+            this.m2Settings = m2Settings;
+        }
+
+        public void setLocalRepo(String localRepo) {
+            this.localRepo = localRepo;
+        }
+
+        public void setRepository(RemoteRepository repository) {
+            this.repository = repository;
+        }
+
+        public void setRepository(String id, String repositoryUrl) {
+            this.repository = new RemoteRepository.Builder(id, "default",
+                    repositoryUrl).build();
         }
 
         public void setM2SecuritySetting(String m2SecuritySetting) {
@@ -73,6 +106,11 @@ public class ShathelMavenRepository {
         }
 
         public File getUserSettingsFile() {
+            return new File(m2Settings);
+        }
+
+
+        public File getDefaultUserSettingsFile() {
             File userHome = new File(System.getProperty("user.home"));
             return new File(new File(userHome, ".m2"), Names.SETTINGS_XML);
         }
@@ -178,7 +216,7 @@ public class ShathelMavenRepository {
     }
 
     public ShathelMavenRepository() {
-        this(new ShathelMavenSettings());
+        this(ShathelMavenSettings.builder().build());
     }
 
     public ShathelMavenRepository(ShathelMavenSettings settings) {
@@ -192,10 +230,8 @@ public class ShathelMavenRepository {
         locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
         locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
 
-        RemoteRepository repo = new RemoteRepository.Builder("central", "default",
-                "http://repo1.maven.org/maven2/").build();
 
-        addRepository(repo);
+        addRepository(settings.getRepository());
         settingsDecrypter = createDecryptorFactorynewInstance(shathelMavenSettings);
 
 
@@ -238,20 +274,19 @@ public class ShathelMavenRepository {
         return locator;
     }
 
-public DependencyNode resolveDependency(Dependency dependency) throws DependencyCollectionException, DependencyResolutionException {
-    RepositorySystemSession session = getSession();
-    CollectRequest collectRequest = new CollectRequest();
-    collectRequest.setRoot(dependency);
-    for (RemoteRepository repository : repositories) {
-        collectRequest.addRepository(repository);
+    public DependencyNode resolveDependency(Dependency dependency) throws DependencyCollectionException, DependencyResolutionException {
+        RepositorySystemSession session = getSession();
+        CollectRequest collectRequest = new CollectRequest();
+        collectRequest.setRoot(dependency);
+        for (RemoteRepository repository : repositories) {
+            collectRequest.addRepository(repository);
+        }
+        DependencyNode node = getLocator().getService(RepositorySystem.class).collectDependencies(session, collectRequest).getRoot();
+        DependencyRequest dependencyRequest = new DependencyRequest();
+        dependencyRequest.setRoot(node);
+        getLocator().getService(RepositorySystem.class).resolveDependencies(session, dependencyRequest);
+        return node;
     }
-    DependencyNode node = getLocator().getService(RepositorySystem.class).collectDependencies(session, collectRequest).getRoot();
-    DependencyRequest dependencyRequest = new DependencyRequest();
-    dependencyRequest.setRoot(node);
-    getLocator().getService(RepositorySystem.class).resolveDependencies(session, dependencyRequest);
-    return node;
-}
-
 
 
     protected String getUserAgent() {
@@ -310,7 +345,7 @@ public DependencyNode resolveDependency(Dependency dependency) throws Dependency
     }
 
     protected File getDefaultLocalRepoDir() {
-        String dir = System.getProperty("maven.repo.local");// tu nadpisać czyms
+        String dir = shathelMavenSettings.getLocalRepo();
         if (dir != null) {
             return new File(dir);
         }
