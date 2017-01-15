@@ -4,12 +4,17 @@
     <!--stdout appender-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d %-5level %logger{36} - %msg%n</pattern>
+            <!--<pattern>%-5level: %msg%n</pattern>-->
+            <!--TODO append error if level > INFO-->
+            <pattern>%msg%n</pattern>
         </encoder>
     </appender>
 
     <root level="ERROR">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+
+    <logger name="org.springframework.shell" level="INFO"/>
 
 </configuration>

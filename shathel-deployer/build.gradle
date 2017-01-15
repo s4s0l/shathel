@@ -14,7 +14,5 @@ dependencies {
         //https://github.com/jline/jline2/issues/205
         exclude group: 'jline'
     }
-    compile('org.springframework.boot:spring-boot-starter') {
-        exclude group: 'ch.qos.logback'
-    }
+    compile('org.springframework.boot:spring-boot-starter')
 }

@@ -18,9 +18,5 @@ subprojects {
     }
 
     dependencies {
-        compile gradleApi()
-        compile "org.yaml:snakeyaml:1.16"
-        compile 'com.avast.gradle:docker-compose-gradle-plugin:0.3.15'
-        compile 'commons-io:commons-io:2.3'
     }
 }

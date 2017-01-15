@@ -1,10 +1,12 @@
-package org.s4s0l.shathel.deployer
+package org.s4s0l.shathel.deployer.shell.customization
 
 import org.springframework.shell.plugin.BannerProvider
+import org.springframework.stereotype.Component
 
 /**
  * @author Matcin Wielgus
  */
+@Component
 class CustomBanner implements BannerProvider{
     @Override
     String getBanner() {
