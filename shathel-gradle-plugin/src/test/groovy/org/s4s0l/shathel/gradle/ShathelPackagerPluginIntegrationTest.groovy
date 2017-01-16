@@ -1,0 +1,40 @@
+package org.s4s0l.shathel.gradle
+
+import spock.lang.Specification
+
+/**
+ * @author Matcin Wielgus
+ */
+class ShathelPackagerPluginIntegrationTest extends org.s4s0l.bootcker.gradle.utils.GradlePluginFunctionalSpecification {
+
+    def "basicTest"() {
+        given:
+        useProjectStructure "../sample-gradle-projects/simple-project"
+
+        when:
+        run 'install'
+
+        then:
+        noExceptionThrown()
+        file("build/libs/basicTest-${System.getenv("PROJECT_VERSION")}-sht.zip").exists()
+
+    }
+
+    /**
+     * This test needs to run after
+     * @see #basicTest()
+     * @return
+     */
+    def "basicTest2"() {
+        given:
+        useProjectStructure "../sample-gradle-projects/simple-project2"
+
+        when:
+        run 'install'
+
+        then:
+        noExceptionThrown()
+        file("build/libs/basicTest2-${System.getenv("PROJECT_VERSION")}-sht.zip").exists()
+
+    }
+}

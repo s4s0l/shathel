@@ -1,10 +1,12 @@
-buildscript{
+buildscript {
     apply from: './gradle/buildscript.gradle', to: buildscript
 }
 
 apply from: './gradle/common.gradle'
 
-group 'org.s4s0l.shathel'
+allprojects {
+    group 'org.s4s0l.shathel'
+}
 subprojects {
     ext {
         tags = ['docker', 'docker-compose', 'gradle', 'spring-boot', 'boot']
@@ -18,5 +20,6 @@ subprojects {
     }
 
     dependencies {
+
     }
 }

@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Builder;
+import lombok.Data;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -23,20 +24,24 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecrypter;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.tools.ant.taskdefs.condition.Os;
+
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.*;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.internal.ant.Names;
 import org.eclipse.aether.internal.ant.types.Authentication;
 import org.eclipse.aether.internal.ant.types.Mirror;
 
 import org.eclipse.aether.internal.ant.types.Proxy;
+import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.*;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -57,62 +62,44 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
  */
 public class ShathelMavenRepository {
     @Builder
+    @Data
     public static class ShathelMavenSettings {
 
-        private String m2SecuritySetting = "~/.m2/settings-security.xml";
+        private String m2SecuritySetting;
 
-        private String m2Settings = getUserSettingsFile().getAbsolutePath();
+        private String m2Settings;
 
-        private String localRepo = System.getProperty("maven.repo.local");
+        private String localRepo;
 
-        private RemoteRepository repository = new RemoteRepository.Builder("central", "default",
-                "http://repo1.maven.org/maven2/").build();
+        private RemoteRepository repository;
 
-        public String getM2SecuritySetting() {
-            return m2SecuritySetting;
+
+        private static class ShathelMavenSettingsBuilder {
+            private String m2SecuritySetting = "~/.m2/settings-security.xml";
+
+            private String m2Settings = getDefaultUserSettingsFile().getAbsolutePath();
+
+            private String localRepo = System.getProperty("maven.repo.local");
+
+            private RemoteRepository repository = new RemoteRepository.Builder("central", "default",
+                    "http://repo1.maven.org/maven2/").build();
+
+            public File getDefaultUserSettingsFile() {
+                File userHome = new File(System.getProperty("user.home"));
+                return new File(new File(userHome, ".m2"), Names.SETTINGS_XML);
+            }
         }
 
-        public String getM2Settings() {
-            return m2Settings;
-        }
 
-        public RemoteRepository getRepository() {
-            return repository;
-        }
 
-        public String getLocalRepo() {
-            return localRepo;
-        }
-
-        public void setM2Settings(String m2Settings) {
-            this.m2Settings = m2Settings;
-        }
-
-        public void setLocalRepo(String localRepo) {
-            this.localRepo = localRepo;
-        }
-
-        public void setRepository(RemoteRepository repository) {
-            this.repository = repository;
-        }
 
         public void setRepository(String id, String repositoryUrl) {
             this.repository = new RemoteRepository.Builder(id, "default",
                     repositoryUrl).build();
         }
 
-        public void setM2SecuritySetting(String m2SecuritySetting) {
-            this.m2SecuritySetting = m2SecuritySetting;
-        }
-
         public File getUserSettingsFile() {
             return new File(m2Settings);
-        }
-
-
-        public File getDefaultUserSettingsFile() {
-            File userHome = new File(System.getProperty("user.home"));
-            return new File(new File(userHome, ".m2"), Names.SETTINGS_XML);
         }
 
         public File getGlobalSettingsFile() {
@@ -229,7 +216,6 @@ public class ShathelMavenRepository {
         locator.addService(TransporterFactory.class, FileTransporterFactory.class);
         locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
         locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-
 
         addRepository(settings.getRepository());
         settingsDecrypter = createDecryptorFactorynewInstance(shathelMavenSettings);
@@ -365,7 +351,8 @@ public class ShathelMavenRepository {
         org.eclipse.aether.repository.LocalRepository repo = new org.eclipse.aether.repository.LocalRepository(
                 repoDir);
 
-        return locator.getService(RepositorySystem.class).newLocalRepositoryManager(session, repo);
+        LocalRepositoryManager localRepositoryManager = locator.getService(RepositorySystem.class).newLocalRepositoryManager(session, repo);
+        return localRepositoryManager;
     }
 
     protected Settings getSettings() {
@@ -455,6 +442,7 @@ public class ShathelMavenRepository {
 
         return new ConservativeAuthenticationSelector(selector);
     }
+
 
 
 }

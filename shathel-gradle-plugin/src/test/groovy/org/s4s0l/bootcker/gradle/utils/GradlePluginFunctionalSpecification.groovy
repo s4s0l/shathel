@@ -1,4 +1,4 @@
-package org.s4s0l.gradle.bootcker.utils
+package org.s4s0l.bootcker.gradle.utils
 
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
@@ -62,7 +62,7 @@ abstract class GradlePluginFunctionalSpecification extends Specification {
 
     GradleRunner runner(String gradleVersion, String... args) {
         def allArgs = new ArrayList();
-        allArgs.add("-Dbootcker_localrepo=" + getLocalRepo().toURI());
+        allArgs.add("-Dbootcker_localrepo=" + getLocalRepo().getAbsolutePath());
         allArgs.add("-Dbootcker_project_version=" + System.getenv("PROJECT_VERSION"));
         allArgs.add("--stacktrace")
         allArgs.addAll(args.toList())

@@ -1,8 +1,10 @@
 
 
 apply plugin: 'com.gradle.plugin-publish'
+
 project.ext.set('gradle.publish.key', System.getenv('GRADLE_PORTAL_KEY'))
 project.ext.set('gradle.publish.secret', System.getenv('GRADLE_PORTAL_SECRET'))
+
 pluginBundle {
     website = "${project.websiteUrl}"
     vcsUrl = "${project.vcsUrl}"
@@ -33,6 +35,7 @@ plugins.withType(MavenPlugin) {
         }
     }
 }
+
 tasks.withType(Test) {
     environment "GRADLE_USER_HOME", gradle.gradleUserHomeDir
     environment "PROJECT_VERSION", project.version

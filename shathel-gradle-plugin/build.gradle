@@ -14,6 +14,13 @@ repositories {
     }
 }
 dependencies {
+    compile project(":shathel-commons")
+    compile gradleApi()
+    compile "org.yaml:snakeyaml:1.16"
+    compile 'commons-io:commons-io:2.3'
     testCompile gradleTestKit()
 }
 
+tasks.withType(Test) {
+    dependsOn project(":shathel-commons").install
+}
