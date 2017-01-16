@@ -1,6 +1,9 @@
 version: 1
 shathel-stack:
   dependencies:
+    - org.s4s0l.shathel.gradle.sample:simple-project:
+        version:
+          expected: "1.2.3-SNAPSHOT"
 
   provisioners:
     provisioner1:

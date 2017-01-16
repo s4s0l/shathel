@@ -60,6 +60,23 @@ abstract class GradlePluginFunctionalSpecification extends Specification {
         return file
     }
 
+    File findFile(String path) {
+        def file = new File(projectDirectory.root, path)
+        def regexprName = file.getName();
+        def files = file.parentFile.listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String n) {
+                (n =~ regexprName).matches()
+            }
+        })
+
+        assert  files.size() == 1
+        file = files[0]
+
+        assert file.parentFile.mkdirs() || file.parentFile.exists()
+        return file
+    }
+
     GradleRunner runner(String gradleVersion, String... args) {
         def allArgs = new ArrayList();
         allArgs.add("-Dbootcker_localrepo=" + getLocalRepo().getAbsolutePath());

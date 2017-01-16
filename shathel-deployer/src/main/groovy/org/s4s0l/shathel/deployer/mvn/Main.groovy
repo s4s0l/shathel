@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons
+package org.s4s0l.shathel.deployer.mvn
 
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.eclipse.aether.graph.Dependency
@@ -9,7 +9,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
  */
 class Main {
 
-    static void main(String[] args) {
+    static void mainXX(String[] args) {
         def instance = new ShathelMavenRepository(ShathelMavenRepository.ShathelMavenSettings.builder().localRepo("build/localrepo").build())
         def node = instance.resolveDependency(
                 new Dependency(

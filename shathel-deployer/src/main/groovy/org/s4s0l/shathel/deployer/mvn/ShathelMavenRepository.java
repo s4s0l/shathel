@@ -1,13 +1,8 @@
-package org.s4s0l.shathel.commons;
+package org.s4s0l.shathel.deployer.mvn;
 
 /**
  * @author Matcin Wielgus
  */
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Builder;
 import lombok.Data;
@@ -24,24 +19,19 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecrypter;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.*;
-import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.internal.ant.Names;
 import org.eclipse.aether.internal.ant.types.Authentication;
 import org.eclipse.aether.internal.ant.types.Mirror;
-
 import org.eclipse.aether.internal.ant.types.Proxy;
-import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.*;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -50,11 +40,15 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-
 import org.eclipse.aether.util.repository.*;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Heavily based on:
@@ -348,7 +342,7 @@ public class ShathelMavenRepository {
 
         File repoDir = getDefaultLocalRepoDir();
 
-        org.eclipse.aether.repository.LocalRepository repo = new org.eclipse.aether.repository.LocalRepository(
+        LocalRepository repo = new LocalRepository(
                 repoDir);
 
         LocalRepositoryManager localRepositoryManager = locator.getService(RepositorySystem.class).newLocalRepositoryManager(session, repo);

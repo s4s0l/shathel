@@ -1,0 +1,6 @@
+version: '2'
+services:
+  project1:
+    image: bootcker
+    ports:
+     - 8080
