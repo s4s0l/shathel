@@ -1,0 +1,39 @@
+
+@startuml
+
+EnvironmentProvider ..> Environment: <<creates>>
+StorageProvider ..> Storage: <<creates>>
+
+SolutionOpener --> EnvironmentProvider
+SolutionOpener --> StorageProvider
+SolutionOpener ..> Solution: <<creates>>
+
+Solution *--> StackDescriptionTree
+Solution *--> SolutionDescription
+Solution o--> Environment
+SolutionDescription --> SolutionModel
+StackDescriptionTree *--> StackDescription
+StackDescription *--> StackResources
+StackDescription *--> StackModel
+
+PasswordManager o--> Storage
+Environment *--> Storage
+Environment *--> EnvironmentContainerRunner
+Environment *--> EnvironmentProvisionExecutor
+Environment *--> StackIntrocpection
+Environment *--> CommandScheduler
+
+CommandScheduler o--> StackIntrocpection
+CommandScheduler o--> StackDescriptionTree
+CommandScheduler ..> CommandSchedule: <<creates>>
+CommandScheduler --> ProvisionCommandProvider
+CommandScheduler --> EnricherProvider
+
+CommandSchedule "1" o--> "m"  StackCommand
+StackCommand *--> "m" ProvisionCommand
+StackCommand o--> StackDescription
+
+EnricherProvider ..> interface Enricher: <<creates>>
+ProvisionCommandProvider ..> ProvisionCommand: <<creates>>
+Enricher --> ProvisionCommandProvider
+@enduml

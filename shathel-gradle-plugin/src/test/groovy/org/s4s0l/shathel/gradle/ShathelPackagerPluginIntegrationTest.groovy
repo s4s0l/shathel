@@ -41,7 +41,7 @@ class ShathelPackagerPluginIntegrationTest extends org.s4s0l.bootcker.gradle.uti
         then:
         noExceptionThrown()
         file("build/shtTemporary/dependencies/simple-project2-${System.getenv("PROJECT_VERSION")}-shathel.zip").exists()
-        findFile("build/shtTemporary/dependencies/simple-project-1.2.3-[0-9\\.-]+-shathel.zip").exists()
+        file("build/shtTemporary/dependencies/simple-project-1.2.3-SNAPSHOT-shathel.zip").exists()
 
     }
 }

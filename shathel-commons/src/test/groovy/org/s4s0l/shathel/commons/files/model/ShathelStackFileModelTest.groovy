@@ -1,5 +1,6 @@
-package org.s4s0l.shathel.commons.model
+package org.s4s0l.shathel.commons.files.model
 
+import org.s4s0l.shathel.commons.files.model.ShathelStackFileModel
 import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 
@@ -30,8 +31,9 @@ class ShathelStackFileModelTest extends Specification {
         dependencies.size() == 1
         dependencies[0].maxVersion == null
         dependencies[0].minVersion == null
-        dependencies[0].expectedVersion == "1.2.3-SNAPSHOT"
-        dependencies[0].groupAndProject == "org.s4s0l.shathel.gradle.sample:simple-project"
+        dependencies[0].version == "1.2.3-SNAPSHOT"
+        dependencies[0].group == "org.s4s0l.shathel.gradle.sample"
+        dependencies[0].name == "simple-project"
 
         when:
         model = new ShathelStackFileModel(new Yaml().load(
@@ -55,8 +57,9 @@ class ShathelStackFileModelTest extends Specification {
         dependencies.size() == 2
         dependencies[1].maxVersion == "1.2.5-SNAPSHOT"
         dependencies[1].minVersion == "1.2.3-SNAPSHOT"
-        dependencies[1].expectedVersion == "1.2.4-SNAPSHOT"
-        dependencies[1].groupAndProject == "org.s4s0l.shathel.gradle.sample:simple-project2"
+        dependencies[1].version == "1.2.4-SNAPSHOT"
+        dependencies[1].group == "org.s4s0l.shathel.gradle.sample"
+        dependencies[1].name == "simple-project2"
     }
 
 }

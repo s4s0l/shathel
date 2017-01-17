@@ -1,0 +1,35 @@
+@startuml
+title OpenSolution(groupProjectVersion)
+alt no solution storage
+    SolutionOpener -> EnvironmentProvider: createEnvironment()
+    EnvironmentProvider -> StorageProvider: createStorage()
+    EnvironmentProvider --> Environment: <<create>>
+    EnvironmentProvider -> Environment: persist()
+    SolutionOpener <-- EnvironmentProvider
+else found storage parameter?
+    SolutionOpener -> EnvironmentProvider: createEnvironment()
+    EnvironmentProvider -> StorageProvider: openStorage()
+    EnvironmentProvider --> Environment: <<create>>
+    EnvironmentProvider -> Environment: persist()
+    SolutionOpener <-- EnvironmentProvider
+end
+SolutionOpener -> SolutionOpener: prepareTempDir
+SolutionOpener --> StackDescriptionTree: <<create>>
+SolutionOpener -> SolutionOpener:push(groupProjectVersion)
+loop while stack not empty
+    SolutionOpener -> DependencyDownloader: download
+    SolutionOpener -> SolutionOpener:unzip
+    SolutionOpener --> StackDescription:<<create>>
+    SolutionOpener --> StackDescriptionTree: add(StackDescription)
+    loop dep in StackDescription.getDependencies()
+        SolutionOpener -> StackIntrospection: getVersion(dep):runningVersion
+        alt runningVersion null or runningVersion < dep
+            SolutionOpener -> SolutionOpener:push(dep)
+        else
+            SolutionOpener -> SolutionOpener:push(runningVersion)
+        end
+    end
+end
+SolutionOpener -> EnvironmentProvider: createEnv()
+SolutionOpener -> StorageProvider: createStorage()
+@enduml

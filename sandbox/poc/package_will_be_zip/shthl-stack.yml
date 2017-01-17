@@ -13,6 +13,7 @@ shathel-stack:
         ...
   provisioners:
     provisioner1:
+      type: groovy
       skipon: [DEV] #????
 
   metadata:

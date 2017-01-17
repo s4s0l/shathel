@@ -1,0 +1,41 @@
+@startuml
+title Creating CommandSchedule
+CommandScheduler --> CommandSchedule: <<create>>
+CommandScheduler -> StackDescTree: Traverse
+loop for each StackDescription i dependance tree driven order
+    CommandScheduler -> StackIntrospection: isRunning
+
+    CommandScheduler -> ProvisionCommandProvider: getProvisionCommands()
+
+    CommandScheduler --> StackCommand: <<create>>
+
+    CommandScheduler -> CommandSchedule: addStackCommand
+
+    == Enrich by others ==
+
+    CommandScheduler -> StackDescTree: Collect Enrichers
+
+    note left
+    Searches for all
+    enrichers in all
+    other stacks that
+    can have sth to do
+    with current stack
+    end note
+
+    CommandScheduler -> EnricherProvider: getEnrichers()
+
+    loop for each enricher
+        CommandScheduler -> Enricher: apply(stackCommand)
+        Enricher -> StackCommand: modifyComposeFile
+        Enricher -> ProvisionCommandProvider: getProvisionCommands()
+        Enricher -> StackCommand: addProvisionCommand()
+        CommandScheduler <-- Enricher
+    end
+
+    == Enrichers end ==
+end
+CommandScheduler <-- StackDescTree: Traverse
+
+
+@enduml

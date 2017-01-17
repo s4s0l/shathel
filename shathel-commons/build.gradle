@@ -7,6 +7,7 @@ apply from: '../gradle/bintray.gradle'
 
 dependencies{
     compile "org.yaml:snakeyaml:1.16"
+    compile 'com.google.guava:guava:21.0'
 }
 
 

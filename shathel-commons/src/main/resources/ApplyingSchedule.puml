@@ -1,0 +1,22 @@
+@startuml
+title Applying CommandSchedule
+Environment -> Environment: createOrReattach()
+Environment -> EnvironmentProvisionExecutor: createContext():EPEContext
+Environment -> EnvironmentContainerRunner: createContext():ECRContext
+    note left
+    Here is an oportunity to
+    create new temporary dir
+     structure for new compose
+     files/ resources for
+     provisioners
+    end note
+
+loop stack in CommandSchedule.getStackCommands()
+    Environment -> EnvironmentProvisionExecutor: runCommandsInStack(EPEContext, stack)
+    loop provisioner in stack.getProvisionCommands()
+        EnvironmentProvisionExecutor -> EnvironmentProvisionExecutor: run(EPEContext,provisioner, stack)
+    end
+    Environment -> EnvironmentContainerRunner: runStack(ECRContext, stack)
+end
+Environment -> EnvironmentContainerRunner: finalize(ECRContext)
+@enduml
