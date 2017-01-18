@@ -1,0 +1,9 @@
+version: "3"
+services:
+  dummy:
+    image: ianneub/network-tools
+    command: /bin/bash -c "until false; do ping metadata; sleep 1; done"
+    deploy:
+      placement:
+            constraints: [node.role == manager]
+

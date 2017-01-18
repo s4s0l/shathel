@@ -4,17 +4,17 @@ import com.google.common.collect.Streams;
 import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * @author Matcin Wielgus
  */
 public class GraphUtils {
-
+    public static <X> Stream<X> depthFirstReverse(Graph<X> graph, X node) {
+        return StreamUtils.streamInReverse(depthFirst(graph, node).collect(Collectors.toList()));
+    }
 
     public static <X> Stream<X> depthFirst(Graph<X> graph, X node) {
         if (Graphs.hasCycle(graph)) {

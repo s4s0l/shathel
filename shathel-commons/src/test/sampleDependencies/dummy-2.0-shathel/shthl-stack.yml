@@ -1,0 +1,7 @@
+version: 1
+shathel-stack:
+  gav: test.group:dummy:2.0
+  dependencies:
+    org.s4s0l.shathel:shathel-core-stack:1.2.3:
+        max: 1.2.3
+        min: 1.2.3

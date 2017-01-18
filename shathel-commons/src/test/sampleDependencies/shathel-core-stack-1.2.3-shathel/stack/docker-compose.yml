@@ -1,0 +1,16 @@
+version: "3"
+services:
+  metadata:
+    image: ianneub/network-tools
+    command: /bin/bash -c "until false; do ping uclient; sleep 1; done"
+    networks:
+      - network
+    deploy:
+      placement:
+            constraints: [node.role == manager]
+networks:
+  network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.42.0/24

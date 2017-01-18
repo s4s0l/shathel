@@ -7,7 +7,10 @@ apply from: '../gradle/bintray.gradle'
 
 dependencies{
     compile "org.yaml:snakeyaml:1.16"
+    compile "org.slf4j:slf4j-api"
+    testCompile "ch.qos.logback:logback-classic"
     compile 'com.google.guava:guava:21.0'
+    compile 'commons-io:commons-io:2.3'
 }
 
 

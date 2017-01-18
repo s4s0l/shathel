@@ -21,7 +21,7 @@ class ShathelPackagerPluginIntegrationTest extends org.s4s0l.bootcker.gradle.uti
     }
 
     /**
-     * This test needs to run after
+     * This test needs to execute after
      * @see #basicTest()
      * @return
      */

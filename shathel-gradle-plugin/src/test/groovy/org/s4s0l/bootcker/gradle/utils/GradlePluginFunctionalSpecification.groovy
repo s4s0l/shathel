@@ -85,7 +85,7 @@ abstract class GradlePluginFunctionalSpecification extends Specification {
         allArgs.addAll(args.toList())
         return GradleRunner.create()
                 .withProjectDir(projectDirectory.root)
-                .withDebug(true) // always run inline to save memory, especially on CI
+                .withDebug(true) // always execute inline to save memory, especially on CI
                 .forwardOutput()
                 .withTestKitDir(getTestKitDir())
                 .withArguments(allArgs)

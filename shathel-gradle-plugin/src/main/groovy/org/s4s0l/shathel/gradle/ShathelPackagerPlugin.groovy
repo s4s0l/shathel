@@ -9,7 +9,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.s4s0l.gradle.bootcker.BootckerComposePreparator
 import org.s4s0l.gradle.bootcker.ComposeFile
 import org.s4s0l.gradle.bootcker.ComposeFilesContainer
-import org.s4s0l.shathel.commons.files.model.ShathelStackFileModel
+import org.s4s0l.shathel.commons.core.model.StackFileModel
 import org.yaml.snakeyaml.Yaml
 
 /**
@@ -22,7 +22,7 @@ class ShathelPackagerPlugin implements Plugin<Project> {
 
         project.configurations.create('shathel')
 
-        def shtlStackModel = new ShathelStackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text));
+        def shtlStackModel = new StackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text));
         shtlStackModel.dependencies.each { d ->
             project.dependencies.shathel group: d.group, name: d.name, version: d.version, classifier: 'shathel', ext: 'zip'
         }
@@ -51,9 +51,8 @@ class ShathelPackagerPlugin implements Plugin<Project> {
                     assert prepare.size() == 1
 
                     //make sure version and project name are same as project
-                    def model = new ShathelStackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text))
-                    model.name = "${project.group}:${project.name}".toString()
-                    model.version = project.version
+                    def model = new StackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text))
+                    model.gav = "${project.group}:${project.name}:${project.version}".toString()
                     new File(shtTemporaryDirectory, 'shthl-stack.yml').text = new Yaml().dump(model.parsedYml)
                 }
             }

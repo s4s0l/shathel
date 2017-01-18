@@ -1,0 +1,9 @@
+version: 1
+shathel-stack:
+  deployName: 00shathel
+  gav: org.s4s0l.shathel:shathel-core-stack:1.2.3
+  enrichers:
+      addNetwork:
+        target: ALL
+        inline: >
+          s.compose.addExternalNetwork("00shathel_network")
