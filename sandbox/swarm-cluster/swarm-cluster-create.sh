@@ -56,7 +56,7 @@ function staticIp(){
 
 
 
-log "Create girst manager node named $CLUSTER_NAME-manager-1"
+log "Create first manager node named $CLUSTER_NAME-manager-1"
 docker-machine create -d virtualbox --engine-registry-mirror https://${CLUSTER_NAME}-manager-1:4001 ${MACHINE_OPTS} ${CLUSTER_NAME}-manager-1
 staticIp ${CLUSTER_NAME}-manager-1
 MANAGER_IP=$(docker-machine ip ${CLUSTER_NAME}-manager-1)

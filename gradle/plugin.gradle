@@ -20,11 +20,6 @@ pluginBundle {
 
 
 
-/************************************************************************************
- * Settings needed for GradlePluginFunctionalSpecification based tests
- * TODO move it with above classes to separate plugin for writing plugins
- */
-
 ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
 plugins.withType(MavenPlugin) {
     install {
@@ -46,5 +41,3 @@ tasks.withType(Test) {
         exceptionFormat 'full'
     }
 }
-/**
- ***********************************************************************************/

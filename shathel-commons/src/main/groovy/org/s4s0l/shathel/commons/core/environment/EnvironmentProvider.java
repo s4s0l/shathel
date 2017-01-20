@@ -5,6 +5,8 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 /**
+ *
+ * TODO tu ma być getEnvironment(EnvDesc)
  * @author Matcin Wielgus
  */
 public interface EnvironmentProvider extends ExtensionInterface{

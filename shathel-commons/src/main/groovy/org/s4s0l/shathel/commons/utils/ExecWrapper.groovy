@@ -13,7 +13,12 @@ class ExecWrapper {
         this.LOGGER = LOGGER
         this.command = command
     }
-
+    def executeForExitValue(String... args) {
+        executeForExitValue(new File("."), args)
+    }
+    def executeForExitValue(String args) {
+        executeForExitValue(new File("."), args)
+    }
     def executeForExitValue(File dir, String args) {
         executeForExitValue(dir, args.split(" "))
     }
@@ -28,23 +33,30 @@ class ExecWrapper {
         return process.exitValue()
     }
 
+    def executeForOutput( String args) {
+        executeForOutput(new File("."), args)
+    }
     def executeForOutput(File dir, String args) {
         executeForOutput(dir, args.split(' '));
     }
-
+    def executeForOutput( String ... args) {
+        executeForOutput(new File("."), args)
+    }
     def executeForOutput(File dir, String... args) {
         StringBuilder sb = new StringBuilder()
-        def process = new ProcessBuilder(([command] << args).flatten())
+        def flatten = ([] << command.split("\\s") << args).flatten().findAll {""!=it.trim()}
+        LOGGER.info("Running ${flatten.join(",")}")
+        def process = new ProcessBuilder(flatten)
                 .directory(dir)
                 .redirectErrorStream(true)
                 .start()
         process.inputStream.eachLine {
-            LOGGER.debug("$command output:  $it")
-            sb.append(it)
+            LOGGER.debug("output:  [$it]")
+            sb.append(it).append("\n")
         }
         process.waitFor();
         if (process.exitValue() == 0) {
-            return sb.toString();
+            return sb.toString().trim();
         } else {
             throw new Exception("Failed")
         }

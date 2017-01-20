@@ -5,7 +5,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <!--<pattern>%-5level: %msg%n</pattern>-->
-            <!--TODO append error if level > INFO-->
+            <!--todo append error if level > INFO-->
             <pattern>%msg%n</pattern>
         </encoder>
     </appender>

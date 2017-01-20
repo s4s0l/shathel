@@ -3,6 +3,9 @@ package org.s4s0l.shathel.commons.core.environment;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 
 /**
+ * Todo verify()
+ * Todo initialize/is initialized
+ *
  * @author Matcin Wielgus
  */
 public class Environment {

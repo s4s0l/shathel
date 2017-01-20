@@ -4,3 +4,4 @@
 build
 .gradle
 out
+/shathel-commons/src/main/groovy/org/s4s0l/shathel/commons/docker/DockerMachineWrapper.java
