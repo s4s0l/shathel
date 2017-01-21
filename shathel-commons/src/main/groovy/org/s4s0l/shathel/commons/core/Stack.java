@@ -13,14 +13,12 @@ public class Stack {
     private final StackTreeDescription stackDescriptionTree;
     private final Environment environment;
     private final EnrichersFasade enricherProvider;
-    private final File executionDir;
 
     public Stack(StackTreeDescription stackDescriptionTree, Environment environment,
-                 EnrichersFasade enricherProvider, File executionDir) {
+                 EnrichersFasade enricherProvider) {
         this.stackDescriptionTree = stackDescriptionTree;
         this.environment = environment;
         this.enricherProvider = enricherProvider;
-        this.executionDir = executionDir;
     }
 
     public StackOperations createStartCommand() {
@@ -38,7 +36,7 @@ public class Stack {
     public void run(StackOperations schedule) {
         new StackOperationsExecutor(environment.getProvisionExecutor(),
                 environment.getContainerRunner(),
-                executionDir).execute(schedule);
+                environment.getExecutionDirectory()).execute(schedule);
     }
 
 }

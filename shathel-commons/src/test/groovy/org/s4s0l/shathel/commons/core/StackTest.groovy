@@ -18,7 +18,7 @@ class StackTest extends Specification {
         given:
         File root = new File("build/localBasicRunTmp")
         def parameters = prepare(root, "sampleDependencies")
-        SolutionFactory factory = new SolutionFactory(DefaultExtensionContext.create(parameters))
+        SolutionFactory factory = new SolutionFactory(parameters, DefaultExtensionContext.create(parameters))
 
         when:
         def solution = factory.open(root, "DEV")

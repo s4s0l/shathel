@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.machine
+package org.s4s0l.shathel.commons.machine.vbox
 
 import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseDecorator

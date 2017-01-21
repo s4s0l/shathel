@@ -8,29 +8,16 @@ import java.util.Optional;
 /**
  * @author Matcin Wielgus
  */
-public class SafeStorage {
-    private final File rootDir;
-    private final char[] masterPassword;
+public interface SafeStorage {
+    void readFile(String key, File copyTo);
 
+    void writeFile(String key, File f);
 
-    public SafeStorage(File rootDir, char[] masterPassword) {
-        this.rootDir = rootDir;
-        this.masterPassword = masterPassword;
-    }
+    Optional<String> readValue(String key);
 
-    public Optional<InputStream> readFile(String key) {
+    void writeValue(String key, String value);
 
-    }
+    OutputStream outputStream(String key);
 
-    public OutputStream writeFile(String ket) {
-
-    }
-
-    public Optional<String> readValue(String key) {
-
-    }
-
-    public String writeValue(String key) {
-
-    }
+    Optional<InputStream> inputStream(String key);
 }

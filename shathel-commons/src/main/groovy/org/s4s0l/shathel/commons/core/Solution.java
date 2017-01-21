@@ -1,12 +1,14 @@
 package org.s4s0l.shathel.commons.core;
 
+import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
 import org.s4s0l.shathel.commons.core.enricher.EnrichersFasade;
-import org.s4s0l.shathel.commons.core.environment.Environment;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
+import org.s4s0l.shathel.commons.core.environment.*;
+import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.core.storage.Storage;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
 import java.io.File;
@@ -15,35 +17,49 @@ import java.io.File;
  * @author Matcin Wielgus
  */
 public class Solution {
-    private final SolutionDescription solutionDescription;
-    private final Environment environment;
-    private final EnrichersFasade enricherProvider;
-    private final DependencyManager dependencyManager;
+    private final ExtensionContext context;
+    private final Parameters params;
     private final Storage storage;
 
-
-    public Solution(SolutionDescription solutionDescription, Environment environment, EnrichersFasade enricherProvider, DependencyManager dependencyManager, Storage storage) {
-        this.solutionDescription = solutionDescription;
-        this.environment = environment;
-        this.enricherProvider = enricherProvider;
-        this.dependencyManager = dependencyManager;
+    public Solution(ExtensionContext context, Parameters params, Storage storage) {
+        this.context = context;
+        this.params = params;
         this.storage = storage;
     }
 
 
-    public Stack openStack(StackReference reference) {
-        File dependenciesDir = storage.getDependenciesDir();
+    public Environment getEnvironment(String environmentName) {
+        SolutionFileModel model = SolutionFileModel.load(storage.getConfiguration());
+        SolutionDescription solutionDescription = new SolutionDescription(model);
+        EnvironmentDescription environmentDescription = solutionDescription.getEnvironmentDescription(environmentName);
+        String type = environmentDescription.getType();
 
-        StackIntrospectionProvider stackIntrospectionProvider = environment.getIntrospectionProvider();
+        EnvironmentProvider environmentProvider = context
+                .lookupOneMatching(EnvironmentProvider.class, x -> x.getType().equals(type))
+                .get();
+        return environmentProvider.getEnvironment(storage, environmentDescription,
+                context, solutionDescription);
+    }
 
+
+    public Stack openStack(Environment e, StackReference reference) {
+
+        StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
+        EnrichersFasade enricherProvider = new EnrichersFasade(context);
+        DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider);
+        StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
+        return new Stack(stackDescriptionTree, e, enricherProvider);
+    }
+
+    private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider) {
         DependencyManager.VersionOverrider overrider = desc ->
                 stackIntrospectionProvider.getIntrospection(desc)
                         .filter(x -> new VersionComparator().compare(x.getReference().getVersion(), desc.getVersion()) > 0)
                         .map(x -> x.getReference().getVersion())
                         .orElse(desc.getVersion());
-
-        StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(dependenciesDir, reference, overrider);
-        return new Stack(stackDescriptionTree, environment, enricherProvider, storage.getExecutionDir());
+        return new DependencyManager(
+                storage.getTemporaryDirectory("dependencies"),
+                context.lookupOne(DependencyDownloader.class).get(), overrider);
     }
 
 

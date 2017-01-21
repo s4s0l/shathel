@@ -14,15 +14,27 @@ class SolutionFileModel {
     }
 
     static SolutionFileModel empty() {
-        return new SolutionFileModel(ImmutableMap.<String, Integer>builder().
+        return new SolutionFileModel(ImmutableMap.<String, Integer> builder().
                 put("version", "1").
                 build())
     }
 
     SolutionFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;   \
-           if (this.parsedYml.version != '1') {
+        this.parsedYml = parsedYml;     \
+             if (this.parsedYml.version != '1') {
             throw new RuntimeException("Invalid stack version number")
         }
+    }
+
+    Map<String, String> getEnvironment(String name) {
+        def e = parsedYml['shathel-solution']['environments'][name];
+        return [
+                name: name,
+                type: e.type.toString() //dummy npe based verification
+        ] << e;
+    }
+
+    String getName() {
+        parsedYml['shathel-solution']['name']
     }
 }

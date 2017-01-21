@@ -1,41 +1,74 @@
 package org.s4s0l.shathel.commons.filestorage;
 
+import org.apache.commons.io.FileUtils;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
  */
 public class FileStorage implements Storage {
-    private final File root;
-    private final Parameters parameters;
+    private final StorageParameters storageParameters;
 
     public FileStorage(File root, Parameters parameters) {
-        this.root = root;
-        this.parameters = parameters;
+        root.mkdirs();
+        storageParameters = new StorageParameters(parameters, root);
+    }
+
+
+    @Override
+    public File getTemporaryDirectory(String name) {
+        File temporaryDirectory = storageParameters.getTemporaryDirectory(name);
+        temporaryDirectory.mkdirs();
+        return temporaryDirectory;
     }
 
     @Override
-    public File getDependenciesDir() {
-        String dependencies = parameters.getParameter("storage.dependencies.dir",
-                new File(root, "dependencies").getAbsolutePath());
-        return new File(dependencies);
+    public File getWorkDirectory(String name) {
+        File temporaryDirectory = storageParameters.getWorkDirectory(name);
+        temporaryDirectory.mkdirs();
+        return temporaryDirectory;
     }
 
     @Override
-    public File getExecutionDir() {
-        String execution = parameters.getParameter("storage.execution.dir",
-                new File(root, "execution").getAbsolutePath());
-        return new File(execution);
-
+    public File getPersistedDirectory(String name) {
+        File persistedDirectory = storageParameters.getPersistedDirectory(name);
+        persistedDirectory.mkdirs();
+        return persistedDirectory;
     }
 
     @Override
-    public File getMountsDir() {
-        String execution = parameters.getParameter("storage.mounts.dir",
-                new File(root, "mounts").getAbsolutePath());
-        return new File(execution);
+    public void verify() {
+        //todo split it with meaningfull messages
+        if (!storageParameters.getRootFile().exists()
+                || !getConfiguration().exists()
+                || !getConfiguration().isFile()
+                || !storageParameters.getRootFile().isDirectory()
+                || !isAncestor(getConfiguration(), storageParameters.getRootFile())) {
+            throw new RuntimeException("Storage verification failed!");
+        }
+    }
+
+    private final static boolean isAncestor(File offspring, File ancestor) {
+        return offspring.getAbsolutePath().startsWith(ancestor.getAbsolutePath());
+    }
+
+    @Override
+    public File getConfiguration() {
+        return storageParameters.get(Optional.empty(), "shathel-solution.yml", Optional.empty());
+    }
+
+    @Override
+    public boolean isModified() {
+        return true;
+    }
+
+    @Override
+    public void save() {
+
     }
 }

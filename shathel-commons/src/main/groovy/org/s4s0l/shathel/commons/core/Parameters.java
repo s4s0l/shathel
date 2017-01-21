@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Singular;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
@@ -13,12 +14,8 @@ public class Parameters {
     @Singular
     private final Map<String, String> parameters;
 
-    public String getParameter(String name,String defaultValue) {
-        String s = parameters.get(name);
-        if(s == null){
-            return defaultValue;
-        }
-        return s;
+    public Optional<String> getParameter(String name) {
+        return Optional.ofNullable(parameters.get(name));
     }
 
 

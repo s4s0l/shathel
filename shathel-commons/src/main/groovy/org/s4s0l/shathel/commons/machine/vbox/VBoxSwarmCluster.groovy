@@ -1,7 +1,8 @@
-package org.s4s0l.shathel.commons.machine
+package org.s4s0l.shathel.commons.machine.vbox
 
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.OpenSslWrapper
+import org.s4s0l.shathel.commons.machine.MachineProvisioner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -10,23 +11,21 @@ import org.slf4j.LoggerFactory
  */
 class VBoxSwarmCluster {
     private final DockerMachineWrapper machine = new DockerMachineWrapper()
-    private final File workDir
     private final String CLUSTER_NAME
     private final int numberOfManagers
     private final int numberOfWorkers
     private final String net
-    private final NetworkSettings ns
+    private final VBoxNetworkSettings ns
     private final String tmpDir
     private final String MACHINE_OPTS
 
     VBoxSwarmCluster(File workDir, String clusterName, int numberOfManagers, int numberOfWorkers, String net) {
-        this.workDir = workDir
         this.CLUSTER_NAME = clusterName
         this.numberOfManagers = numberOfManagers
         this.numberOfWorkers = numberOfWorkers
         this.net = net
-        ns = new NetworkSettings(net)
-        tmpDir = new File(workDir, "tmp").with {
+        ns = new VBoxNetworkSettings(net)
+        tmpDir = workDir. with {
             mkdirs()
             absolutePath
         }
@@ -37,10 +36,10 @@ class VBoxSwarmCluster {
 
     private static
     final Logger LOGGER = LoggerFactory.getLogger(VBoxSwarmCluster.class);
+    boolean modified = false;
 
-
-    def create() {
-
+    synchronized boolean createMachines() {
+        modified = false;
         int currentIp = 99
         String password = "qwerty";
 
@@ -92,7 +91,7 @@ class VBoxSwarmCluster {
             customizePortainer(CLUSTER_NAME, password, 9000, MANAGER_IP)
         }
 
-
+        return modified;
     }
 
 
@@ -127,8 +126,13 @@ class VBoxSwarmCluster {
         machine.sudo(machineName, "cp -f /tmp/fixation /var/lib/boot2docker/bootsync.sh")
         machine.restart(machineName)
         machine.regenerateCerts(machineName)
+        markModified()
         machine.restart(machineName)
         return address
+    }
+
+    private markModified(){
+        modified = true
     }
 /**
  *
@@ -138,6 +142,7 @@ class VBoxSwarmCluster {
         log "Create node named $machineName"
         if (machine.getMachinesByName(machineName).isEmpty()) {
             machine.create("-d virtualbox --engine-registry-mirror https://${registryMirrorHost}:4001 ${MACHINE_OPTS} $machineName")
+            markModified()
         }
         return staticIp(machineName, expectedIp)
     }
@@ -228,7 +233,7 @@ docker run -d --restart=always -p 4001:5000 --name shathel-mirror-registry
     private void generateRegistryCertificates(String MANAGER_IP) {
         log "Generate Certificates for mirror and repository"
 
-        def rootDir = new File("${tmpDir}/${CLUSTER_NAME}-registry/mirrorcerts");
+        def rootDir = new File("${tmpDir}/registries");
 
         def keyFile = new File(rootDir, "/mirrorcerts/domain.key")
         def crtFile = new File(rootDir, "/mirrorcerts/ca.crt")
@@ -243,6 +248,7 @@ docker run -d --restart=always -p 4001:5000 --name shathel-mirror-registry
     }
 
     private String generateKeyPair(String MANAGER_IP, File keyFile, File crtFile) {
+        markModified()
         new OpenSslWrapper().generateKeyPair(MANAGER_IP, [MANAGER_IP],
                 ["${CLUSTER_NAME}-manager-1", "dregistry.${CLUSTER_NAME}"],
                 "${keyFile.absolutePath}",
@@ -250,35 +256,3 @@ docker run -d --restart=always -p 4001:5000 --name shathel-mirror-registry
     }
 }
 
-class NetworkSettings {
-    private final String network;
-
-    NetworkSettings(String network) {
-        this.network = network
-    }
-
-    String addMissing(String addr, int val, int upto = 3) {
-        String tmp = addr;
-        while (tmp.count(".") < upto) {
-            tmp = tmp + ".$val"
-        }
-        tmp
-    }
-
-    String getMask() {
-        addMissing(network.replaceAll("[^\\.]+", "255"), 0);
-    }
-
-    String getBcast() {
-        addMissing(network, 255, 3);
-    }
-
-    String getAddress(int val) {
-        addMissing(network, 0, 2) + ".$val"
-    }
-
-    String getCidr(int val) {
-        getAddress(val) + "/${8 * (network.count(".") + 1)} "
-    }
-
-}

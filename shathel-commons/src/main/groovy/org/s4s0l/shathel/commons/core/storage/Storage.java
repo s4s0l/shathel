@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.core.storage;
 
+import org.s4s0l.shathel.commons.core.SolutionDescription;
+
 import java.io.File;
 
 /**
@@ -7,9 +9,19 @@ import java.io.File;
  */
 public interface Storage {
 
-    File getDependenciesDir();
+    File getTemporaryDirectory(String name);
 
-    File getExecutionDir();
+    File getWorkDirectory(String name);
 
-    File getMountsDir();
+    File getPersistedDirectory(String name);
+
+    void verify();
+
+    File getConfiguration();
+
+    boolean isModified();
+
+    void save();
+
+
 }

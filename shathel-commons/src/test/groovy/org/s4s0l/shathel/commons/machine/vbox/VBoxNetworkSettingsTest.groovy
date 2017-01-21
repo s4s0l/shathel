@@ -1,15 +1,16 @@
-package org.s4s0l.shathel.commons.machine
+package org.s4s0l.shathel.commons.machine.vbox
 
+import org.s4s0l.shathel.commons.machine.vbox.VBoxNetworkSettings
 import spock.lang.Specification
 
 /**
  * @author Matcin Wielgus
  */
-class NetworkSettingsTest extends Specification {
+class VBoxNetworkSettingsTest extends Specification {
 
     def "Should work for x.x.x"(){
         when:
-        NetworkSettings ns = new NetworkSettings("1.2.3");
+        VBoxNetworkSettings ns = new VBoxNetworkSettings("1.2.3");
 
         then:
         ns.getMask() == "255.255.255.0"
@@ -18,7 +19,7 @@ class NetworkSettingsTest extends Specification {
         ns.getCidr(254) == "1.2.3.254/24"
 
         when:
-        ns = new NetworkSettings("1.2");
+        ns = new VBoxNetworkSettings("1.2");
 
         then:
         ns.getMask() == "255.255.0.0"

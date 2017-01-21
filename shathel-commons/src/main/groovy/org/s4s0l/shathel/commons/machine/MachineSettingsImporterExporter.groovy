@@ -65,7 +65,7 @@ class MachineSettingsImporterExporter {
     }
 
 
-    void unloadSettings(InputStream is, File destinationDirectory) {
+    void loadSettings(InputStream is, File destinationDirectory) {
         IoUtils.unZipIt(is, destinationDirectory);
         new File(destinationDirectory, "machines").listFiles()
                 .findAll { it.isDirectory() }

@@ -1,6 +1,7 @@
-package org.s4s0l.shathel.commons.machine
+package org.s4s0l.shathel.commons.machine.vbox
 
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
+import org.s4s0l.shathel.commons.machine.vbox.VBoxSwarmCluster
 import spock.lang.*
 import spock.lang.Specification
 

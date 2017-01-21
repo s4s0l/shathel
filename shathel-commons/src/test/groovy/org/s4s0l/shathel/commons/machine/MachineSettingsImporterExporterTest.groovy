@@ -39,7 +39,7 @@ class MachineSettingsImporterExporterTest extends Specification {
 
         when:
         ie.saveSettings(srcDir, new FileOutputStream(saved))
-        ie.unloadSettings(new FileInputStream(saved), targetDir)
+        ie.loadSettings(new FileInputStream(saved), targetDir)
 
 
         then:

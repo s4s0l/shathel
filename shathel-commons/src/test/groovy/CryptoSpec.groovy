@@ -21,7 +21,8 @@ import java.util.logging.Level
  * @author Matcin Wielgus
  */
 class CryptoSpec extends Specification {
-private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);
+    private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);
+
     private static void removeCryptographyRestrictions() {
         if (!isRestrictedCryptography()) {
             logger.info("Cryptography restrictions removal not needed");
@@ -64,7 +65,7 @@ private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);
         }
     }
 
-    static void xxx(){
+    static void xxx() {
         try {
             Field field = Class.forName("javax.crypto.JceSecurity").getDeclaredField("isRestricted");
             field.setAccessible(true);
@@ -81,9 +82,13 @@ private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);
     def "SODD"() {
         given:
         def password = "12334567890qwerty"
-        def salt = [0, 0, 0, 0, 0] as byte[]
+        def salt = (1..16) as byte[]
         new SecureRandom([1, 2, 3, 4, 5, 6] as byte[]).nextBytes(salt)
 
+        def iv = (1..16) as byte[]
+        new SecureRandom([1, 2, 3, 4, 5, 6] as byte[]).nextBytes(iv)
+
+        println salt
 //        removeCryptographyRestrictions()
         xxx()
 
@@ -95,17 +100,13 @@ private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);
 
         when:
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        AlgorithmParameters params = cipher.getParameters();
-        byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+        cipher.init(Cipher.ENCRYPT_MODE, secret, new IvParameterSpec(iv));
         byte[] ciphertext = cipher.doFinal("Hello, World!".getBytes("UTF-8"));
 
 
 
-         factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-         spec = new PBEKeySpec(password.getChars(), salt, 65536, 256);
-         tmp = factory.generateSecret(spec);
-         secret = new SecretKeySpec(tmp.getEncoded(), "AES")
+
+        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
         String plaintext = new String(cipher.doFinal(ciphertext), "UTF-8");
 

@@ -16,25 +16,30 @@ public class DependencyManager {
         String overridenVersion(StackReference desc);
     }
 
+    private final File dependenciesDir;
     private final DependencyDownloader downloader;
+    private final VersionOverrider overrider;
 
-    public DependencyManager(DependencyDownloader downloader) {
+
+    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, VersionOverrider overrider) {
+        this.dependenciesDir = dependenciesDir;
         this.downloader = downloader;
+        this.overrider = overrider;
     }
 
-    public StackTreeDescription downloadDependencies(File dependenciesDir, StackReference root, VersionOverrider overrider) {
+    public StackTreeDescription downloadDependencies(StackReference root ) {
         StackDescription desc = getStackDescription(dependenciesDir, root, desc1 -> desc1.getVersion());
         StackTreeDescription.Builder builder = StackTreeDescription.builder(desc);
-        addDependencies(dependenciesDir, desc, builder, overrider);
+        addDependencies( desc, builder);
         return builder.build();
     }
 
-    private void addDependencies(File dependenciesDir, StackDescription parent, StackTreeDescription.Builder builder, VersionOverrider overrider) {
+    private void addDependencies( StackDescription parent, StackTreeDescription.Builder builder) {
         List<StackReference> dependencies = parent.getDependencies();
         for (StackReference dependency : dependencies) {
             StackDescription depDesc = getStackDescription(dependenciesDir, dependency,overrider);
             builder.addNode(parent.getReference(), depDesc);
-            addDependencies(dependenciesDir, depDesc, builder, overrider);
+            addDependencies( depDesc, builder);
         }
     }
 

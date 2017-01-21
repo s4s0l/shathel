@@ -1,0 +1,12 @@
+version: 1
+shathel-solution:
+  name: ${SOLLUTION_NAME}
+  environments:
+    dev:
+      type: docker-compose
+      build-allowed: true
+    itg:
+      type: docker-machine-vbox
+      build-allowed: true
+      managers: 2
+      workers: 1

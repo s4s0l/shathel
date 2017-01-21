@@ -1,37 +1,38 @@
 package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
+import org.s4s0l.shathel.commons.core.security.SafeStorage;
+import org.s4s0l.shathel.commons.core.storage.Storage;
+
+import java.io.File;
 
 /**
- * Todo verify()
- * Todo initialize/is initialized
  *
  * @author Matcin Wielgus
  */
-public class Environment {
-    private final StackIntrospectionProvider introspectionProvider;
-    private final EnvironmentProvisionExecutor provisionExecutor;
-    private final EnvironmentContainerRunner containerRunner;
+public interface Environment {
 
+    File getExecutionDirectory();
 
-    public Environment(StackIntrospectionProvider introspectionProvider,
-                       EnvironmentProvisionExecutor provisionExecutor,
-                       EnvironmentContainerRunner containerRunner) {
-        this.introspectionProvider = introspectionProvider;
-        this.provisionExecutor = provisionExecutor;
-        this.containerRunner = containerRunner;
-        }
+    boolean isInitialized();
 
-    public StackIntrospectionProvider getIntrospectionProvider() {
-        return introspectionProvider;
-    }
+    void initialize();
 
-    public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return provisionExecutor;
-    }
+    void start();
 
-    public EnvironmentContainerRunner getContainerRunner() {
-        return containerRunner;
-    }
+    boolean isStarted();
+
+    void stop();
+
+    void destroy();
+
+    void verify();
+
+    StackIntrospectionProvider getIntrospectionProvider();
+
+    EnvironmentProvisionExecutor getProvisionExecutor();
+
+    EnvironmentContainerRunner getContainerRunner();
+
 
 }

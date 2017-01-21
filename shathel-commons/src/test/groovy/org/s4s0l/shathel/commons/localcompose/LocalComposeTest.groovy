@@ -9,7 +9,7 @@ import spock.lang.Specification
 class LocalComposeTest extends Specification {
     def "deleteMeTest"(){
 //        given:
-//        def compose = new LocalCompose()
+//        def compose = new LocalEnvironmentContainerRunner()
 //
 //        when:
 //        def introspection = compose.getIntrospection(null)

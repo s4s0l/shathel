@@ -3,6 +3,8 @@ package org.s4s0l.shathel.commons.core;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 
+import java.util.Map;
+
 /**
  * @author Matcin Wielgus
  */
@@ -13,8 +15,12 @@ public class SolutionDescription {
         this.model = model;
     }
 
-    EnvironmentDescription getEnvironmentDescription(String envName) {
-        return new EnvironmentDescription(envName, "LOCAL_COMPOSE");
+    public EnvironmentDescription getEnvironmentDescription(String envName) {
+        Map<String, String> x = model.getEnvironment(envName);
+        return new EnvironmentDescription(x.get("type"), x.get("type"), x);
     }
 
+    public String getName() {
+        return model.getName();
+    }
 }
