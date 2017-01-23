@@ -4,6 +4,7 @@ ext {
 }
 
 apply from: '../gradle/bintray.gradle'
+apply from: '../gradle/integration.gradle'
 
 dependencies{
     compile "org.yaml:snakeyaml:1.16"

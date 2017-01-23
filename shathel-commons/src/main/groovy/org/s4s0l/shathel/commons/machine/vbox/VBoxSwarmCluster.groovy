@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
  * @author Matcin Wielgus
  */
 class VBoxSwarmCluster {
-    private final DockerMachineWrapper machine = new DockerMachineWrapper()
+    private final DockerMachineWrapper machine;
     private final String CLUSTER_NAME
     private final int numberOfManagers
     private final int numberOfWorkers
@@ -29,8 +29,9 @@ class VBoxSwarmCluster {
             mkdirs()
             absolutePath
         }
+        machine = new DockerMachineWrapper(workDir);
         MACHINE_OPTS = "--virtualbox-hostonly-cidr=${ns.getCidr(254)} " +
-                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.0-rc5/boot2docker.iso"
+                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.0/boot2docker.iso"
     }
 
 
@@ -50,8 +51,8 @@ class VBoxSwarmCluster {
         initSwarm("${CLUSTER_NAME}-manager-1", MANAGER_IP)
 
         log "Saving tokens"
-        String manager_token = machine.ssh("${CLUSTER_NAME}-manager-1", "docker swarm join-token -q manager")
-        String worker_token = machine.ssh("${CLUSTER_NAME}-manager-1", "docker swarm join-token -q worker")
+        String manager_token = machine.getJoinTokenForManager("${CLUSTER_NAME}-manager-1")
+        String worker_token = machine.getJoinTokenForWorker("${CLUSTER_NAME}-manager-1")
         log "Manager token:${manager_token}"
         log "Worker token:${worker_token}"
 
@@ -76,8 +77,7 @@ class VBoxSwarmCluster {
 
         new PortainerCustomizer().with {
             log "Launching Portainer"
-            def portainerUp = machine.ssh("${CLUSTER_NAME}-manager-1", "docker service ls -q -f name=portainer")
-            if (portainerUp == "") {
+            if (!machine.isServiceRunning("${CLUSTER_NAME}-manager-1", "portainer")) {
                 machine.ssh("${CLUSTER_NAME}-manager-1",
                         """docker service create 
                 --name portainer 
@@ -88,7 +88,7 @@ class VBoxSwarmCluster {
                 -H unix:///var/run/docker.sock""".replace("\n", ""))
             }
             log "Initiating portainer configuration"
-            customizePortainer(CLUSTER_NAME, password, 9000, MANAGER_IP)
+            customizePortainer(CLUSTER_NAME, password, 9000, MANAGER_IP, machine)
         }
 
         return modified;
@@ -121,13 +121,18 @@ class VBoxSwarmCluster {
         #SHATELIP_END
         """
         def file = new File(tmpDir, "fix");
-        file.text = fixationCommand
-        machine.copy(file.absolutePath, "$machineName:/tmp/fixation")
-        machine.sudo(machineName, "cp -f /tmp/fixation /var/lib/boot2docker/bootsync.sh")
-        machine.restart(machineName)
-        machine.regenerateCerts(machineName)
-        markModified()
-        machine.restart(machineName)
+        try{
+            file.text = fixationCommand
+            machine.copy(file.absolutePath, "$machineName:/tmp/fixation")
+            machine.sudo(machineName, "cp -f /tmp/fixation /var/lib/boot2docker/bootsync.sh")
+            machine.restart(machineName)
+            machine.regenerateCerts(machineName)
+            markModified()
+            machine.restart(machineName)
+        }finally {
+            file.delete()
+        }
+
         return address
     }
 
@@ -148,12 +153,12 @@ class VBoxSwarmCluster {
     }
 
     private void distributeKeys(String to, String repositoriesIp) {
-        machine.copy("$tmpDir/${CLUSTER_NAME}-registry/mirrorcerts/ca.crt",
+        machine.copy("$tmpDir/registries/mirrorcerts/ca.crt",
                 "$to:/tmp/mirror-ca.crt")
         machine.sudo(to, "mkdir -p /etc/docker/certs.d/$repositoriesIp:4001/")
         machine.sudo(to, "cp /tmp/mirror-ca.crt /etc/docker/certs.d/$repositoriesIp:4001/ca.crt")
 
-        machine.copy("$tmpDir/${CLUSTER_NAME}-registry/certs/ca.crt",
+        machine.copy("$tmpDir/registries/certs/ca.crt",
                 "$to:/tmp/repo-ca.crt")
         machine.sudo(to, "mkdir -p /etc/docker/certs.d/$repositoriesIp:4000/")
         machine.sudo(to, "cp /tmp/repo-ca.crt /etc/docker/certs.d/$repositoriesIp:4000/ca.crt")
@@ -163,18 +168,16 @@ class VBoxSwarmCluster {
 
     private void joinSwarm(String nodeName, String advertiseIp, String manager_token, String MANAGER_IP) {
         log "Swarm Manager Join"
-        if (machine.ssh(nodeName, "docker info") =~ /Swarm: active/) {
+        if (machine.isSwarmActive(nodeName)) {
             log "Swarm already present"
         } else {
-
-            machine.ssh(nodeName,
-                    "docker swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${manager_token} ${MANAGER_IP}:2377"
-            )
+            machine.swarmJoin(nodeName, advertiseIp,manager_token, MANAGER_IP)
         }
     }
 
     private void initSwarm(String nodeName, String advertiseIp) {
         log "Swarm Init"
+        //todo enclose in wrapper isSwarmActive()
         if (machine.ssh(nodeName, "docker info") =~ /Swarm: active/) {
             log "Swarm already present"
         } else {
@@ -195,10 +198,10 @@ class VBoxSwarmCluster {
         machine.sudo("${nodeName}", "mkdir -p /registry/certs")
         machine.sudo("${nodeName}", "mkdir -p /registry/mirrorcerts")
         machine.sudo("${nodeName}", "chown -R docker /registry")
-        machine.copy("${tmpDir}/${CLUSTER_NAME}-registry/mirrorcerts/ca.crt", "${nodeName}:/registry/mirrorcerts/ca.crt")
-        machine.copy("${tmpDir}/${CLUSTER_NAME}-registry/mirrorcerts/domain.key", "${nodeName}:/registry/mirrorcerts/domain.key")
-        machine.copy("${tmpDir}/${CLUSTER_NAME}-registry/certs/ca.crt", "${nodeName}:/registry/certs/ca.crt")
-        machine.copy("${tmpDir}/${CLUSTER_NAME}-registry/certs/domain.key", "${nodeName}:/registry/certs/domain.key")
+        machine.copy("${tmpDir}/registries/mirrorcerts/ca.crt", "${nodeName}:/registry/mirrorcerts/ca.crt")
+        machine.copy("${tmpDir}/registries/mirrorcerts/domain.key", "${nodeName}:/registry/mirrorcerts/domain.key")
+        machine.copy("${tmpDir}/registries/certs/ca.crt", "${nodeName}:/registry/certs/ca.crt")
+        machine.copy("${tmpDir}/registries/certs/domain.key", "${nodeName}:/registry/certs/domain.key")
 
         log "Run mirror repository container"
         removeContainerIfRunning(nodeName, "shathel-mirror-registry")
@@ -224,6 +227,7 @@ docker run -d --restart=always -p 4001:5000 --name shathel-mirror-registry
     }
 
     private void removeContainerIfRunning(String machineName, String containerName) {
+        //todo enclose in wrapper isContainerRunning()
         def runningMirrorId = machine.ssh(machineName, "docker ps -q -f name=${containerName}").trim()
         if (runningMirrorId != "") {
             machine.ssh(machineName, "docker rm -f -v ${runningMirrorId}")

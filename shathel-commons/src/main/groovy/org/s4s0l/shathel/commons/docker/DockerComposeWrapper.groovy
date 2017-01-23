@@ -11,18 +11,27 @@ class DockerComposeWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(DockerComposeWrapper.class);
 
-    final ExecWrapper exec = new ExecWrapper(LOGGER,'docker-compose')
+    final ExecWrapper exec = new ExecWrapper(LOGGER, 'docker-compose')
 
     boolean up(File project, String projectName) {
         exec.executeForExitValue(project, "-p $projectName up -d") == 0
     }
 
     boolean down(File project, String projectName) {
-        exec.executeForExitValue(project, "-p $projectName down --remove-orphans")==0
+        exec.executeForExitValue(project, "-p $projectName down --remove-orphans") == 0
     }
-
-    String containers(File project, String projectName) {
-        exec.executeForOutput(project, "-p $projectName ps -q")
+    /**
+     * removes all containers,networks for given docker-compose project name
+     * @param projectName
+     */
+    void removeAllForComposeProject(String projectName) {
+        def docker = new DockerWrapper();
+        docker.getContainerIdsByFilter("label=com.docker.compose.project=$projectName").each {
+            docker.removeContainer(it)
+        }
+        docker.getNetworkIdsByFilter("label=com.docker.compose.project=$projectName").each {
+            docker.removeNetwork(it)
+        }
     }
 
 

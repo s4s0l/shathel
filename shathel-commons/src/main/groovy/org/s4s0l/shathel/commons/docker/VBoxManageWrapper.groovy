@@ -15,12 +15,17 @@ class VBoxManageWrapper {
 
     final ExecWrapper exec = new ExecWrapper(LOGGER, 'VBoxManage')
 
-    def unregister(String vmName, boolean withDelete) {
-        if (exists(vmName)) {
+    /**
+     * removes given vm
+     * @param vmName
+     * @param withDelete - if true deletes all files otherwise just unregisters
+     */
+    void removeVm(String vmName, boolean withDelete) {
+        if (isVmPresent(vmName)) {
             def uuid = getDvdUuid(vmName, "boot2docker.iso")
             exec.executeForOutput("unregistervm $vmName ${withDelete ? "--delete" : ""}")
             if (uuid) {
-                closeDvd(uuid)
+                removeDvd(uuid)
             }
             waitUntilNotExists(vmName)
         }
@@ -28,7 +33,7 @@ class VBoxManageWrapper {
 
     private boolean waitUntilNotExists(String vmName) {
         (1..20).find {
-            if (!exists(vmName)) {
+            if (!isVmPresent(vmName)) {
                 return true
             } else {
                 sleep(1000)
@@ -37,7 +42,12 @@ class VBoxManageWrapper {
         }
     }
 
-    boolean exists(String vmName) {
+    /**
+     * checks if vm exists
+     * @param vmName
+     * @return
+     */
+    boolean isVmPresent(String vmName) {
         exec.executeForOutput("list vms").contains("\"$vmName\"")
     }
 
@@ -51,8 +61,12 @@ class VBoxManageWrapper {
         }
     }
 
-
-    def getUuidOfDvdInDirectory(File d) {
+    /**
+     * returns uuid of dvd which lies inside given directory (or exact file)
+     * @param d
+     * @return
+     */
+    String getUuidOfDvdInDirectory(File d) {
         def dvds = exec.executeForOutput("list dvds")
         String path = d.absolutePath.replaceAll("\\/", "\\\\/")
         Matcher a = dvds =~ /UUID:\s*([a-f0-9-]+)\n.*\n.*\nLocation:\s+$path/
@@ -62,8 +76,12 @@ class VBoxManageWrapper {
             return null;
         }
     }
-
-    void closeDvd(String uuid) {
+    /**
+     *
+     * Closes given dvd medium,
+     * @param uuid
+     */
+    void removeDvd(String uuid) {
         exec.executeForOutput("closemedium dvd $uuid")
         (1..10).find {
             if (!exec.executeForOutput("list dvds").contains(uuid)) {
@@ -75,11 +93,19 @@ class VBoxManageWrapper {
         }
     }
 
-    def registervm(File file) {
+    /**
+     * Registers vm from given file
+     * @param file
+     */
+    void registervm(File file) {
         exec.executeForOutput("registervm ${file.absolutePath}")
     }
 
-    def poweroff(String machineName) {
+    /**
+     * Powers off the machine
+     * @param machineName
+     */
+    void poweroff(String machineName) {
         if (exec.executeForOutput("list runningvms").contains("\"$machineName\"")) {
             exec.executeForOutput("controlvm $machineName poweroff")
         }

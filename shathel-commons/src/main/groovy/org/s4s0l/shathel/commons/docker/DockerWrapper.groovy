@@ -12,18 +12,97 @@ class DockerWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(DockerComposeWrapper.class);
 
-    final ExecWrapper exec = new ExecWrapper(LOGGER, 'docker')
+    final ExecWrapper exec;
 
-    def Map<String, String> findLabelsOfOneByFilter(String filter) {
-        String[] dockerIds = exec.executeForOutput(new File("."), "ps -f $filter -q").split("\\s")
+    DockerWrapper() {
+        this(new ExecWrapper(LOGGER, 'docker'))
+    }
+
+
+    DockerWrapper(ExecWrapper execWrapper) {
+        exec = execWrapper;
+    }
+
+    /**
+     * gets container ids for containers matching given filter
+     * @param filter
+     * @return
+     */
+    List<String> getContainerIdsByFilter(String filter) {
+        exec.executeForOutput("ps -a -f $filter -q").readLines()
+    }
+
+    /**
+     * gets networks ids for networks matching filter given
+     * @param filter
+     * @return
+     */
+    List<String> getNetworkIdsByFilter(String filter) {
+        exec.executeForOutput("network ls -f $filter -q").readLines()
+    }
+
+    /**
+     * removes container
+     * @param containerId
+     */
+    void removeContainer(String containerId) {
+        exec.executeForOutput("rm -f -v $containerId")
+    }
+
+    /**
+     * removes network
+     * @param networkId
+     * @return
+     */
+    void removeNetwork(String networkId) {
+        exec.executeForOutput("network rm $networkId")
+    }
+
+    /**
+     * Gets labels map for container matching given filter.
+     * @param filter
+     * @return
+     */
+    Map<String, String> getLabelsOfOneByFilter(String filter) {
+        String[] dockerIds = exec.executeForOutput("ps -f $filter -q").split("\\s")
         if (dockerIds.size() > 1) {
             throw new Exception("Multiple containers match filter $filter")
         }
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
             return [:]
         }
-        String inspect = exec.executeForOutput(new File("."), "inspect ${dockerIds[0]}")
+        String inspect = exec.executeForOutput("inspect ${dockerIds[0]}")
         def val = new JsonSlurper().parseText(inspect);
         val[0].Config.Labels
+    }
+
+    /**
+     * returns json representation for docker info
+     * @return
+     */
+    Map getInfo() {
+        def output = exec.executeForOutput("info --format '{{ json . }}'")
+        return new JsonSlurper().parseText(output);
+    }
+
+    /**
+     * Returns all swarm nodes
+     * @return
+     */
+    Map getNodes() {
+        String output = exec.executeForOutput("node list")
+        output.readLines()
+                .findAll { !it.startsWith("ID") }
+                .collect { it.replaceAll("(?<=[a-z0-9]+)\\s+\\*\\s", "   ") }
+                .collect { it.split("\\s+") }
+                .collectEntries {
+            [(it[1]):
+                     [id           : it[0],
+                      hostName     : it[1],
+                      status       : it[2],
+                      availability : it[3],
+                      managerStatus: it.size() == 5 ? it[4] : null
+                     ]]
+        }
     }
 }

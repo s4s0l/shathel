@@ -10,6 +10,9 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.TemplateUtils;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Matcin Wielgus
@@ -42,7 +45,7 @@ public class Shathel {
             FileStorage fileStorage = createFileStorage(f);
             File configuration = fileStorage.getConfiguration();
             if (configuration.exists()) {
-                throw new RuntimeException("Configuration already exists!");
+                throw new RuntimeException("Configuration already isVmPresent!");
             }
             String solutionName = params.getParameter("shathel.solution.name")
                     .orElse(f.getName());
@@ -62,9 +65,11 @@ public class Shathel {
     }
 
     private String getDefaultConfig(String projectName) {
+        Map x = new HashMap();
+        x.put("SOLLUTION_NAME", projectName);
         return TemplateUtils.generateTemplate(
                 this.getClass().getResource("/default-shathel-solution.yml"),
-                ImmutableMap.of("SOLLUTION_NAME", projectName));
+                x);
     }
 
     public Solution getSolution(Storage storage) {

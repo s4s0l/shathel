@@ -9,11 +9,15 @@ import spock.lang.Specification
  */
 class FileStorageTest extends Specification {
 
+    def getRootDir() {
+        return "build/Test${getClass().getSimpleName()}"
+    }
+
     def "FileStorageTest with overrides"() {
         given:
-        FileStorage fs = create("build/FileStorageTest/1", [
-                'shathel.storage.data.x.dir':'data_x',
-                'shathel.storage.tmp.x.dir':f('tmp_x').absolutePath,
+        FileStorage fs = create("${rootDir}/1", [
+                'shathel.storage.data.x.dir'          : 'data_x',
+                'shathel.storage.tmp.x.dir'           : f('tmp_x').absolutePath,
                 'shathel.storage.shathel-solution.yml': 'my-file.yml'
         ])
 
@@ -39,7 +43,7 @@ class FileStorageTest extends Specification {
 
     def "FileStorageTest with defaults"() {
         given:
-        FileStorage fs = create("build/FileStorageTest/1", [:])
+        FileStorage fs = create("${rootDir}/1", [:])
 
 
         when:
@@ -79,8 +83,8 @@ class FileStorageTest extends Specification {
 
     }
 
-    private File f(String name){
-        return new File("build/FileStorageTest/$name");
+    private File f(String name) {
+        return new File("${rootDir}/$name");
     }
 
     private FileStorage create(String where, LinkedHashMap params) {

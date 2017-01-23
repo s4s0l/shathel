@@ -31,7 +31,7 @@ public class IoUtils {
 
         try {
 
-            //create output directory is not exists
+            //create output directory is not isVmPresent
             File folder = outputFolder;
             if (!folder.exists()) {
                 folder.mkdirs();
@@ -46,7 +46,7 @@ public class IoUtils {
 
                     String fileName = ze.getName();
                     File newFile = new File(outputFolder + File.separator + fileName);
-                    //create all non exists folders
+                    //create all non isVmPresent folders
                     //else you will hit FileNotFoundException for compressed folder
                     new File(newFile.getParent()).mkdirs();
 

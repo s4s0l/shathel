@@ -21,7 +21,7 @@ class SolutionFileModel {
 
     SolutionFileModel(Object parsedYml) {
         this.parsedYml = parsedYml;     \
-             if (this.parsedYml.version != '1') {
+             if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
     }

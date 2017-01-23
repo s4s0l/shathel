@@ -8,6 +8,8 @@ import org.apache.http.entity.mime.FormBodyPart
 import org.apache.http.entity.mime.HttpMultipartMode
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
+import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
+
 import static groovyx.net.http.ContentType.JSON
 
 class PortainerCustomizer {
@@ -19,14 +21,9 @@ class PortainerCustomizer {
     def customizePortainer(String clusterName,
                            String adminPassword,
                            int portainerPort,
-                           String ip) {
+                           String ip, DockerMachineWrapper machine) {
 
         def json = new JsonSlurper()
-//    def clusterName = args.size() > 0 ? args[0] : "consul"
-//    def adminPassword = args.size() > 1 ? args[1] : "adminadmin"
-//    def portainerPort = 9000
-//    def ip = "docker-machine ip ${clusterName}-manager-1".execute().text.trim()
-
 
         def portainer = new RESTClient("http://${ip}:${portainerPort}")
         portainer.handler['404'] = portainer.handler.get(Status.SUCCESS)
@@ -59,25 +56,23 @@ class PortainerCustomizer {
 
         HttpResponseDecorator result = portainer.post([
                 requestContentType: JSON,
-                contentType: JSON,
-                path: '/api/auth',
-                body: [username: "admin", password: adminPassword]]
+                contentType       : JSON,
+                path              : '/api/auth',
+                body              : [username: "admin", password: adminPassword]]
 
         )
-        if(result.status == 200){
-            return;
+        if (result.status != 200) {
+            log "Initiating password"
+
+            result = portainer.post(
+                    requestContentType: JSON,
+                    contentType: JSON,
+                    path: '/api/users/admin/init',
+                    body: [password: adminPassword]
+            )
+            assert result.status == 200
+
         }
-
-        log "Initiating password"
-
-        result = portainer.post(
-                requestContentType: JSON,
-                contentType: JSON,
-                path: '/api/users/admin/init',
-                body: [password: adminPassword]
-        )
-        assert result.status == 200
-
         log "Getting token"
 
         result = portainer.post(
@@ -99,13 +94,12 @@ class PortainerCustomizer {
                 e
         }
 
-        "docker-machine ls -q --filter name=${clusterName}-.*"
-                .execute().text.split("\n")
+        machine.getMachinesByName("${clusterName}-.*")
                 .each {
             def machineName = it
-            def machineEnvs = "docker-machine env ${it}".execute().text
-            def certPath = (machineEnvs =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/)[0][1]
-            def machineIp = (machineEnvs =~ /[^\s]+ DOCKER_HOST="(.+)"/)[0][1]
+            def envs = machine.getMachineEnvs(machineName);
+            def certPath = envs['DOCKER_CERT_PATH']
+            def machineIp = envs['DOCKER_HOST']
             log "Adding $machineName as endpoint"
             result = portainer.post(
                     requestContentType: JSON,

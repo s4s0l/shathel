@@ -12,29 +12,34 @@ import spock.lang.Specification
 class MachineSettingsImporterExporterTest extends Specification {
 
     def setupSpec() {
-        cleanupSpec()
+        cleanOnEnd()
+        FileUtils.deleteDirectory(new File("${getRootDir()}"));
     }
 
+    String getRootDir(){
+        return "build/Test${getClass().getSimpleName()}"
+    }
+    
     // Run after all the tests, even after failures:
-    def cleanupSpec() {
+    def cleanOnEnd() {
         new VBoxManageWrapper().with {
             poweroff("machineMovingTest")
-            unregister("machineMovingTest", true)
+            removeVm("machineMovingTest", true)
         }
-        FileUtils.deleteDirectory(new File("build/machineStorageTest"));
+        true
     }
 
     @IgnoreIf({ Boolean.valueOf(env['IGNORE_MACHINE_TESTS']) })
     def "Saving and restoring to different location should not break VBox nor Docker-Machine"() {
         given:
-        def srcDir = new File("build/machineStorageTest/sourceCfg");
-        def targetDir = new File("build/machineStorageTest/targetCfg");
+        def srcDir = new File("${getRootDir()}/sourceCfg");
+        def targetDir = new File("${getRootDir()}/targetCfg");
         srcDir.mkdirs()
 
 
         new DockerMachineWrapper(srcDir).create("-d virtualbox machineMovingTest")
-        MachineSettingsImporterExporter ie = new MachineSettingsImporterExporter(new File("build/machineStorageTest/tmp"))
-        File saved = new File("build/machineStorageTest/saved.zip")
+        MachineSettingsImporterExporter ie = new MachineSettingsImporterExporter(new File("${getRootDir()}/tmp"))
+        File saved = new File("${getRootDir()}/saved.zip")
         saved.createNewFile()
 
         when:
@@ -44,7 +49,10 @@ class MachineSettingsImporterExporterTest extends Specification {
 
         then:
         new DockerMachineWrapper(targetDir).start("machineMovingTest")
-                .contains("may have new IP addresses")
+
+
+
+        cleanOnEnd()
 
     }
 }

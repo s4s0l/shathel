@@ -31,7 +31,7 @@ class VBoxNetworkSettings {
     }
 
     String getCidr(int val) {
-        getAddress(val) + "/${8 * (network.count(".") + 1)} "
+        getAddress(val) + "/${8 * (network.count(".") + 1)}"
     }
 
 }

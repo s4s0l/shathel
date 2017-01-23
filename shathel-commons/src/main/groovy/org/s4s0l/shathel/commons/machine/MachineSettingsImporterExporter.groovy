@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.commons.machine
 
-import com.google.common.collect.ImmutableList
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.VBoxManageWrapper
@@ -8,7 +7,6 @@ import org.s4s0l.shathel.commons.utils.IoUtils
 
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
-import java.util.stream.Stream
 
 /**
  * @author Matcin Wielgus
@@ -28,7 +26,7 @@ class MachineSettingsImporterExporter {
 
     private void stopMachine(String name, File vmFolder) {
         new DockerMachineWrapper(vmFolder.getParentFile().getParentFile()).stop(name)
-        vbox.unregister(name, false)
+        vbox.removeVm(name, false)
     }
 
     void saveSettings(File dockerMachineSettingsFolder, OutputStream outputStream) {

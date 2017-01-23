@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,5 +11,7 @@ import java.util.Optional;
 public interface StackIntrospectionProvider {
 
     Optional<StackIntrospection> getIntrospection(StackReference reference);
+
+    List<StackIntrospection> getAllStacks();
 
 }

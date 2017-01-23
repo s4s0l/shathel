@@ -45,7 +45,7 @@ class ExecWrapper {
     def executeForOutput(File dir, String... args) {
         StringBuilder sb = new StringBuilder()
         def flatten = ([] << command.split("\\s") << args).flatten().findAll {""!=it.trim()}
-        LOGGER.info("Running ${flatten.join(",")}")
+        LOGGER.debug("Running ${flatten.join(",")}")
         def process = new ProcessBuilder(flatten)
                 .directory(dir)
                 .redirectErrorStream(true)

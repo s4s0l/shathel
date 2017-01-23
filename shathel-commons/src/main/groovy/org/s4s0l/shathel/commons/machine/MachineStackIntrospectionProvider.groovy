@@ -12,4 +12,9 @@ class MachineStackIntrospectionProvider implements StackIntrospectionProvider{
     Optional<StackIntrospection> getIntrospection(StackReference reference) {
         return null
     }
+
+    @Override
+    List<StackIntrospection> getAllStacks() {
+        return null
+    }
 }

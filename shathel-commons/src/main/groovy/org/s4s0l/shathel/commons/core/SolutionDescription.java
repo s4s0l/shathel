@@ -17,7 +17,7 @@ public class SolutionDescription {
 
     public EnvironmentDescription getEnvironmentDescription(String envName) {
         Map<String, String> x = model.getEnvironment(envName);
-        return new EnvironmentDescription(x.get("type"), x.get("type"), x);
+        return new EnvironmentDescription(x.get("name"), x.get("type"), x);
     }
 
     public String getName() {
