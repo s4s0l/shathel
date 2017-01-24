@@ -101,6 +101,18 @@ class VBoxManageWrapper {
         exec.executeForOutput("registervm ${file.absolutePath}")
     }
 
+
+    Map<String, String> getVmInfo(String machineName) {
+        exec.executeForOutput("showvminfo --machinereadable ${machineName}")
+                .readLines()
+                .collectEntries {
+            def value = it.substring(it.indexOf('=') + 1)
+            value = value.startsWith("\"") ? value.substring(1) : value
+            value = value.endsWith("\"") ? value.substring(0, value.length() - 1) : value
+            [(it.substring(0, it.indexOf('='))): value]
+        }
+    }
+
     /**
      * Powers off the machine
      * @param machineName

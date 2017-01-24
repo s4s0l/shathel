@@ -40,12 +40,14 @@ public class Shathel {
         return fileStorage;
     }
 
-    public Storage initStorage(File f) {
+    public Storage initStorage(File f, boolean failIfExists) {
         try {
             FileStorage fileStorage = createFileStorage(f);
             File configuration = fileStorage.getConfiguration();
             if (configuration.exists()) {
-                throw new RuntimeException("Configuration already isVmPresent!");
+                if (failIfExists)
+                    throw new RuntimeException("Configuration already isVmPresent!");
+                return getStorage(f);
             }
             String solutionName = params.getParameter("shathel.solution.name")
                     .orElse(f.getName());

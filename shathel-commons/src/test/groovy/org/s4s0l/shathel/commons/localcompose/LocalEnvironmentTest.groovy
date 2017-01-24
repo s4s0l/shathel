@@ -38,7 +38,7 @@ class LocalEnvironmentTest extends Specification {
         Shathel sht = new Shathel(parameters)
 
         when:
-        def storage = sht.initStorage(root)
+        def storage = sht.initStorage(root, true)
 
         then:
         new File(root, "shathel-solution.yml").text.contains("name: LocalComposeTest")

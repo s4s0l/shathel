@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.machine
 
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
+import org.s4s0l.shathel.commons.docker.DockerWrapper
 
 /**
  * @author Matcin Wielgus
@@ -18,45 +19,52 @@ class DockerMachineCommons {
         return new DockerMachineWrapper(settingsDir);
     }
 
-    List<String> getAllNodeNames() {
-        getManagerNodeNames() + getWorkerNodeNames()
+    enum Type {
+        MANAGER, WORKER
     }
 
-    List<String> getManagerNodeNames() {
-        getWrapper().getMachines()
-                .findAll { it.key =~ /$baseMachineName-manager-[0-9]+/ }
-                .collect { it.key }
-
-    }
-
-
-    List<String> getWorkerNodeNames() {
-        getWrapper().getMachines()
-                .findAll { it.key =~ /$baseMachineName-worker-[0-9]+/ }
-                .collect { it.key }
+    Map<Type, List<String>> getMachines() {
+        def machines = getWrapper().getMachines();
+        [
+                (Type.MANAGER): machines
+                        .findAll { it.key =~ /$baseMachineName-manager-[0-9]+/ }
+                        .collect { it.key },
+                (Type.WORKER) : machines
+                        .findAll { it.key =~ /$baseMachineName-worker-[0-9]+/ }
+                        .collect { it.key },
+        ]
     }
 
 
     void startAll() {
-        getAllNodeNames().each {
+        getMachines()
+                .collect { it.value }
+                .flatten()
+                .each {
             getWrapper().start(it)
         }
     }
 
     boolean isAllStarted() {
         Map machines = getWrapper().getMachines();
-        machines.find { it.state != "Running" } == null
+        machines.find { it.value.state != "Running" } == null
     }
 
     void stopAll() {
-        getAllNodeNames().each {
+        getMachines()
+                .collect { it.value }
+                .flatten()
+                .each {
             getWrapper().stop(it)
         }
 
     }
 
     void destroyAll() {
-        getAllNodeNames().each {
+        getMachines()
+                .collect { it.value }
+                .flatten()
+                .each {
             getWrapper().remove(it)
         }
     }
@@ -73,7 +81,7 @@ class DockerMachineCommons {
 
     void testIsWorker(String machine) {
         if (!getWrapper().isSwarmWorker(machine)) {
-            throw new RuntimeException("$machine was expected to be a swarm manager!")
+            throw new RuntimeException("$machine was expected to be a swarm worker!")
         }
     }
 
@@ -84,15 +92,19 @@ class DockerMachineCommons {
                 .findAll { it.key.contains("-manager-") }
                 .findAll {
             !['Reachable', 'Leader'].contains(it.value.managerStatus)
-        }:
+        }.isEmpty():
                 "All nodes named $baseMachineName-manager-X must be managers in cluster"
         assert nodes
                 .findAll { it.key.contains("-worker-") }
                 .findAll {
             it.value.managerStatus != null
-        }:
+        }.isEmpty():
                 "All nodes named $baseMachineName-worker-X must not be managers"
 
 
+    }
+
+    DockerWrapper getDockerWrapperForManagementNode() {
+        return getWrapper().getDockerWrapperOn("$baseMachineName-manager-1");
     }
 }

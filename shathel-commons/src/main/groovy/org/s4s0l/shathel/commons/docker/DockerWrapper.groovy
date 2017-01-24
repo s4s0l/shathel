@@ -63,17 +63,32 @@ class DockerWrapper {
      * @param filter
      * @return
      */
-    Map<String, String> getLabelsOfOneByFilter(String filter) {
+    List<Map<String, String>> getLabelsOfContainersMatching(String filter) {
         String[] dockerIds = exec.executeForOutput("ps -f $filter -q").split("\\s")
-        if (dockerIds.size() > 1) {
-            throw new Exception("Multiple containers match filter $filter")
-        }
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
-            return [:]
+            return []
         }
-        String inspect = exec.executeForOutput("inspect ${dockerIds[0]}")
-        def val = new JsonSlurper().parseText(inspect);
-        val[0].Config.Labels
+        dockerIds.collect{
+            String inspect = exec.executeForOutput("inspect ${dockerIds[0]}")
+            def val = new JsonSlurper().parseText(inspect);
+            def ret = [:]
+            ret << val[0].Config.Labels
+            ret << [name:val[0].Name]
+        }
+    }
+
+    List<Map<String, String>> getServicesOfContainersMatching(String filter) {
+        String[] dockerIds = exec.executeForOutput("service ls -f $filter -q").split("\\s")
+        if (dockerIds.size() == 0 || "" == dockerIds[0]) {
+            return []
+        }
+        dockerIds.collect{
+            String inspect = exec.executeForOutput("service inspect ${dockerIds[0]}")
+            def val = new JsonSlurper().parseText(inspect);
+            def ret = [:]
+            ret << val[0].Spec.Labels
+            ret << [name:val[0].Spec.Name]
+        }
     }
 
     /**
@@ -105,4 +120,14 @@ class DockerWrapper {
                      ]]
         }
     }
+
+    void stackDeploy(File composeFile, String deploymentName) {
+        exec.executeForOutput(composeFile.getParentFile(), "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName");
+    }
+
+    void stackUnDeploy(File composeFile, String deploymentName) {
+        exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
+    }
+
+
 }

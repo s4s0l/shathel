@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.localcompose;
 
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
+import org.s4s0l.shathel.commons.core.environment.StackIntrospectionResolver;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 
@@ -16,12 +17,14 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
 
     @Override
     public Optional<StackIntrospection> getIntrospection(StackReference reference) {
-        Map oneByFilter = new DockerWrapper().getLabelsOfOneByFilter("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
-        if (oneByFilter.get("org.shathel.stack.ga") == null) {
+        List<Map<String,String>> oneByFilter = new DockerWrapper()
+                .getLabelsOfContainersMatching("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
+        if(oneByFilter.isEmpty()){
             return Optional.empty();
         }
-        String o = (String) oneByFilter.get("org.shathel.stack.gav");
-        return Optional.of(new StackIntrospection(new StackReference(o), oneByFilter));
+        StackIntrospectionResolver resolver = new StackIntrospectionResolver(oneByFilter);
+        String o = resolver.getGav();
+        return Optional.of(new StackIntrospection(new StackReference(o), resolver.getShathelLabels()));
     }
 
     @Override

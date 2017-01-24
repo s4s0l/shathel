@@ -37,10 +37,17 @@ class ComposeFileModel {
     void addLabelToServices(String key, String value) {
         parsedYml.services?.each {
             if (it.value.labels == null) {
-                it.value.labels = [(key):value]
-            } else {
-                it.value.labels << [(key):value]
+                it.value.labels = [:]
             }
+            it.value.labels << [(key): value]
+            if (it.value.deploy == null) {
+                it.value.deploy = [:]
+            }
+            if (it.value.deploy.labels == null) {
+                it.value.deploy.labels = [:]
+            }
+            it.value.deploy.labels << [(key): value]
+
         }
     }
 

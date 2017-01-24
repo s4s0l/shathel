@@ -20,18 +20,21 @@ class SolutionFileModel {
     }
 
     SolutionFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;     \
-             if (this.parsedYml.version != 1) {
+        this.parsedYml = parsedYml;      \
+              if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
     }
 
     Map<String, String> getEnvironment(String name) {
         def e = parsedYml['shathel-solution']['environments'][name];
-        return [
+        def params = [
                 name: name,
                 type: e.type.toString() //dummy npe based verification
         ] << e;
+        params.collectEntries {
+            [(it.key): it.value?.toString()]
+        }
     }
 
     String getName() {

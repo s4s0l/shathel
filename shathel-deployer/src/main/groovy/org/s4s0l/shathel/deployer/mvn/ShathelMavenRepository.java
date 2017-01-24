@@ -23,7 +23,9 @@ import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.*;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
@@ -245,7 +247,6 @@ public class ShathelMavenRepository {
         session.setAuthenticationSelector(getAuthSelector());
         session.setCache(new DefaultRepositoryCache());
         session.setLocalRepositoryManager(getLocalRepoMan(session));
-
         return session;
     }
 
@@ -261,6 +262,7 @@ public class ShathelMavenRepository {
         for (RemoteRepository repository : repositories) {
             collectRequest.addRepository(repository);
         }
+
         DependencyNode node = getLocator().getService(RepositorySystem.class).collectDependencies(session, collectRequest).getRoot();
         DependencyRequest dependencyRequest = new DependencyRequest();
         dependencyRequest.setRoot(node);

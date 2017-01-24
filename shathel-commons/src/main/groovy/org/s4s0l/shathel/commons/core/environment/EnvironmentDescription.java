@@ -30,6 +30,7 @@ public class EnvironmentDescription {
     }
 
     public Optional<Integer> getParameterAsInt(String name) {
-        return getParameter(name).map(Integer::parseInt);
+        return getParameter(name)
+                .map(Integer::parseInt);
     }
 }

@@ -10,6 +10,9 @@ import org.s4s0l.shathel.commons.core.security.SafeStorage;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,15 +24,18 @@ public class MachineEnvironment implements Environment {
     private final File temporaryDir;
     private final SafeStorage safeStorage;
     private final EnvironmentDescription environmentDescription;
+    private final MachineSettingsImporterExporter machineSettingsImporterExporter;
 
 
     public MachineEnvironment(String solutionName, File temporaryDir, SafeStorage safeStorage,
                               EnvironmentDescription environmentDescription,
+                              MachineSettingsImporterExporter machineSettingsImporterExporter,
                               MachineProvisioner machineProvisioner) {
         this.solutionName = solutionName;
         this.temporaryDir = temporaryDir;
         this.safeStorage = safeStorage;
         this.environmentDescription = environmentDescription;
+        this.machineSettingsImporterExporter = machineSettingsImporterExporter;
         this.machineProvisioner = machineProvisioner;
     }
 
@@ -50,10 +56,11 @@ public class MachineEnvironment implements Environment {
             return false;
         }
         DockerMachineCommons dm = getDockerMachineCommons();
-        if (dm.getManagerNodeNames().size() != getManagersCount()) {
+        Map<DockerMachineCommons.Type, List<String>> machines = dm.getMachines();
+        if (machines.get(DockerMachineCommons.Type.MANAGER).size() < getManagersCount()) {
             return false;
         }
-        if (dm.getWorkerNodeNames().size() != getWorkersCount()) {
+        if (machines.get(DockerMachineCommons.Type.WORKER).size() < getWorkersCount()) {
             return false;
         }
         return true;
@@ -61,19 +68,27 @@ public class MachineEnvironment implements Environment {
 
     @Override
     public void initialize() {
+        stop();
         try {
             FileUtils.deleteDirectory(getDockerMachineStorageDir());
             String safeStoreKey = getSafeStorageKey();
             Optional<InputStream> inputStream = safeStorage.inputStream(safeStoreKey);
             if (inputStream.isPresent()) {
-                getImporterExporter().loadSettings(inputStream.get(), getDockerMachineStorageDir());
+                //todo tu brakuje czegos w rodzaju reload settings
+                //co by odrejestrowało istniejace maszyny z vboxa aby mu nie robic syfu
+                getImporterExporter().loadSettings(inputStream.get(),
+                        getDockerMachineStorageDir());
+                start();
             } else {
                 getDockerMachineStorageDir().mkdirs();
             }
 
-            boolean changed = getMachineProvisioner().createMachines(getDockerMachineStorageDir(),
+            boolean changed = getMachineProvisioner().createMachines(
+                    getDockerMachineStorageDir(),
                     getBaseMachineName(),
-                    environmentDescription.getName(), getManagersCount(), getWorkersCount());
+                    environmentDescription.getName(),
+                    getManagersCount(),
+                    getWorkersCount());
 
             if (changed) {
                 getImporterExporter().saveSettings(getDockerMachineStorageDir(),
@@ -85,11 +100,11 @@ public class MachineEnvironment implements Environment {
     }
 
     private String getBaseMachineName() {
-        return solutionName + "." + environmentDescription.getName();
+        return solutionName + "-" + environmentDescription.getName();
     }
 
     private String getSafeStorageKey() {
-        return environmentDescription.getName() + "/MACHINES";
+        return "machines";
     }
 
     @Override
@@ -117,34 +132,38 @@ public class MachineEnvironment implements Environment {
     @Override
     public void verify() {
         if (!isInitialized()) {
-            throw new RuntimeException("Not initialized");
+            throw new RuntimeException("Environment is not initialized");
         }
         DockerMachineCommons dmc = getDockerMachineCommons();
-        for (String machine : dmc.getAllNodeNames()) {
-            dmc.testConnectivity(machine);
-        }
-        for (String machine : dmc.getManagerNodeNames()) {
-            dmc.testIsManager(machine);
-        }
-        for (String machine : dmc.getWorkerNodeNames()) {
-            dmc.testIsWorker(machine);
-        }
+        Map<DockerMachineCommons.Type, List<String>> machines = dmc.getMachines();
+
+        machines.entrySet()
+                .stream()
+                .map(Map.Entry::getValue)
+                .flatMap(Collection::stream)
+                .forEach(dmc::testConnectivity);
+        machines.get(DockerMachineCommons.Type.MANAGER)
+                .stream()
+                .forEach(dmc::testIsManager);
+        machines.get(DockerMachineCommons.Type.WORKER)
+                .stream()
+                .forEach(dmc::testIsWorker);
         dmc.testSwarmStatus();
     }
 
     @Override
     public StackIntrospectionProvider getIntrospectionProvider() {
-        return null;
+        return new MachineStackIntrospectionProvider(getDockerMachineCommons());
     }
 
     @Override
     public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return null;
+        return new MachineEnvironmentProvisionExecutor();
     }
 
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
-        return null;
+        return new MachineEnvironmentContainerRunner(getDockerMachineCommons());
     }
 
 
@@ -153,11 +172,13 @@ public class MachineEnvironment implements Environment {
     }
 
     private DockerMachineCommons getDockerMachineCommons() {
-        return new DockerMachineCommons(getBaseMachineName(), getDockerMachineStorageDir());
+        return new DockerMachineCommons(getBaseMachineName(),
+                getDockerMachineStorageDir());
     }
 
+
     private MachineSettingsImporterExporter getImporterExporter() {
-        return new MachineSettingsImporterExporter(new File(temporaryDir, "importExportTmp"));
+        return machineSettingsImporterExporter;
     }
 
     private int getManagersCount() {

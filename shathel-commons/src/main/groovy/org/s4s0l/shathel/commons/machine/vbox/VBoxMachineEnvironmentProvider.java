@@ -9,7 +9,10 @@ import org.s4s0l.shathel.commons.core.security.SafeStorage;
 import org.s4s0l.shathel.commons.core.security.SafeStorageProvider;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.machine.MachineEnvironment;
+import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
+
+import java.io.File;
 
 /**
  * @author Matcin Wielgus
@@ -32,7 +35,10 @@ public class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
         String name = environmentDescription.getName();
         SafeStorage safeStorage = ctxt.lookupOne(SafeStorageProvider.class)
                 .get().getSafeStorage(s, name);
-        return new MachineEnvironment(solutionDescription.getName(), s.getTemporaryDirectory(name),
-                safeStorage, environmentDescription, new VBoxMachineProvisioner(params));
+        File temporaryDirectory = s.getTemporaryDirectory(name);
+        MachineSettingsImporterExporter machineSettingsImporterExporter = new VBoxMachineSettingsImporterExporter(new File(temporaryDirectory,
+                "importExportTmp"));
+        return new MachineEnvironment(solutionDescription.getName(), temporaryDirectory,
+                safeStorage, environmentDescription, machineSettingsImporterExporter, new VBoxMachineProvisioner(params));
     }
 }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
@@ -39,12 +40,12 @@ public class SafeStorageImpl implements SafeStorage {
         }
     }
 
-        private static final String CRYPTO_TYPE = "AES/GCM/NoPadding";
-//    private static final String CRYPTO_TYPE = "AES/CBC/PKCS5Padding";
+//    private static final String CRYPTO_TYPE = "AES/GCM/NoPadding";
+        private static final String CRYPTO_TYPE = "AES/CBC/PKCS5Padding";
     private static final int AES_KEY_SIZE = 256; // in bits
     private static final int GCM_TAG_LENGTH = 16; // in bytes
     private static final byte[] DEFAULT_SALT = new byte[]{124, -21, -54, -120, 56, 27, -2, -67, -8, 121, -113, -21, -72, -53, 125, 124};
-//    private static final byte[] IV = new byte[]{-80, -93, -12, 116, 53, -9, 118, 77, 24, 0, 66, -76, -70, 91, 38, -82};
+    //    private static final byte[] IV = new byte[]{-80, -93, -12, 116, 53, -9, 118, 77, 24, 0, 66, -76, -70, 91, 38, -82};
     private final File rootDir;
     private final SecretKey secret;
     private final byte[] iv;
@@ -55,10 +56,10 @@ public class SafeStorageImpl implements SafeStorage {
     }
 
     public AlgorithmParameterSpec getParameter() {
-//        return new IvParameterSpec(iv);
+        return new IvParameterSpec(iv);
 //
 //
-        return new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
+//        return new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
     }
 
 
@@ -118,6 +119,7 @@ public class SafeStorageImpl implements SafeStorage {
     public Optional<InputStream> inputStream(String key) {
         File f = new File(rootDir, key);
         return Optional.ofNullable(f)
+                .filter(File::exists)
                 .map(file -> {
                     try {
                         return new FileInputStream(file);
@@ -125,6 +127,7 @@ public class SafeStorageImpl implements SafeStorage {
                         throw new RuntimeException(e);
                     }
                 })
+                .map(file -> new BufferedInputStream(file))
                 .map(file -> new CipherInputStream(file, getDecriptionCipher()));
     }
 
@@ -142,7 +145,7 @@ public class SafeStorageImpl implements SafeStorage {
 
     @Override
     public void readFile(String key, File copyTo) {
-        inputStream("files/" +key).map(x -> {
+        inputStream("files/" + key).map(x -> {
             try {
                 try (FileOutputStream fos = new FileOutputStream(copyTo)) {
                     IOUtils.copy(x, fos);
@@ -157,12 +160,11 @@ public class SafeStorageImpl implements SafeStorage {
     }
 
 
-
     @Override
     public void writeFile(String key, File f) {
         try {
             try (InputStream fos = new FileInputStream(f);
-                 OutputStream xsas = outputStream("files/" +key)) {
+                 OutputStream xsas = outputStream("files/" + key)) {
                 IOUtils.copy(fos, xsas);
             }
         } catch (Exception e) {

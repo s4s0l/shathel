@@ -6,6 +6,7 @@ import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper
+import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
 import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
@@ -17,50 +18,48 @@ class VBoxEnvironmentTest
         extends Specification {
 
     def setupSpec() {
-        FileUtils.deleteDirectory(new File(getRootDir()));
         cleanOnEnd()
+        FileUtils.deleteDirectory(new File(getRootDir()));
     }
 
     boolean cleanOnEnd() {
-        new DockerComposeWrapper().with {
-            removeAllForComposeProject("dummy")
-            removeAllForComposeProject("00shathel")
+        def file = new File(getRootDir(), "tmp/itg/settings")
+        if (file.exists()) {
+            def wrapper = new DockerMachineWrapper(file)
+            new File(file, "machines").listFiles().each {
+                wrapper.remove(it.name)
+            }
         }
+
         true
     }
 
-    def "Run stack in local docker integration test"() {
+    def "Run stack in vbox integration test"() {
         given:
         File root = new File(getRootDir())
         def parameters = prepare(root, "sampleDependencies")
         Shathel sht = new Shathel(parameters)
-        def solution = sht.getSolution(sht.initStorage(root))
+        def solution = sht.getSolution(sht.initStorage(root,false))
         def environment = solution.getEnvironment("itg")
 
         when:
+        if (!environment.isInitialized()) {
+            environment.initialize()
+        }
+        if (!environment.isStarted()) {
+            environment.start()
+        }
         def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
         def command = stack.createStartCommand();
 
         then:
-        command != null
         command.commands.size() == 2
-        command.commands[0].description.name == 'shathel-core-stack'
-        command.commands[1].description.name == 'dummy'
 
         when:
         stack.run(command)
 
         then:
-        def preparedCompose2 = new Yaml().load(new File(root, "tmp/itg/execution/dummy-2.0-shathel/stack/docker-compose.yml").text)
-        preparedCompose2.networks['00shathel_network'].external == true
-        preparedCompose2.services.dummy.networks == ['00shathel_network']
-
-        when:
-        command = stack.createStartCommand()
-
-        then:
-        command != null
-        command.commands.isEmpty()
+        stack.createStartCommand().commands.isEmpty()
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -74,12 +73,15 @@ class VBoxEnvironmentTest
         then:
         stack.createStartCommand().commands.size() == 2
 
-
         cleanOnEnd()
     }
 
-    private GString getRootDir() {
+    private String getRootDir() {
         "build/Test${getClass().getSimpleName()}"
+    }
+
+    private String getClusterName() {
+        return getClass().getSimpleName()
     }
 
 
@@ -92,6 +94,7 @@ class VBoxEnvironmentTest
                 .build()
         src.listFiles()
                 .findAll { it.isDirectory() }
+                .findAll { !new File(deps, "${it.getName()}.zip").exists() }
                 .each {
             IoUtils.zipIt(it,
                     new File(deps, "${it.getName()}.zip"))

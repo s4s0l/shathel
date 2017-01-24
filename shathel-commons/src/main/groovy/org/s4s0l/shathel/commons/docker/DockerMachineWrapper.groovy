@@ -21,8 +21,13 @@ class DockerMachineWrapper {
         exec = new ExecWrapper(LOGGER, "docker-machine")
     }
 
-    private DockerWrapper getDockerWraperOnHost(String machineName){
-        return new DockerWrapper(new ExecWrapper(LOGGER, "docker-machine ssh $machineName docker"))
+    private DockerWrapper getDockerWrapperOverSsh(String machineName) {
+        return new DockerWrapper(new ExecWrapper(LOGGER, "${exec.command} ssh $machineName docker"))
+    }
+
+    DockerWrapper getDockerWrapperOn(String machineName) {
+        def envs = getMachineEnvs(machineName)
+        return new DockerWrapper(new ExecWrapper(LOGGER, 'docker', envs))
     }
 
     void copy(String from, String to) {
@@ -30,14 +35,14 @@ class DockerMachineWrapper {
                 "scp $from $to");
     }
 
-    Map<String,String> getMachineEnvs(String machineName){
+    Map<String, String> getMachineEnvs(String machineName) {
         def output = exec.executeForOutput("env ${machineName}")
         [
-                DOCKER_CERT_PATH:(output =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/)[0][1],
-                DOCKER_HOST:(output =~ /[^\s]+ DOCKER_HOST="(.+)"/)[0][1],
-                DOCKER_TLS_VERIFY:(output =~ /[^\s]+ DOCKER_TLS_VERIFY="(.+)"/)[0][1],
-                DOCKER_MACHINE_NAME:(output =~ /[^\s]+ DOCKER_MACHINE_NAME="(.+)"/)[0][1],
-                DOCKER_API_VERSION:(output =~ /[^\s]+ DOCKER_API_VERSION="(.+)"/)[0][1],
+                DOCKER_CERT_PATH   : (output =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/)[0][1],
+                DOCKER_HOST        : (output =~ /[^\s]+ DOCKER_HOST="(.+)"/)[0][1],
+                DOCKER_TLS_VERIFY  : (output =~ /[^\s]+ DOCKER_TLS_VERIFY="(.+)"/)[0][1],
+                DOCKER_MACHINE_NAME: (output =~ /[^\s]+ DOCKER_MACHINE_NAME="(.+)"/)[0][1],
+                DOCKER_API_VERSION : (output =~ /[^\s]+ DOCKER_API_VERSION="(.+)"/)[0][1],
         ]
     }
 
@@ -104,7 +109,7 @@ class DockerMachineWrapper {
      * @param machineName
      */
     boolean start(String machineName) {
-        if ("Running" != exec.executeForOutput("status $machineName").trim()){
+        if ("Running" != exec.executeForOutput("status $machineName").trim()) {
             exec.executeForOutput("start $machineName")
             return true;
         }
@@ -118,7 +123,7 @@ class DockerMachineWrapper {
      * @return
      */
     Map getInfo(String machineName) {
-        return getDockerWraperOnHost(machineName).getInfo()
+        return getDockerWrapperOverSsh(machineName).getInfo()
     }
 
     /**
@@ -128,7 +133,7 @@ class DockerMachineWrapper {
      * @return
      */
     Map getNodes(String machineName) {
-        return getDockerWraperOnHost(machineName).getNodes();
+        return getDockerWrapperOverSsh(machineName).getNodes();
     }
 
     /**
@@ -138,30 +143,30 @@ class DockerMachineWrapper {
     Map getMachines() {
         def output = exec.executeForOutput("ls")
         return output.readLines()
-        .findAll {!it.startsWith("NAME")}
-        .collect { it.split("\\s+")}
-        .collectEntries {
+                .findAll { !it.startsWith("NAME") }
+                .collect { it.split("\\s+") }
+                .collectEntries {
             [
                     (it[0]):
                             [
-                                    name:it[0],
-                                    driver:it[2],
-                                    state:it[3]
+                                    name  : it[0],
+                                    driver: it[2],
+                                    state : it[3]
                             ]
             ]
         }
     }
 
 
-    String getJoinTokenForManager(String machineName){
+    String getJoinTokenForManager(String machineName) {
         return ssh(machineName, "docker swarm join-token -q manager")
     }
 
-    String getJoinTokenForWorker(String machineName){
+    String getJoinTokenForWorker(String machineName) {
         return ssh(machineName, "docker swarm join-token -q worker")
     }
 
-    boolean isServiceRunning(String machineName, String containerName){
+    boolean isServiceRunning(String machineName, String containerName) {
         return "" != ssh(machineName, "docker service ls -q -f name=$containerName")
     }
 
@@ -170,7 +175,7 @@ class DockerMachineWrapper {
     }
 
 
-    boolean isSwarmManager(String machine){
+    boolean isSwarmManager(String machine) {
         def info = getInfo(machine)
         def thisNodeInSwarm = info.Swarm.NodeID
         def managers = info.Swarm.RemoteManagers
@@ -182,7 +187,7 @@ class DockerMachineWrapper {
         return true
     }
 
-    boolean isSwarmWorker(String machine){
+    boolean isSwarmWorker(String machine) {
         def info = getInfo(machine)
         def managers = info.Swarm.RemoteManagers
         if (info.Swarm.LocalNodeState != "active"
@@ -193,11 +198,11 @@ class DockerMachineWrapper {
         return true
     }
 
-    boolean isSwarmActive(String machine){
+    boolean isSwarmActive(String machine) {
         return ssh(machine, "docker info") =~ /Swarm: active/;
     }
 
-    void swarmJoin(String machine, String advertiseIp, String token, String managerIp){
+    void swarmJoin(String machine, String advertiseIp, String token, String managerIp) {
         ssh(machine,
                 "docker swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${token} ${managerIp}:2377"
         )

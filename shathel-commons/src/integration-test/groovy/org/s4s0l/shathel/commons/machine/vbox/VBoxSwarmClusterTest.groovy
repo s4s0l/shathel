@@ -11,7 +11,7 @@ import spock.lang.Specification
 class VBoxSwarmClusterTest extends Specification {
     def setupSpec() {
         new DockerMachineWrapper(new File(getRootDir())).with{
-            getMachinesByName("unitTestCluster-.*").each { remove(it) }
+            getMachinesByName("$clusterName-.*").each { remove(it) }
         }
     }
 
@@ -25,13 +25,13 @@ class VBoxSwarmClusterTest extends Specification {
     def "Schould create and destroy machine swarm cluster"() {
         given:
         VBoxSwarmCluster c = new VBoxSwarmCluster(new File(getRootDir()),
-                "unitTestCluster", 2, 1, "20.20.20")
+                "$clusterName", 2, 1, "20.20.20")
         when:
         c.createMachines()
         then:
-        new DockerMachineWrapper(new File(getRootDir())).getMachinesByName("unitTestCluster-.*").sort() ==
-                ["unitTestCluster-manager-1", "unitTestCluster-manager-2",
-                 "unitTestCluster-worker-1"]
+        new DockerMachineWrapper(new File(getRootDir())).getMachinesByName("$clusterName-.*").sort() ==
+                ["$clusterName-manager-1", "$clusterName-manager-2",
+                 "$clusterName-worker-1"]
 
 
         cleanOnEnd()
@@ -39,5 +39,9 @@ class VBoxSwarmClusterTest extends Specification {
 
     private String getRootDir() {
         "build/Test${getClass().getSimpleName()}"
+    }
+
+    private String getClusterName(){
+        return getClass().getSimpleName()
     }
 }

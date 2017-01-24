@@ -2,7 +2,7 @@ version: "3"
 services:
   metadata:
     image: ianneub/network-tools
-    command: /bin/bash -c "until false; do ping uclient; sleep 1; done"
+    command: /bin/bash -c "until false; do ping tasks.metadata; sleep 1; done"
     networks:
       - network
     deploy:

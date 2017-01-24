@@ -177,7 +177,7 @@ class VBoxSwarmCluster {
 
     private void initSwarm(String nodeName, String advertiseIp) {
         log "Swarm Init"
-        //todo enclose in wrapper isSwarmActive()
+        //todo enclose in docker isSwarmActive()
         if (machine.ssh(nodeName, "docker info") =~ /Swarm: active/) {
             log "Swarm already present"
         } else {
@@ -227,7 +227,7 @@ docker run -d --restart=always -p 4001:5000 --name shathel-mirror-registry
     }
 
     private void removeContainerIfRunning(String machineName, String containerName) {
-        //todo enclose in wrapper isContainerRunning()
+        //todo enclose in docker isContainerRunning()
         def runningMirrorId = machine.ssh(machineName, "docker ps -q -f name=${containerName}").trim()
         if (runningMirrorId != "") {
             machine.ssh(machineName, "docker rm -f -v ${runningMirrorId}")

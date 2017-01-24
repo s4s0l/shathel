@@ -8,48 +8,35 @@ import org.slf4j.Logger
 class ExecWrapper {
     final Logger LOGGER;
     final String command;
+    final Map<String, String> environment;
 
-    ExecWrapper(Logger LOGGER, String command) {
+    ExecWrapper(Logger LOGGER, String command, Map<String, String> environment = [:]) {
         this.LOGGER = LOGGER
         this.command = command
-    }
-    def executeForExitValue(String... args) {
-        executeForExitValue(new File("."), args)
-    }
-    def executeForExitValue(String args) {
-        executeForExitValue(new File("."), args)
-    }
-    def executeForExitValue(File dir, String args) {
-        executeForExitValue(dir, args.split(" "))
+        this.environment = environment;
     }
 
-    def executeForExitValue(File dir, String... args) {
-        def process = new ProcessBuilder(([command] << args).flatten())
-                .directory(dir)
-                .redirectErrorStream(true)
-                .start()
+    def executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String args) {
+        executeForExitValue(dir, env, args.split(' '))
+    }
+
+    def executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String... args) {
+        List<?> flatten = fix(args)
+        Process process = createProcess(flatten, dir, env)
         process.inputStream.eachLine { LOGGER.debug("$command output:  $it") }
         process.waitFor();
         return process.exitValue()
     }
 
-    def executeForOutput( String args) {
-        executeForOutput(new File("."), args)
+    def executeForOutput(File dir = new File("."), Map<String, String> env = [:], String args) {
+        executeForOutput(dir, env, args.split(' '))
     }
-    def executeForOutput(File dir, String args) {
-        executeForOutput(dir, args.split(' '));
-    }
-    def executeForOutput( String ... args) {
-        executeForOutput(new File("."), args)
-    }
-    def executeForOutput(File dir, String... args) {
+
+    def executeForOutput(File dir = new File("."), Map<String, String> env = [:], String... args) {
         StringBuilder sb = new StringBuilder()
-        def flatten = ([] << command.split("\\s") << args).flatten().findAll {""!=it.trim()}
+        List<?> flatten = fix(args)
         LOGGER.debug("Running ${flatten.join(",")}")
-        def process = new ProcessBuilder(flatten)
-                .directory(dir)
-                .redirectErrorStream(true)
-                .start()
+        Process process = createProcess(flatten, dir, env)
         process.inputStream.eachLine {
             LOGGER.debug("output:  [$it]")
             sb.append(it).append("\n")
@@ -60,5 +47,20 @@ class ExecWrapper {
         } else {
             throw new Exception("Failed")
         }
+    }
+
+    private List<?> fix(String... args) {
+        def flatten = ([] << command.split("\\s") << args).flatten().findAll {
+            "" != it.trim()
+        }
+        flatten
+    }
+
+    private Process createProcess(List<String> command, File dir, Map<String, String> env = [:]) {
+        ProcessBuilder builder = new ProcessBuilder(command)
+                .directory(dir)
+                .redirectErrorStream(true)
+        builder.environment() << environment << env
+        return builder.start()
     }
 }

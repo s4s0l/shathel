@@ -43,7 +43,7 @@ public class Solution {
 
 
     public Stack openStack(Environment e, StackReference reference) {
-
+        e.verify();
         StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
         EnrichersFasade enricherProvider = new EnrichersFasade(context);
         DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider);

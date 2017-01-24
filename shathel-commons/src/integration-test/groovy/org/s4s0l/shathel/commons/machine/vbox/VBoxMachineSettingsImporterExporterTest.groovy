@@ -1,15 +1,16 @@
-package org.s4s0l.shathel.commons.machine
+package org.s4s0l.shathel.commons.machine.vbox
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.VBoxManageWrapper
+import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 /**
  * @author Matcin Wielgus
  */
-class MachineSettingsImporterExporterTest extends Specification {
+class VBoxMachineSettingsImporterExporterTest extends Specification {
 
     def setupSpec() {
         cleanOnEnd()
@@ -38,7 +39,7 @@ class MachineSettingsImporterExporterTest extends Specification {
 
 
         new DockerMachineWrapper(srcDir).create("-d virtualbox machineMovingTest")
-        MachineSettingsImporterExporter ie = new MachineSettingsImporterExporter(new File("${getRootDir()}/tmp"))
+        MachineSettingsImporterExporter ie = new VBoxMachineSettingsImporterExporter(new File("${getRootDir()}/tmp"))
         File saved = new File("${getRootDir()}/saved.zip")
         saved.createNewFile()
 
