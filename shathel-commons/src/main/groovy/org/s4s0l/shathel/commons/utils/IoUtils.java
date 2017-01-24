@@ -86,7 +86,6 @@ public class IoUtils {
      *
      * @param sourceDirPath
      * @param zipFilePath
-     * @throws IOException
      */
     public static void zipIt(File sourceDirPath, File zipFilePath) {
         Path p = null;

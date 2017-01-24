@@ -1,9 +1,17 @@
 TODO: integracja z shellem
-TODO: Password manager
+
 TODO: Zrobic bazową prawdziwą paczkę shathela
+
+TODO: test czy mirror w ogole dziala
+
+TODO: Password manager
 TODO: Zrobic paczke dla consula
+
 TODO: Zrobic paczke dla vaulta
+
 TODO: Zrobic paczke dla prometheusza
+
+
 TODO: wyciaganie juz dzialajacych stackow w poszukiwaniu globalnych enricherów
 TODO: Portainer uruchomić jako pachke sht
 TODO: post provisioning - skrypty grooviego + fajne jaieś api do pobierania info o otoczeniu
@@ -11,4 +19,7 @@ TODO: post provisioning - skrypty grooviego + fajne jaieś api do pobierania inf
 TODO: integracja z gitowym storage
 TODO: Zrobic paczke dla ELK
 TODO: Zrobic paczke dla spring admina
+
+TODO bosluga prywatnych repo - sciaga z repox do repo lokalnego
+TODO: uprawnienia do repozytorium
 TODO: szkielet odpalania docker machine na Digital Ocean

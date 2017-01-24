@@ -1,14 +1,13 @@
-package org.s4s0l.shathel.deployer.shell.customization
+package org.s4s0l.shathel.deployer.shell.customization;
 
-import org.springframework.shell.plugin.support.DefaultPromptProvider
-import org.springframework.stereotype.Component
+import org.springframework.shell.plugin.support.DefaultPromptProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Matcin Wielgus
  */
 @Component
-class CustomPrompt extends DefaultPromptProvider {
-
+public class CustomPrompt extends DefaultPromptProvider {
     /**
      * Getter for the Prompt.
      *
@@ -16,7 +15,7 @@ class CustomPrompt extends DefaultPromptProvider {
      */
     @Override
     public final String getPrompt() {
-        return "\$shathel>";
+        return "$shathel>";
     }
 
     /**

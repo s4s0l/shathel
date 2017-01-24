@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.deployer.shell;
 
+import org.s4s0l.shathel.deployer.shell.BootShim;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.shell.core.ExitShellRequest;

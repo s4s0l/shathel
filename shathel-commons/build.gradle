@@ -3,6 +3,8 @@ ext {
     displayName = "Shathel Commons"
 }
 
+apply from: '../gradle/groovy.gradle'
+apply from: '../gradle/spring.gradle'
 apply from: '../gradle/bintray.gradle'
 apply from: '../gradle/integration.gradle'
 
