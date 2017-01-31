@@ -6,8 +6,11 @@ env:
 
 
 build:
-
+  pre_ci_boot:
+    options: "-v $SHIPPABLE_BUILD_DIR:$SHIPPABLE_BUILD_DIR"
   ci:
+    - pwd
     - docker build -t dind4java:1.13.0 sandbox/did4java
+    - docker rm -f some-docker | true
     - docker run --privileged --name some-docker  -d docker:1.13.0-dind
-    - docker run --link some-docker:docker -w /build -v $(pwd):/build dind4java:1.13.0 ls -al
+    - docker run --link some-docker:docker -w /build -v ${SHIPPABLE_BUILD_DIR}:/build dind4java:1.13.0 ls -al
