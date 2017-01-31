@@ -34,6 +34,10 @@ dependencies {
     compile ('org.springframework.shell:spring-shell:1.2.0.M1') {
         //https://github.com/jline/jline2/issues/205
         exclude group: 'jline'
+        exclude group: 'com.google.guava'
     }
     compile('org.springframework.boot:spring-boot-starter')
+
+    testCompile "org.scalactic:scalactic_2.12:3.0.1"
+    testCompile "org.scalatest:scalatest_2.12:3.0.1"
 }

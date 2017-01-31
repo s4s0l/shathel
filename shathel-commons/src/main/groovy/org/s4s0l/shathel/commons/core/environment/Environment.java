@@ -28,6 +28,11 @@ public interface Environment {
 
     void verify();
 
+    void save();
+
+    void load();
+
+
     StackIntrospectionProvider getIntrospectionProvider();
 
     EnvironmentProvisionExecutor getProvisionExecutor();

@@ -16,6 +16,7 @@ class OpenSslWrapper {
     def generateKeyPair(String cn,
                         List<String> ips, List<String> dns,
                         String keyOutFile, String certOutFile) {
+        LOGGER.info("openssl: generating key $keyOutFile for ${cn} (${ips.join(",")})")
         new File(keyOutFile).getParentFile().mkdirs()
         new File(certOutFile).getParentFile().mkdirs()
         File tmp = File.createTempFile("sslcfg", "cnf");

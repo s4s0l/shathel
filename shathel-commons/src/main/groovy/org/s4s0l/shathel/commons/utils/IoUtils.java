@@ -49,11 +49,14 @@ public class IoUtils {
                     //create all non isVmPresent folders
                     //else you will hit FileNotFoundException for compressed folder
                     new File(newFile.getParent()).mkdirs();
-
-                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, len);
+                    if (ze.isDirectory()) {
+                        newFile.mkdirs();
+                    } else {
+                        try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                            int len;
+                            while ((len = zis.read(buffer)) > 0) {
+                                fos.write(buffer, 0, len);
+                            }
                         }
                     }
                     ze = zis.getNextEntry();

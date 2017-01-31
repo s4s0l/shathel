@@ -29,8 +29,7 @@ public class Solution {
 
 
     public Environment getEnvironment(String environmentName) {
-        SolutionFileModel model = SolutionFileModel.load(storage.getConfiguration());
-        SolutionDescription solutionDescription = new SolutionDescription(model);
+        SolutionDescription solutionDescription = getSolutionDescription();
         EnvironmentDescription environmentDescription = solutionDescription.getEnvironmentDescription(environmentName);
         String type = environmentDescription.getType();
 
@@ -39,6 +38,11 @@ public class Solution {
                 .get();
         return environmentProvider.getEnvironment(storage, environmentDescription,
                 context, solutionDescription);
+    }
+
+    public SolutionDescription getSolutionDescription() {
+        SolutionFileModel model = SolutionFileModel.load(storage.getConfiguration());
+        return new SolutionDescription(model);
     }
 
 

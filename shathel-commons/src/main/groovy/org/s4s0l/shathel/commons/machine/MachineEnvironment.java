@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -15,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author Matcin Wielgus
  */
 public class MachineEnvironment implements Environment {
-
+    private static final Logger LOGGER = getLogger(MachineEnvironment.class);
     private final String solutionName;
     private final File temporaryDir;
     private final SafeStorage safeStorage;
@@ -66,23 +69,35 @@ public class MachineEnvironment implements Environment {
         return true;
     }
 
+
+    @Override
+    public void save() {
+        String safeStoreKey = getSafeStorageKey();
+        getImporterExporter().saveSettings(getDockerMachineStorageDir(),
+                safeStorage.outputStream(safeStoreKey));
+    }
+
+    @Override
+    public void load() {
+        stop();
+        String safeStoreKey = getSafeStorageKey();
+        Optional<InputStream> inputStream = safeStorage.inputStream(safeStoreKey);
+        if (inputStream.isPresent()) {
+            if (isStarted()) {
+                stop();
+            }
+            getImporterExporter().loadSettings(inputStream.get(),
+                    getDockerMachineStorageDir());
+        } else {
+            throw new RuntimeException("No saved state found!");
+        }
+    }
+
     @Override
     public void initialize() {
         stop();
         try {
-            FileUtils.deleteDirectory(getDockerMachineStorageDir());
-            String safeStoreKey = getSafeStorageKey();
-            Optional<InputStream> inputStream = safeStorage.inputStream(safeStoreKey);
-            if (inputStream.isPresent()) {
-                //todo tu brakuje czegos w rodzaju reload settings
-                //co by odrejestrowało istniejace maszyny z vboxa aby mu nie robic syfu
-                getImporterExporter().loadSettings(inputStream.get(),
-                        getDockerMachineStorageDir());
-                start();
-            } else {
-                getDockerMachineStorageDir().mkdirs();
-            }
-
+            getDockerMachineStorageDir().mkdirs();
             boolean changed = getMachineProvisioner().createMachines(
                     getDockerMachineStorageDir(),
                     getBaseMachineName(),
@@ -91,8 +106,7 @@ public class MachineEnvironment implements Environment {
                     getWorkersCount());
 
             if (changed) {
-                getImporterExporter().saveSettings(getDockerMachineStorageDir(),
-                        safeStorage.outputStream(safeStoreKey));
+                LOGGER.info("Remember to save docker machine settings");
             }
         } catch (Exception e) {
             throw new RuntimeException("Initialization failed", e);
@@ -125,8 +139,6 @@ public class MachineEnvironment implements Environment {
     @Override
     public void destroy() {
         getDockerMachineCommons().destroyAll();
-        getImporterExporter().saveSettings(getDockerMachineStorageDir(),
-                safeStorage.outputStream(getSafeStorageKey()));
     }
 
     @Override

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.s4s0l.shathel.gradle.sample2</groupId>
+  <artifactId>simple-project2</artifactId>
+  <versioning>
+    <versions>
+      <version>DEVELOPER-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20170131001357</lastUpdated>
+  </versioning>
+</metadata>

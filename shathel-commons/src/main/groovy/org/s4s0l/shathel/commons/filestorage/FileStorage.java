@@ -1,11 +1,9 @@
 package org.s4s0l.shathel.commons.filestorage;
 
-import org.apache.commons.io.FileUtils;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 
 /**

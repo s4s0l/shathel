@@ -46,6 +46,7 @@ class DockerWrapper {
      * @param containerId
      */
     void removeContainer(String containerId) {
+        LOGGER.info("docker: removing container $containerId")
         exec.executeForOutput("rm -f -v $containerId")
     }
 
@@ -55,6 +56,7 @@ class DockerWrapper {
      * @return
      */
     void removeNetwork(String networkId) {
+        LOGGER.info("docker: removing network $networkId")
         exec.executeForOutput("network rm $networkId")
     }
 
@@ -122,10 +124,12 @@ class DockerWrapper {
     }
 
     void stackDeploy(File composeFile, String deploymentName) {
+        LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
         exec.executeForOutput(composeFile.getParentFile(), "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName");
     }
 
     void stackUnDeploy(File composeFile, String deploymentName) {
+        LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
         exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
     }
 

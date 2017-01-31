@@ -14,10 +14,12 @@ class DockerComposeWrapper {
     final ExecWrapper exec = new ExecWrapper(LOGGER, 'docker-compose')
 
     boolean up(File project, String projectName) {
+        LOGGER.info("compose: starting project $projectName from ${project.absolutePath}")
         exec.executeForExitValue(project, "-p $projectName up -d") == 0
     }
 
     boolean down(File project, String projectName) {
+        LOGGER.info("compose: stopping project $projectName from ${project.absolutePath}")
         exec.executeForExitValue(project, "-p $projectName down --remove-orphans") == 0
     }
     /**
@@ -25,6 +27,7 @@ class DockerComposeWrapper {
      * @param projectName
      */
     void removeAllForComposeProject(String projectName) {
+        LOGGER.info("compose: removing all for project named $projectName")
         def docker = new DockerWrapper();
         docker.getContainerIdsByFilter("label=com.docker.compose.project=$projectName").each {
             docker.removeContainer(it)
@@ -35,4 +38,7 @@ class DockerComposeWrapper {
     }
 
 
+    String version() {
+        (exec.executeForOutput("version") =~ /docker-compose version ([^\s]+),/)[0][1]
+    }
 }

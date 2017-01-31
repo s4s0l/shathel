@@ -4,4 +4,5 @@
 build
 .gradle
 out
-/shathel-commons/src/main/groovy/org/s4s0l/shathel/commons/docker/DockerMachineWrapper.java
+shathel-deployer/src/test/resources/localRepo/com/
+shathel-deployer/src/test/resources/localRepo/org/springframework/

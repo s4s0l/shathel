@@ -8,7 +8,7 @@ apply from: '../gradle/spring.gradle'
 apply from: '../gradle/bintray.gradle'
 apply from: '../gradle/integration.gradle'
 
-dependencies{
+dependencies {
     compile "org.yaml:snakeyaml:1.16"
     compile "org.slf4j:slf4j-api"
     testCompile "ch.qos.logback:logback-classic"
@@ -19,15 +19,15 @@ dependencies{
 
 }
 
-
 //Needed by tests in gradle-plugin
 ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
-plugins.withType(MavenPlugin) {
-    install {
-        repositories {
-            mavenDeployer {
-                repository(url: localRepoUrl.toURI())
-            }
-        }
-    }
+System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
+
+test {
+    environment "SHT_ENV_OVER_BY_MAP", "from env"
+    environment "SHT_PROP_OVER_BY_MAP", "from env"
+    environment "SHT_ENV_OVER_BY_PROP", "from env"
+    environment "SHT_ENV_NOOVER", "from env"
+    environment "SHT_PROP_NOOVER", "from env"
+    environment "SHT_MAP_NOOVER", "from env"
 }

@@ -9,12 +9,17 @@ import org.apache.http.entity.mime.HttpMultipartMode
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static groovyx.net.http.ContentType.JSON
 
 class PortainerCustomizer {
+    private static
+    final Logger LOGGER = LoggerFactory.getLogger(PortainerCustomizer.class);
+
     def log(String x) {
-        println "-----portainer:" + x
+        LOGGER.info("-----portainer:" + x);
     }
 
 

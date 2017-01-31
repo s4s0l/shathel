@@ -15,7 +15,7 @@ public class DefaultSafeStorageProvider implements SafeStorageProvider {
     @Override
     public SafeStorage getSafeStorage(Storage s, String name) {
         String x = "shathel.safe." + name + ".password";
-        return new SafeStorageImpl(s.getPersistedDirectory("safe/" + name),
+        return new SafeStorageImpl(s.getPersistedDirectory("safe." + name),
                 parameters.getParameter(x)
                         .map(pass -> pass.toCharArray())
                         .orElseThrow(() -> new RuntimeException("No password provided for " + x)));

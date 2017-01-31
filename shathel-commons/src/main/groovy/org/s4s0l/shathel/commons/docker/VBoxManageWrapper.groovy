@@ -22,6 +22,7 @@ class VBoxManageWrapper {
      */
     void removeVm(String vmName, boolean withDelete) {
         if (isVmPresent(vmName)) {
+            LOGGER.info("VBoxManage: Removing vm $vmName")
             def uuid = getDvdUuid(vmName, "boot2docker.iso")
             exec.executeForOutput("unregistervm $vmName ${withDelete ? "--delete" : ""}")
             if (uuid) {
@@ -82,6 +83,7 @@ class VBoxManageWrapper {
      * @param uuid
      */
     void removeDvd(String uuid) {
+        LOGGER.info("VBoxManage: Removing dvd $uuid")
         exec.executeForOutput("closemedium dvd $uuid")
         (1..10).find {
             if (!exec.executeForOutput("list dvds").contains(uuid)) {
@@ -98,6 +100,7 @@ class VBoxManageWrapper {
      * @param file
      */
     void registervm(File file) {
+        LOGGER.info("VBoxManage: Registering vm ${file.absolutePath}")
         exec.executeForOutput("registervm ${file.absolutePath}")
     }
 
@@ -119,6 +122,7 @@ class VBoxManageWrapper {
      */
     void poweroff(String machineName) {
         if (exec.executeForOutput("list runningvms").contains("\"$machineName\"")) {
+            LOGGER.info("VBoxManage: Powering off vm ${machineName}")
             exec.executeForOutput("controlvm $machineName poweroff")
         }
     }

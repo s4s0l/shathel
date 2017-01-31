@@ -16,5 +16,8 @@
 
 
     <logger name="org.springframework.shell" level="INFO"/>
+    <logger name="org.s4s0l.shathel" level="INFO"/>
+    <logger name="org.s4s0l.shathel.deployer.Main$" level="Error"/>
+    <logger name="org.s4s0l.shathel.deployer.Main" level="Error"/>
 
 </configuration>

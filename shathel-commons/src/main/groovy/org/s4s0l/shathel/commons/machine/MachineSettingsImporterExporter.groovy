@@ -67,6 +67,7 @@ class MachineSettingsImporterExporter {
         IoUtils.unZipIt(is, destinationDirectory);
         new File(destinationDirectory, "machines").listFiles()
                 .findAll { it.isDirectory() }
+                .collect { beforeLoad(it); it}
                 .collect { it ->
             new File(it, "config.json").with {
                 text = text.replaceAll(MachineSettingsImporterExporter.DIRECTORY_PLACEHOLDER, destinationDirectory.absolutePath)
@@ -88,6 +89,11 @@ class MachineSettingsImporterExporter {
     protected void afterLoad(File restoredMachineDir) {
 
     }
+
+    protected void beforeLoad(File restoredMachineDir) {
+
+    }
+
 
 
     protected void beforeSave(File vmFolder) {

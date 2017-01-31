@@ -16,11 +16,11 @@ class ExecWrapper {
         this.environment = environment;
     }
 
-    def executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String args) {
+    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String args) {
         executeForExitValue(dir, env, args.split(' '))
     }
 
-    def executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String... args) {
+    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String... args) {
         List<?> flatten = fix(args)
         Process process = createProcess(flatten, dir, env)
         process.inputStream.eachLine { LOGGER.debug("$command output:  $it") }
@@ -28,11 +28,11 @@ class ExecWrapper {
         return process.exitValue()
     }
 
-    def executeForOutput(File dir = new File("."), Map<String, String> env = [:], String args) {
+    String executeForOutput(File dir = new File("."), Map<String, String> env = [:], String args) {
         executeForOutput(dir, env, args.split(' '))
     }
 
-    def executeForOutput(File dir = new File("."), Map<String, String> env = [:], String... args) {
+    String executeForOutput(File dir = new File("."), Map<String, String> env = [:], String... args) {
         StringBuilder sb = new StringBuilder()
         List<?> flatten = fix(args)
         LOGGER.debug("Running ${flatten.join(",")}")
@@ -45,6 +45,7 @@ class ExecWrapper {
         if (process.exitValue() == 0) {
             return sb.toString().trim();
         } else {
+            LOGGER.error("Command failed with output:\n" + sb.toString().trim())
             throw new Exception("Failed")
         }
     }

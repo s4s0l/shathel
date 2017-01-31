@@ -21,15 +21,16 @@ pluginBundle {
 
 
 ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
-plugins.withType(MavenPlugin) {
-    install {
-        repositories {
-            mavenDeployer {
-                repository(url: localRepoUrl.toURI())
-            }
-        }
-    }
-}
+System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
+//plugins.withType(MavenPlugin) {
+//    install {
+//        repositories {
+//            mavenDeployer {
+//                repository(url: localRepoUrl.toURI())
+//            }
+//        }
+//    }
+//}
 
 tasks.withType(Test) {
     environment "GRADLE_USER_HOME", gradle.gradleUserHomeDir

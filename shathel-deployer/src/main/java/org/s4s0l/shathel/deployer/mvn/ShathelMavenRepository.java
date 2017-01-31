@@ -23,9 +23,7 @@ import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.*;
 import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
@@ -70,23 +68,32 @@ public class ShathelMavenRepository {
         private RemoteRepository repository;
 
 
-        private static class ShathelMavenSettingsBuilder {
-            private String m2SecuritySetting = "~/.m2/settings-security.xml";
+        public static class ShathelMavenSettingsBuilder {
 
-            private String m2Settings = getDefaultUserSettingsFile().getAbsolutePath();
+            private String m2SecuritySetting = getDefaultM2SecuritySetting();
 
-            private String localRepo = System.getProperty("maven.repo.local");
+            private String m2Settings = getDefaultUserSettingsFile();
+
+            private String localRepo = getDefaultLocalRepo();
 
             private RemoteRepository repository = new RemoteRepository.Builder("central", "default",
-                    "http://repo1.maven.org/maven2/").build();
+                    getMavenCentrajUrl()).build();
 
-            public File getDefaultUserSettingsFile() {
-                File userHome = new File(System.getProperty("user.home"));
-                return new File(new File(userHome, ".m2"), Names.SETTINGS_XML);
+            public static String getMavenCentrajUrl() {
+                return "http://repo1.maven.org/maven2/";
+            }
+
+            public static String getDefaultM2SecuritySetting() {
+                return "~/.m2/settings-security.xml";
+            }
+
+            public static String getDefaultUserSettingsFile() {
+                return new File(new File(new File(System.getProperty("user.home")), ".m2"), Names.SETTINGS_XML).getAbsolutePath();
+            }
+            public static String getDefaultLocalRepo() {
+                return new File(new File(System.getProperty("user.home")), ".m2/repository").getAbsolutePath();
             }
         }
-
-
 
 
         public void setRepository(String id, String repositoryUrl) {
@@ -343,10 +350,10 @@ public class ShathelMavenRepository {
     protected LocalRepositoryManager getLocalRepoMan(RepositorySystemSession session) {
 
         File repoDir = getDefaultLocalRepoDir();
+//        LocalRepositoryManager localRepositoryManager = new SimpleLocalRepoManagerMetadataFix(repoDir);
 
         LocalRepository repo = new LocalRepository(
                 repoDir);
-
         LocalRepositoryManager localRepositoryManager = locator.getService(RepositorySystem.class).newLocalRepositoryManager(session, repo);
         return localRepositoryManager;
     }
@@ -438,7 +445,6 @@ public class ShathelMavenRepository {
 
         return new ConservativeAuthenticationSelector(selector);
     }
-
 
 
 }

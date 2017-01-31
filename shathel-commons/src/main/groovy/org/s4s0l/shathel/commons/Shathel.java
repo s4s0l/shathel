@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.commons;
 
-import com.google.common.collect.ImmutableMap;
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.Solution;
@@ -10,7 +9,6 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.TemplateUtils;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +44,7 @@ public class Shathel {
             File configuration = fileStorage.getConfiguration();
             if (configuration.exists()) {
                 if (failIfExists)
-                    throw new RuntimeException("Configuration already isVmPresent!");
+                    throw new RuntimeException("Configuration already present!");
                 return getStorage(f);
             }
             String solutionName = params.getParameter("shathel.solution.name")

@@ -6,6 +6,7 @@ import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
 import org.s4s0l.shathel.commons.core.storage.Storage;
+import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 
 import java.io.File;
 
@@ -42,6 +43,16 @@ public class LocalEnvironment implements Environment {
     }
 
     @Override
+    public void save() {
+
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
     public void start() {
 
     }
@@ -66,7 +77,7 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public void verify() {
-
+        new DockerComposeWrapper().version();
     }
 
     @Override

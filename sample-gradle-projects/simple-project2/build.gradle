@@ -1,3 +1,4 @@
+System.setProperty("maven.repo.local", "${System.getProperty('bootcker_localrepo') ?: "../../build/localrepo"}")
 buildscript {
     repositories {
         jcenter()
@@ -23,18 +24,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'shathel'
 
 version = "${System.getProperty('bootcker_project_version') ?: "DEVELOPER-SNAPSHOT"}"
-ext.localRepoUrl = new File("${System.getProperty('bootcker_localrepo') ?: "../../build/localrepo"}")
 
-plugins.withType(MavenPlugin) {
-    install {
-        repositories {
-            mavenDeployer {
-                uniqueVersion = false
-                repository(id:'local',url: localRepoUrl.toURI())
-            }
-        }
-    }
-}
 
 
 repositories {

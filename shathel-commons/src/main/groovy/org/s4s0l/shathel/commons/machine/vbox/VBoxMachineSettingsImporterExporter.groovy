@@ -16,11 +16,15 @@ class VBoxMachineSettingsImporterExporter extends MachineSettingsImporterExporte
 
     @Override
     protected void afterLoad(File restoredMachineDir) {
+        vbox.registervm(new File(restoredMachineDir, "${restoredMachineDir.name}/${restoredMachineDir.name}.vbox"))
+    }
+
+    @Override
+    protected void beforeLoad(File restoredMachineDir) {
         if (vbox.isVmPresent(restoredMachineDir.name)) {
             new DockerMachineWrapper(restoredMachineDir.getParentFile().getParentFile()).stop(restoredMachineDir.name)
             vbox.removeVm(restoredMachineDir.name, false)
         }
-        vbox.registervm(new File(restoredMachineDir, "${restoredMachineDir.name}/${restoredMachineDir.name}.vbox"))
     }
 
     @Override

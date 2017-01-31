@@ -5,10 +5,8 @@ import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
-import org.s4s0l.shathel.commons.docker.DockerComposeWrapper
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
-import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 
 /**

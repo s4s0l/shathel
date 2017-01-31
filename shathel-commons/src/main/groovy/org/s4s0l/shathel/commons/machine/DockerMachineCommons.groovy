@@ -47,7 +47,7 @@ class DockerMachineCommons {
 
     boolean isAllStarted() {
         Map machines = getWrapper().getMachines();
-        machines.find { it.value.state != "Running" } == null
+        !machines.isEmpty() && machines.find { it.value.state != "Running" } == null
     }
 
     void stopAll() {

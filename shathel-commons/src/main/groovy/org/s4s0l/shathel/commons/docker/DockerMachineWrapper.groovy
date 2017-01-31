@@ -11,7 +11,7 @@ class DockerMachineWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(DockerMachineWrapper.class);
 
-    private final ExecWrapper exec;
+    final ExecWrapper exec;
 
     DockerMachineWrapper(File staorageDir) {
         exec = new ExecWrapper(LOGGER, "docker-machine -s ${staorageDir.absolutePath}")
@@ -31,6 +31,7 @@ class DockerMachineWrapper {
     }
 
     void copy(String from, String to) {
+        LOGGER.info("machine: copy $from $to")
         exec.executeForOutput(new File("."),
                 "scp $from $to");
     }
@@ -52,11 +53,13 @@ class DockerMachineWrapper {
     }
 
     void restart(String node) {
+        LOGGER.info("machine: restarting $node")
         exec.executeForOutput(new File("."),
                 "restart $node ");
     }
 
     void regenerateCerts(String node) {
+        LOGGER.info("machine: regenerating certs for $node")
         exec.executeForOutput(new File("."),
                 "regenerate-certs -f  $node ");
     }
@@ -91,6 +94,7 @@ class DockerMachineWrapper {
      * @param machineName
      */
     void remove(String machineName) {
+        LOGGER.info("machine: removing $machineName")
         exec.executeForOutput("rm -f $machineName")
     }
 
@@ -99,8 +103,10 @@ class DockerMachineWrapper {
      * @param machineName
      */
     void stop(String machineName) {
-        if ("Running" == exec.executeForOutput("status $machineName").trim())
+        if ("Running" == exec.executeForOutput("status $machineName").trim()) {
+            LOGGER.info("machine: stopping $machineName")
             exec.executeForOutput("stop $machineName")
+        }
     }
 
     /**
@@ -110,6 +116,7 @@ class DockerMachineWrapper {
      */
     boolean start(String machineName) {
         if ("Running" != exec.executeForOutput("status $machineName").trim()) {
+            LOGGER.info("machine: starting $machineName")
             exec.executeForOutput("start $machineName")
             return true;
         }
@@ -203,6 +210,7 @@ class DockerMachineWrapper {
     }
 
     void swarmJoin(String machine, String advertiseIp, String token, String managerIp) {
+        LOGGER.info("machine: machine $machine is joining swarm at $managerIp")
         ssh(machine,
                 "docker swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${token} ${managerIp}:2377"
         )
