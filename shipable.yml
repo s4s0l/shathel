@@ -1,0 +1,9 @@
+language: none
+env:
+  - DOCKER_VERSION=1.12.6 COMPOSE_VERSION=1.9.0
+
+
+build:
+
+  ci:
+    - docker ps
