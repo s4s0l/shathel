@@ -2,8 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 env:
-  - DOCKER_VERSION=1.12.6 COMPOSE_VERSION=1.9.0
-
+  - DOCKER_VERSION=1.12.6 COMPOSE_VERSION=1.9.0 BINTRAY_USER=sasol
+  - secure: OE2KRt9auAest3tMJUOgnbAn11R6squpYrVH+1j3MtsP7SwwzGVdvTC98H2iIfomgq+a1Gp/a+vAXb85aNE+ZdLuGpCFs1Pgug2yL99SLUNt7ZLmUs3gPS/V5jN6MUKHxB0aGs9o0eQ9abWMS4P4tFj7675PYIUJKV8AkDX975nkLsn9dScd8r9UBsb6nCaoAlzQWBB7KOg2wEOJS2RnUkE6P5O03Gle/y/hYtAF1OI5F44n3TEkMFOxuq1/1CqB9HH7+AvbGOc+5Fy4GpHODIq1UGhuReS79xK7HTfTfwiJofmYxsw5LYIwHUba4oJKK7vThVxXmZ4Lh+meXkkm2g==
 
 build:
   pre_ci_boot:
@@ -14,3 +14,10 @@ build:
     - docker rm -f some-docker | true
     - docker run --privileged --name some-docker  -d docker:1.13.0-dind
     - docker run --link some-docker:docker -w /build -v ${SHIPPABLE_BUILD_DIR}:/build dind4java:1.13.0 ./gradlew test
+  on_success:
+    - >
+      test $IS_PULL_REQUEST == "false" &&
+      test $IS_GIT_TAG == "true" &&
+      test $SHIPPABLE_REPO_SLUG == "s4s0l/shathel" &&
+      test $DOCKER_VERSION == "1.12.6" &&
+      sudo ./gradlew bintrayUpload -Pversion="$GIT_TAG_NAME" --info
