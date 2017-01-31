@@ -23,7 +23,7 @@ class ExecWrapperTest extends Specification {
         exit = ew.executeForExitValue(new File("src"), "-al asdasd")
 
         then:
-        exit == 2
+        exit != 0
     }
 
     def "Schould return output"(){

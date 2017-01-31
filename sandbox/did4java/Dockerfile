@@ -1,8 +1,11 @@
-FROM docker:1.13.0-dind
+FROM docker:1.13.0
 
-ENV COMPOSE_VERSION=1.9.0
+ENV COMPOSE_VERSION=1.10.0-rc1
 
-RUN curl -o /usr/local/bin/docker-compose -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-Linux-x86_64 && chmod +x /usr/local/bin/docker-compose
+RUN apk add --no-cache py-pip
+RUN pip install docker-compose=="$COMPOSE_VERSION"
+#RUN curl -o /usr/local/bin/docker-compose -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-Linux-x86_64
+#RUN chmod +x /usr/local/bin/docker-compose
 
 # https://github.com/docker-library/openjdk/blob/0476812eabd178c77534f3c03bd0a2673822d7b9/8-jdk/alpine/Dockerfile
 # A few problems with compiling Java from source:
@@ -33,5 +36,3 @@ RUN set -x \
 		openjdk8="$JAVA_ALPINE_VERSION" \
 	&& [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
-ENTRYPOINT ["dockerd-entrypoint.sh"]
-CMD []
