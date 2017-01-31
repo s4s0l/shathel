@@ -8,9 +8,11 @@ env:
 build:
 
   ci:
-    - docker version
-    - docker ps -a -f label=com.docker.compose.project=dummy -q
     - java -version
+    - docker version
+    - curl -sSL https://get.docker.com/ | sh
+    - apt-get -y --force-yes install docker-engine=${DOCKER_VERSION}-0~ubuntu-trusty
+    - docker version
     - curl -o /usr/local/bin/docker-compose -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-Linux-x86_64 && sudo chmod +x /usr/local/bin/docker-compose
     - docker ps
     - ./gradlew test --info
