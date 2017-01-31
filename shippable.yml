@@ -8,6 +8,8 @@ env:
 build:
 
   ci:
+    - pwd
+    - ls -al
     - java -version
     - docker version
     - curl -sSL https://get.docker.com/ | sh
