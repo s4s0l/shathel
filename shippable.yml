@@ -19,7 +19,7 @@ build:
     - >
       (
       test $IS_PULL_REQUEST == "false" &&
-      test $IS_GIT_TAG == "true" &&
+      test $IS_RELEASE == "true" &&
       test $SHIPPABLE_REPO_SLUG == "s4s0l/shathel" &&
       test $DOCKER_VERSION == "1.12.6" &&
       docker run --link some-docker:docker -w /build -v ${SHIPPABLE_BUILD_DIR}:/build
