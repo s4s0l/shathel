@@ -6,8 +6,11 @@ env:
 build:
 
   ci:
-    - sudo apt-get install openjdk-8-jdk
-    - java -version
+    - add-apt-repository -y ppa:openjdk-r/ppa
+    - apt-get update
+    - apt-get install openjdk-8-jdk
+    - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+    - $JAVA_HOME/bin/java -version
     - curl -o /usr/local/bin/docker-compose -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-Linux-x86_64 && sudo chmod +x /usr/local/bin/docker-compose
     - docker ps
     - ./gradlew test --info
