@@ -8,13 +8,5 @@ env:
 build:
 
   ci:
-    - pwd
-    - ls -al
-    - java -version
-    - docker version
-    - curl -sSL https://get.docker.com/ | sh
-    - apt-get -y --force-yes install docker-engine=${DOCKER_VERSION}-0~ubuntu-trusty
-    - docker version
-    - curl -o /usr/local/bin/docker-compose -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-Linux-x86_64 && sudo chmod +x /usr/local/bin/docker-compose
-    - docker ps
-    - ./gradlew test --info
+    - docker build -t dind4java:1.13.0 sandbox/did4java
+    - docker run --privileged --name some-docker -v /root/src/github.com/s4s0l/shathel:/build --rm -ti dind4java:1.13.0 ls -al /build
