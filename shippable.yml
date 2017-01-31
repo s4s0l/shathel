@@ -20,4 +20,7 @@ build:
       test $IS_GIT_TAG == "true" &&
       test $SHIPPABLE_REPO_SLUG == "s4s0l/shathel" &&
       test $DOCKER_VERSION == "1.12.6" &&
-      sudo ./gradlew bintrayUpload -Pversion="$GIT_TAG_NAME" --info
+      docker run --link some-docker:docker -w /build -v ${SHIPPABLE_BUILD_DIR}:/build
+      -e BINTRAY_USER=$BINTRAY_USER
+      -e BINTRAY_KEY=$BINTRAY_KEY
+      dind4java:1.13.0 ./gradlew bintrayUpload -Pversion="$GIT_TAG_NAME" --info
