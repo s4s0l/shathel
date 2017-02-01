@@ -1,4 +1,4 @@
-FROM docker:1.13.0
+FROM docker:1.13.0-dind
 
 ENV COMPOSE_VERSION=1.10.0-rc1
 
@@ -35,4 +35,8 @@ RUN set -x \
 	&& apk add --no-cache \
 		openjdk8="$JAVA_ALPINE_VERSION" \
 	&& [ "$JAVA_HOME" = "$(docker-java-home)" ]
-
+RUN apk add --no-cache bash
+ADD start.sh /start.sh
+RUN chmod +x /start.sh
+ENTRYPOINT ["/start.sh"]
+CMD [""]

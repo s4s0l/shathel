@@ -8,7 +8,7 @@ root@do-test1:~# systemctl daemon-reload
 root@do-test1:~# service docker restart
 
 
-
+Jak ustawic aby exponował portyna okreslonym interfejsie:
 [Service]
 ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver aufs --tlsverify --tlscacert /etc/docker/ca.pem \
 --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem --label provider=digitalocean --ip 10.132.14.242 <- private ip
@@ -18,8 +18,9 @@ ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock 
 docker swarm init --listen-addr eth1 --advertise-addr eth1
 
 
+
 service:
-tu nie dziala --ip
+tu nie dziala --ip z powyżej i tak słucha na wszystkich interfejsach
 
 docker service create     --name portainer     --publish 9000:9000     --constraint 'node.role==manager'     --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock     portainer/portainer     -H unix:///var/run/docker.sock
 

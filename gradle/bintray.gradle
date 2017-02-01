@@ -62,7 +62,7 @@ bintray {
         vcsUrl = "${project.vcsUrl}"
         websiteUrl = "${project.websiteUrl}"
         issueTrackerUrl = "${project.issueTrackerUrl}"
-        githubRepo = "${project.githubRepository}" //Optional Github repository
+        githubRepo = "${project.githubRepository}" //Optional Github repositoryName
         githubReleaseNotesFile = 'README.md'
         labels = project.tags
         version {

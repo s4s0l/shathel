@@ -62,7 +62,7 @@ staticIp ${CLUSTER_NAME}-manager-1
 MANAGER_IP=$(docker-machine ip ${CLUSTER_NAME}-manager-1)
 
 
-log "Generate Certificates for mirror and repository"
+log "Generate Certificates for mirror and repositoryName"
 mkdir -p /tmp/${CLUSTER_NAME}-registry/mirrorcerts
 mkdir -p /tmp/${CLUSTER_NAME}-registry/certs
 openssl req -newkey rsa:4096 -nodes -sha256 -x509 -days 365 -subj "/CN=${MANAGER_IP}" \
@@ -81,7 +81,7 @@ openssl req -newkey rsa:4096 -nodes -sha256 -x509 -days 365 -subj "/CN=${MANAGER
 
 
 
-log "Copy Certificates for mirror and repository to local docker"
+log "Copy Certificates for mirror and repositoryName to local docker"
 sudo mkdir -p /etc/docker/certs.d/${MANAGER_IP}:4000/
 sudo mkdir -p /etc/docker/certs.d/${MANAGER_IP}:4001/
 sudo cp /tmp/${CLUSTER_NAME}-registry/certs/ca.crt /etc/docker/certs.d/${MANAGER_IP}:4000/ca.crt
@@ -103,7 +103,7 @@ docker-machine scp /tmp/${CLUSTER_NAME}-registry/certs/domain.key ${CLUSTER_NAME
 
 
 
-log "Run mirror repository container"
+log "Run mirror repositoryName container"
 docker-machine ssh ${CLUSTER_NAME}-manager-1 docker run -d --restart=always -p 4001:5000 --name mirror-registry \
  -v /registry/mirrordata:/var/lib/registry \
  -v /registry/mirrorcerts:/certs \
@@ -112,7 +112,7 @@ docker-machine ssh ${CLUSTER_NAME}-manager-1 docker run -d --restart=always -p 4
  -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
   registry:2.5
 
-log "Run repository container"
+log "Run repositoryName container"
 docker-machine ssh ${CLUSTER_NAME}-manager-1 docker run -d --restart=always -p 4000:5000 --name registry \
  -v /registry/data:/var/lib/registry \
  -v /registry/certs:/certs \

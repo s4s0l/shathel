@@ -26,7 +26,7 @@ System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
 //    install {
 //        repositories {
 //            mavenDeployer {
-//                repository(url: localRepoUrl.toURI())
+//                repositoryName(url: localRepoUrl.toURI())
 //            }
 //        }
 //    }
