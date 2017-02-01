@@ -30,5 +30,6 @@ build:
       -e BINTRAY_USER=$BINTRAY_USER
       -e BINTRAY_KEY=$BINTRAY_KEY
       -e GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
-      dind4java:1.13.0 ./gradlew -Pversion="$GIT_TAG_NAME" --info bintrayUpload uploadGithubRelease
+      dind4java:1.13.0 ./gradlew --project-cache-dir=.cache --gradle-user-home=.cache
+      -Pversion="$GIT_TAG_NAME" --info bintrayUpload uploadGithubRelease
       ) || (echo "SKIPPED")
