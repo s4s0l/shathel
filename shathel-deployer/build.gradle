@@ -50,7 +50,7 @@ springBoot {
 apply from: '../gradle/github.gradle'
 
 task(type: GitHubReleaseUploadAsset, dependsOn: assemble, "uploadGithubRelease") {
-    markAsNonPre = false
+    markAsNonPre = true
     asset(file("$project.buildDir/libs/$project.name-${project.version}.jar"),
             [name : "$project.name",
              label: "Runnable $project.name jar"]

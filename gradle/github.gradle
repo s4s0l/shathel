@@ -1,4 +1,4 @@
-buildscript{
+buildscript {
     repositories {
         jcenter()
     }
@@ -14,45 +14,17 @@ import groovyx.net.http.RESTClient
 import static groovyx.net.http.ContentType.JSON
 
 class GitHubReleaseAsset extends org.gradle.api.DefaultTask {
-    private static final Logger BUILD_LOGGER = Logging.getLogger(GitHubReleaseAsset.class);
+    private static
+    final Logger BUILD_LOGGER = Logging.getLogger(GitHubReleaseAsset.class);
     def token;
     def repositoryName = null;
     def githubReleaseTag = null;
     def markAsNonPre = false;
 
-    private Map<File,Map<String,String>> assetsToUpload = [:]
+    private Map<File, Map<String, String>> assetsToUpload = [:]
 
-    private def contents = [
-            jar: 'application/java-archive',
-            zip: 'application/zip'
-    ]
-
-    private String getRepoNameFromSystem() {
-        System.getProperty("user.name") + "/" + project.rootProject.getName()
-    }
-
-    private String getRepoNameFromProject() {
-        return (project.ext.has('githubRepository') ? project.ext['githubRepository'] : null)
-    }
-
-    private def getExtension(File f) {
-        def of = f.getName().lastIndexOf(".")
-
-        if (of == -1) {
-            return null;
-        } else {
-            return f.getName().substring(of + 1)
-        }
-    }
-
-    def asset(File f, Map<String, String> params = [:]) {
-        def n = params.getOrDefault('name', f.getName())
-        def l = params.getOrDefault('label', params.getOrDefault('name', f.getName()))
-        def ct = params.getOrDefault('contentType', contents[getExtension(f)]) ?: "application/zip"
-        assetsToUpload << [(f): [name: n, label: l, contentType: ct]]
-
-    }
-
+    private def contents = [jar: 'application/java-archive',
+                            zip: 'application/zip']
 
     @org.gradle.api.tasks.TaskAction
     def void upload() {
@@ -65,37 +37,55 @@ class GitHubReleaseAsset extends org.gradle.api.DefaultTask {
         BUILD_LOGGER.info("GitHub: Uploading to repositoryName $repo tag $tag")
         def gh = createClient()
         def heads = headers(tok);
-        HttpResponseDecorator result = gh.get(
-                path: "/repos/$repo/releases/tags/$tag",
-                headers: heads
-        )
+        HttpResponseDecorator result = gh.get([
+                path   : "/repos/$repo/releases/tags/$tag",
+                headers: heads])
         def uploadUrl = result.data.upload_url
         def id = result.data.id
-
         assetsToUpload.each {
             gh.getEncoder()[it.value.contentType] = gh.getEncoder().&encodeStream
             BUILD_LOGGER.log(LogLevel.WARN, "GitHub: Uploading to repositoryName $repo tag $tag file ${it.key.path} : ${it.value}")
-            result = gh.post(
-                    uri: uploadUrl - "{?name,label}",
-                    query: [
-                            name:"${it.value.name}",
-                            label:"${it.value.label}"
-                    ],
-                    body: it.key.bytes,
+            gh.post([
+                    uri               : uploadUrl - "{?name,label}",
+                    query             : [name : "${it.value.name}",
+                                         label: "${it.value.label}"],
+                    body              : it.key.bytes,
                     requestContentType: it.value.contentType,
-                    headers: heads
-            )
+                    headers           : heads
+            ])
         }
-
-
-        if(markAsNonPre){
-            gh.post(
-                    path: "/repos/$repo/releases/$id",
+        if (markAsNonPre) {
+            gh.post([
+                    path              : "/repos/$repo/releases/$id",
                     requestContentType: JSON,
-                    headers: heads,
-                    body: ["prerelease": false]
-            )
+                    headers           : heads,
+                    body              : ["prerelease": false]
+            ])
         }
+    }
+
+    private String getRepoNameFromSystem() {
+        System.getProperty("user.name") + "/" + project.rootProject.getName()
+    }
+
+    private String getRepoNameFromProject() {
+        return (project.ext.has('githubRepository') ? project.ext['githubRepository'] : null)
+    }
+
+    private def getExtension(File f) {
+        def of = f.getName().lastIndexOf(".")
+        if (of == -1) {
+            return null;
+        } else {
+            return f.getName().substring(of + 1)
+        }
+    }
+
+    def asset(File f, Map<String, String> params = [:]) {
+        def n = params.getOrDefault('name', f.getName())
+        def l = params.getOrDefault('label', params.getOrDefault('name', f.getName()))
+        def ct = params.getOrDefault('contentType', contents[getExtension(f)]) ?: "application/zip"
+        assetsToUpload << [(f): [name: n, label: l, contentType: ct]]
     }
 
     private LinkedHashMap<String, String> headers(String tok) {
@@ -103,12 +93,9 @@ class GitHubReleaseAsset extends org.gradle.api.DefaultTask {
          'User-Agent'   : 's4s0l release enricher']
     }
 
-
     def createClient() {
         def gh = new RESTClient("https://api.github.com")
-//        gh.handler[Status.FAILURE] = gh.handler.get(Status.SUCCESS)
         gh.ignoreSSLIssues()
-//        gh.getEncoder()["application/zip"] = gh.getEncoder().&encodeStream
         gh
     }
 }
