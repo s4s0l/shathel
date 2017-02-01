@@ -12,7 +12,7 @@ build:
   ci:
     - pwd
     - docker build -t dind4java:1.13.0 sandbox/did4java
-    - docker run --privileged -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm -ti dind4java:1.13.0 ./gradlew clean test
+    - docker run --privileged -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm dind4java:1.13.0 ./gradlew clean test
   on_success:
     - >
       (
