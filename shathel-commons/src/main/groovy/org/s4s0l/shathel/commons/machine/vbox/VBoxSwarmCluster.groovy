@@ -31,7 +31,7 @@ class VBoxSwarmCluster {
         }
         machine = new DockerMachineWrapper(workDir);
         MACHINE_OPTS = "--virtualbox-hostonly-cidr=${ns.getCidr(254)} " +
-                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.0/boot2docker.iso"
+                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.1-rc1/boot2docker.iso"
     }
 
 

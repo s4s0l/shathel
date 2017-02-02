@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.core.stack;
 
+import org.s4s0l.shathel.commons.core.model.GavUtils;
+
 /**
  * @author Matcin Wielgus
  */
@@ -10,11 +12,11 @@ public class StackReference {
 
     public StackReference(String group, String name, String version) {
         this.name = name;
-        this.group = group;
+        this.group = group == null ? GavUtils.DEFAULT_GROUP : group;
         this.version = version;
     }
     public StackReference(String gav) {
-        this(gav.split(":")[0], gav.split(":")[1], gav.split(":")[2] );
+        this(GavUtils.getGroup(gav), GavUtils.getName(gav), GavUtils.getVersion(gav) );
     }
     public String getName() {
         return name;

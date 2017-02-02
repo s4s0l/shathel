@@ -1,5 +1,5 @@
 apply plugin: org.s4s0l.shathel.gradle.ShathelPackagerPlugin
 ext {
-    displayName = "Shathel Stack:Core"
+    displayName = "Shathel Stack:Portainer"
 }
 apply from: '../gradle/bintray.gradle'

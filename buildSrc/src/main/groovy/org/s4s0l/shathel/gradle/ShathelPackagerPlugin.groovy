@@ -9,22 +9,49 @@ import org.gradle.api.tasks.bundling.Zip
 import org.s4s0l.gradle.bootcker.BootckerComposePreparator
 import org.s4s0l.gradle.bootcker.ComposeFile
 import org.s4s0l.gradle.bootcker.ComposeFilesContainer
-import org.s4s0l.shathel.commons.core.model.StackFileModel
 import org.yaml.snakeyaml.Yaml
 
 /**
  * @author Matcin Wielgus
  */
 class ShathelPackagerPlugin implements Plugin<Project> {
+
+    def getLocalProjectNameFromGav(String gav){
+        def of = gav.lastIndexOf(":")
+        def ret = gav.substring(0, of)
+        ret.startsWith(":") ? ret : ":$ret"
+
+    }
+
     @Override
     void apply(Project project) {
-        project.extensions.create('shathel', ShathelPackagerExtension)
+//        project.extensions.create('shathel', ShathelPackagerExtension)
 
         project.configurations.create('shathel')
 
-        def shtlStackModel = new StackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text));
-        shtlStackModel.dependencies.each { d ->
-            project.dependencies.shathel group: d.group, name: d.name, version: d.version, classifier: 'shathel', ext: 'zip'
+        def shtlStackModel = new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text)
+        def deps = shtlStackModel['shathel-stack'].dependencies.collect {
+            kv ->
+                def splitted = kv.key.split(':')
+                splitted = splitted.length == 2 ? "org.s4s0l.shathel:${kv.key}".split(":") : splitted
+                [
+                        group     : splitted[0],
+                        name      : splitted[1],
+                        version   : splitted[splitted.length - 1],
+                        minVersion: kv.value?.min,
+                        maxVersion: kv.value?.max,
+                        gav       : kv.key
+                ]
+
+        }
+        deps.each { d ->
+            if (d.version == '$version' && project.findProject(getLocalProjectNameFromGav(d.gav))){
+                project.dependencies {
+                    shathel project.dependencies.project(path: getLocalProjectNameFromGav(d.gav), configuration: 'shathel')
+                }
+            }else{
+                project.dependencies.shathel group: d.group, name: d.name, version: d.version, classifier: 'shathel', ext: 'zip'
+            }
         }
 
 
@@ -51,9 +78,9 @@ class ShathelPackagerPlugin implements Plugin<Project> {
                     assert prepare.size() == 1
 
                     //make sure version and project name are same as project
-                    def model = new StackFileModel(new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text))
-                    model.gav = "${project.group}:${project.name}:${project.version}".toString()
-                    new File(shtTemporaryDirectory, 'shthl-stack.yml').text = new Yaml().dump(model.parsedYml)
+                    def parsedYml = new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text)
+                    parsedYml['shathel-stack']['gav'] = "${project.group}:${project.name}:${project.version}".toString()
+                    new File(shtTemporaryDirectory, 'shthl-stack.yml').text = new Yaml().dump(parsedYml)
                 }
             }
 
@@ -76,6 +103,7 @@ class ShathelPackagerPlugin implements Plugin<Project> {
             assemble.dependsOn shtAssemble
             artifacts {
                 archives shtAssemble
+                shathel shtAssemble
             }
         }
     }

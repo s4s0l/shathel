@@ -1,3 +1,5 @@
 include 'shathel-commons'
 include 'shathel-gradle-plugin'
 include 'shathel-deployer'
+include 'shathel-stack-core'
+include 'shathel-stack-portainer'

@@ -9,12 +9,23 @@ apply from: '../gradle/spring.gradle'
 apply from: '../gradle/bintray.gradle'
 apply from: '../gradle/plugin.gradle'
 
-
+/**
+ * Below is a funny trick to share sources between buildSrc and
+ * this project. cause projects shathel-stack-* need some parts of
+ * this plugin. DRY man DRY...
+ */
+sourceSets {
+    main {
+        groovy {
+            srcDirs '../buildSrc/src/main/groovy'
+        }
+    }
+}
 
 dependencies {
     compile project(":shathel-commons")
     compile gradleApi()
-    compile 'org.s4s0l.gradle:bootcker-gradle-plugin:0.2.3'
+    compile 'org.s4s0l.gradle:bootcker-gradle-plugin:0.2.4'
     compile "org.yaml:snakeyaml:1.16"
     compile 'commons-io:commons-io:2.3'
     testCompile gradleTestKit()
