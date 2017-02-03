@@ -1,6 +1,7 @@
-package org.s4s0l.shathel.commons.core.swarm;
+package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
+import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ public interface SwarmClusterWrapper {
 
     String ssh(String node, String command);
 
+    String sudo(String node, String command);
+
     void scp(String from, String to);
 
     void destroy(String node);
@@ -26,8 +29,43 @@ public interface SwarmClusterWrapper {
 
     DockerWrapper getWrapperForNode(String node);
 
-    default boolean isInitialized(int managersCount, int workersCount){
+    String getNonRootUser();
+    /**
+     * @return ip of machine created
+     */
+    CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost);
+
+    default boolean isInitialized(int managersCount, int workersCount) {
         return getAllNodeNames().size() >= managersCount + workersCount;
+    }
+
+
+    /**
+     * returns DOCKER_* environment variables used to talk with
+     * docker daemon running on given node
+     *
+     * @param node
+     * @return
+     */
+    Map<String, String> getMachineEnvs(String node);
+
+
+    class CreationResult {
+        private final String ip;
+        private final boolean modified;
+
+        public CreationResult(String ip, boolean modified) {
+            this.ip = ip;
+            this.modified = modified;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public boolean isModified() {
+            return modified;
+        }
     }
 
     class Node {

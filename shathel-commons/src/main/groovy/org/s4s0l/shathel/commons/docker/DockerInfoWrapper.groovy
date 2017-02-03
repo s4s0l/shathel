@@ -34,7 +34,7 @@ class DockerInfoWrapper {
     }
 
     boolean isSwarmActive() {
-        return info.Swarm.Cluster.ID != null && (isSwarmWorker() || isManager())
+        return info.Swarm.LocalNodeState == "active" && (isSwarmWorker() || isManager())
     }
 
     String getSwarmClusterId() {
@@ -58,6 +58,7 @@ class DockerInfoWrapper {
                 remoteManagers.put(it.NodeID, it.Addr)
             }
         }
+        return remoteManagers
     }
 
 }

@@ -2,7 +2,7 @@ version: "3"
 services:
   dummy:
     image: ianneub/network-tools
-    command: /bin/bash -c "until false; do ping metadata; sleep 1; done"
+    command: /bin/bash -c "trap 'echo SIGTERM; exit 143' SIGTERM; until false; do ping metadata; sleep 1; done"
     deploy:
       placement:
             constraints: [node.role == manager]

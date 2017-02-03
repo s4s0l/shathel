@@ -22,7 +22,6 @@ class DockerMachineWrapper {
     }
 
 
-
     DockerWrapper getDockerWrapperOn(String machineName) {
         def envs = getMachineEnvs(machineName)
         return new DockerWrapper(new ExecWrapper(LOGGER, 'docker', envs))
@@ -37,12 +36,19 @@ class DockerMachineWrapper {
     Map<String, String> getMachineEnvs(String machineName) {
         def output = exec.executeForOutput("env ${machineName}")
         [
-                DOCKER_CERT_PATH   : (output =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/)[0][1],
-                DOCKER_HOST        : (output =~ /[^\s]+ DOCKER_HOST="(.+)"/)[0][1],
-                DOCKER_TLS_VERIFY  : (output =~ /[^\s]+ DOCKER_TLS_VERIFY="(.+)"/)[0][1],
-                DOCKER_MACHINE_NAME: (output =~ /[^\s]+ DOCKER_MACHINE_NAME="(.+)"/)[0][1],
-                DOCKER_API_VERSION : (output =~ /[^\s]+ DOCKER_API_VERSION="(.+)"/)[0][1],
-        ]
+                DOCKER_CERT_PATH   : (output =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/),
+                DOCKER_HOST        : (output =~ /[^\s]+ DOCKER_HOST="(.+)"/),
+                DOCKER_TLS_VERIFY  : (output =~ /[^\s]+ DOCKER_TLS_VERIFY="(.+)"/),
+                DOCKER_MACHINE_NAME: (output =~ /[^\s]+ DOCKER_MACHINE_NAME="(.+)"/),
+                DOCKER_API_VERSION : (output =~ /[^\s]+ DOCKER_API_VERSION="(.+)"/),
+        ].collectEntries {
+            [
+                    (it.key):
+                            it.value.size() == 1 ?
+                                    (it.value[0].size() == 2 ? it.value[0][1] : "")
+                                    : ""
+            ]
+        }.findAll { it.value != null }
     }
 
     String sudo(String node, String command) {
@@ -121,15 +127,12 @@ class DockerMachineWrapper {
         return false;
     }
 
-
-
-
-
     /**
      * returns docker-machine ls statuses
+     * name -> name|driver|state
      * @return
      */
-    Map getMachines() {
+    Map<String, Map<String, String>> getMachines() {
         def output = exec.executeForOutput("ls")
         return output.readLines()
                 .findAll { !it.startsWith("NAME") }
@@ -145,9 +148,6 @@ class DockerMachineWrapper {
             ]
         }
     }
-
-
-
 
 
 }

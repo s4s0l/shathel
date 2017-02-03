@@ -29,11 +29,11 @@ class DockerComposeWrapper {
     void removeAllForComposeProject(String projectName) {
         LOGGER.info("compose: removing all for project named $projectName")
         def docker = new DockerWrapper();
-        docker.getContainerIdsByFilter("label=com.docker.compose.project=$projectName").each {
-            docker.removeContainer(it)
+        docker.containerIdsByFilter("label=com.docker.compose.project=$projectName").each {
+            docker.containerRemove(it)
         }
-        docker.getNetworkIdsByFilter("label=com.docker.compose.project=$projectName").each {
-            docker.removeNetwork(it)
+        docker.networkIdsByFilter("label=com.docker.compose.project=$projectName").each {
+            docker.networkRemove(it)
         }
     }
 

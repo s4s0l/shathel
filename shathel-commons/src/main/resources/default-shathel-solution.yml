@@ -3,10 +3,15 @@ shathel-solution:
   name: ${SOLLUTION_NAME}
   environments:
     dev:
-      type: docker-compose
+      type: dind
       build-allowed: true
+      managers: 2
+      workers: 1
     itg:
       type: docker-machine-vbox
       build-allowed: true
       managers: 2
       workers: 1
+    composed:
+      type: docker-compose
+      build-allowed: true

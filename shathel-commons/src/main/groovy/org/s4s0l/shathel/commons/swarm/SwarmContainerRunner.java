@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.core.swarm;
+package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunnerContext;

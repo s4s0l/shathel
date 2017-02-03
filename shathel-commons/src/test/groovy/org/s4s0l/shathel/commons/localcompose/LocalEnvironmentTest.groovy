@@ -42,7 +42,7 @@ class LocalEnvironmentTest extends Specification {
 
         when:
         def solution = sht.getSolution(storage)
-        def environment = solution.getEnvironment("dev")
+        def environment = solution.getEnvironment("composed")
 
         then:
         environment != null;
@@ -73,7 +73,7 @@ class LocalEnvironmentTest extends Specification {
         stack.run(command)
 
         then:
-        def preparedCompose2 = new Yaml().load(new File(root, "tmp/dev/execution/dummy-2.0-shathel/stack/docker-compose.yml").text)
+        def preparedCompose2 = new Yaml().load(new File(root, "tmp/composed/execution/dummy-2.0-shathel/stack/docker-compose.yml").text)
         preparedCompose2.networks['00shathel_network'].external == true
         preparedCompose2.services.dummy.networks == ['00shathel_network']
 
@@ -90,7 +90,7 @@ class LocalEnvironmentTest extends Specification {
 
         then:
         stopCommand != null
-        stopCommand.commands*.type == [StackCommand.Type.STOP,StackCommand.Type.STOP]
+        stopCommand.commands*.type == [StackCommand.Type.STOP, StackCommand.Type.STOP]
 
 
         when:
@@ -113,7 +113,7 @@ class LocalEnvironmentTest extends Specification {
         deps.mkdirs()
         Parameters parameters = Parameters.builder()
                 .parameter("shathel.storage.tmp.dependencies.dir", deps.absolutePath)
-        .parameter("shathel.solution.name", "LocalComposeTest")
+                .parameter("shathel.solution.name", "LocalComposeTest")
                 .build()
         src.listFiles()
                 .findAll { it.isDirectory() }

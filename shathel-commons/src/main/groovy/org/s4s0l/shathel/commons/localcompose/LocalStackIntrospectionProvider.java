@@ -18,7 +18,7 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
     @Override
     public Optional<StackIntrospection> getIntrospection(StackReference reference) {
         List<Map<String,String>> oneByFilter = new DockerWrapper()
-                .getLabelsOfContainersMatching("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
+                .containersLabelsByFilter("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
         if(oneByFilter.isEmpty()){
             return Optional.empty();
         }

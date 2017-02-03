@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.machine
 
 import org.apache.commons.io.FileUtils
+import org.s4s0l.shathel.commons.core.SettingsImporterExporter
 import org.s4s0l.shathel.commons.utils.IoUtils
 
 import java.nio.file.Files
@@ -9,7 +10,7 @@ import java.nio.file.attribute.PosixFilePermission
 /**
  * @author Matcin Wielgus
  */
-class MachineSettingsImporterExporter {
+class MachineSettingsImporterExporter implements SettingsImporterExporter{
 
     private static final List<String> ignoredElements = ["Logs"]
     private static final String DIRECTORY_PLACEHOLDER = "SHATHEL_TMP_BASE_DIR"

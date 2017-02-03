@@ -23,7 +23,7 @@ object DeployerParameters {
     "shathel.storage.init",
     "shathel.solution.name",
 //    "shathel.safe.{env}.password",
-    "shathel.vbox.{env}.net",
+    "shathel.network.{env}.net",
     "shathel.storage.tmp.dependencies.dir",
     "shathel.storage.tmp.{env}.dir",
     "shathel.storage.work.{env}.dir",

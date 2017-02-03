@@ -89,6 +89,7 @@ class VBoxEnvironmentTest
         deps.mkdirs()
         Parameters parameters = Parameters.builder()
                 .parameter("shathel.safe.itg.password", "MySecretPassword")
+                .parameter("shathel.network.itg.net", "20.20.21")
                 .build()
         src.listFiles()
                 .findAll { it.isDirectory() }

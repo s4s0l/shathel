@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.core.swarm;
+package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
@@ -21,7 +21,7 @@ public class SwarmStackIntrospectionProvider implements StackIntrospectionProvid
 
     @Override
     public Optional<StackIntrospection> getIntrospection(StackReference reference) {
-        List<Map<String, String>> matching = docker.getServicesOfContainersMatching("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
+        List<Map<String, String>> matching = docker.servicesOfContainersMatching("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
         if (matching.isEmpty()) {
             return Optional.empty();
         }

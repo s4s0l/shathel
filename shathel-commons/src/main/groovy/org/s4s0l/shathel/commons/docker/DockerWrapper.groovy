@@ -24,30 +24,31 @@ class DockerWrapper {
     }
 
     /**
-     * gets container ids for containers matching given filter
-     * @param filter
-     * @return
-     */
-    List<String> getContainerIdsByFilter(String filter) {
-        exec.executeForOutput("ps -a -f $filter -q").readLines()
-    }
-
-    /**
      * gets networks ids for networks matching filter given
      * @param filter
      * @return
      */
-    List<String> getNetworkIdsByFilter(String filter) {
+    List<String> networkIdsByFilter(String filter) {
         exec.executeForOutput("network ls -f $filter -q").readLines()
     }
 
     /**
-     * removes container
-     * @param containerId
+     * Sample output :{"Driver": "bridge",
+     "ID": "d5f560c933cc",
+     "IPv6": "false",
+     "Internal": "false",
+     "Labels": "",
+     "Name": "shathel.env.dind",
+     "Scope": "local"}* @param filter
+     * @return
      */
-    void removeContainer(String containerId) {
-        LOGGER.info("docker: removing container $containerId")
-        exec.executeForOutput("rm -f -v $containerId")
+    List<Map<String, String>> networkBasicsByFilter(String filter) {
+        def output = exec.executeForOutput("network", "ls", "-f", "$filter", "--format", "{{ json . }}")
+        return fixPsOutToJson(output)
+    }
+
+    boolean networkExistsByFilter(String filter) {
+        networkBasicsByFilter(filter).size() == 1
     }
 
     /**
@@ -55,9 +56,54 @@ class DockerWrapper {
      * @param networkId
      * @return
      */
-    void removeNetwork(String networkId) {
+    void networkRemove(String networkId) {
         LOGGER.info("docker: removing network $networkId")
         exec.executeForOutput("network rm $networkId")
+    }
+
+    /**
+     * gets container ids for containers matching given filter
+     * @param filter
+     * @return
+     */
+    List<String> containerIdsByFilter(String filter) {
+        exec.executeForOutput("ps -a -f $filter -q").readLines()
+    }
+
+    /**
+     * gets container info by filter.
+     * sample output:
+     *{"Command": "\"dockerd-entrypoin...\"",
+     "CreatedAt": "2017-02-03 12:11:54 +0100 CET",
+     "ID": "42514f183edd",
+     "Image": "docker:1.13.0-dind",
+     "Labels": "a=b,org.shathel.env.dind=true",
+     "LocalVolumes": "1",
+     "Mounts": "7830960a420e...",
+     "Names": "x-dev-manager-3",
+     "Networks": "bridge",
+     "Ports": "2375/tcp",
+     "RunningFor": "4 seconds",
+     "Size": "0 B",
+     "Status": "Up 2 seconds"}* @param filter
+     * @return
+     */
+    List<Map<String, String>> containerBasicInfoByFilter(String filter) {
+        def out = exec.executeForOutput("ps", "-a", "-f", "$filter", "-q", "--format", "{{ json . }}")
+        return fixPsOutToJson(out)
+    }
+
+    private Object fixPsOutToJson(String out) {
+        new JsonSlurper().parseText("[${out.replaceAll("\\}\\s+\\{", "},{")}]")
+    }
+
+    /**
+     * removes container
+     * @param containerId
+     */
+    void containerRemove(String containerId) {
+        LOGGER.info("docker: removing container $containerId")
+        exec.executeForOutput("rm -f -v $containerId")
     }
 
     /**
@@ -65,7 +111,7 @@ class DockerWrapper {
      * @param filter
      * @return
      */
-    List<Map<String, String>> getLabelsOfContainersMatching(String filter) {
+    List<Map<String, String>> containersLabelsByFilter(String filter) {
         String[] dockerIds = exec.executeForOutput("ps -f $filter -q").split("\\s")
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
             return []
@@ -79,7 +125,25 @@ class DockerWrapper {
         }
     }
 
-    List<Map<String, String>> getServicesOfContainersMatching(String filter) {
+    boolean containerRunning(String containerName) {
+        "" != exec.executeForOutput("ps -q -f name=${containerName}").trim()
+    }
+
+    /**
+     *
+     * @param containerName
+     * @return true if removed
+     */
+    boolean containerRemoveIfPresent(String containerName) {
+        if (containerExists(containerName)) {
+            containerRemove(containerName)
+            return true
+        }
+        return false
+
+    }
+
+    List<Map<String, String>> servicesOfContainersMatching(String filter) {
         String[] dockerIds = exec.executeForOutput("service ls -f $filter -q").split("\\s")
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
             return []
@@ -93,20 +157,40 @@ class DockerWrapper {
         }
     }
 
+    boolean serviceRunning(String containerName) {
+        return "" != exec.executeForOutput("service ls -q -f name=$containerName")
+    }
+
+    void serviceCreate(String params) {
+        exec.executeForOutput("service create $params")
+    }
+
     /**
      * returns json representation for docker info
      * @return
      */
-    Map getInfo() {
-        def output = exec.executeForOutput("info --format '{{ json . }}'")
+    Map daemonInfo() {
+        exec.executeForOutput("version")
+        def output = exec.executeForOutput("info", "-f", "{{ json . }}")
         return new JsonSlurper().parseText(output);
+    }
+
+
+    void stackDeploy(File composeFile, String deploymentName) {
+        LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
+        exec.executeForOutput(composeFile.getParentFile(), "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName");
+    }
+
+    void stackUnDeploy(File composeFile, String deploymentName) {
+        LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
+        exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
     }
 
     /**
      * Returns all swarm nodes
      * @return
      */
-    Map<String, Map<String, String>> getNodes() {
+    Map<String, Map<String, String>> swarmNodes() {
         String output = exec.executeForOutput("node list")
         output.readLines()
                 .findAll { !it.startsWith("ID") }
@@ -123,37 +207,66 @@ class DockerWrapper {
         }
     }
 
-    void stackDeploy(File composeFile, String deploymentName) {
-        LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
-        exec.executeForOutput(composeFile.getParentFile(), "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName");
+    boolean swarmActive() {
+        return new DockerInfoWrapper(daemonInfo(), null).isSwarmActive()
     }
 
-    void stackUnDeploy(File composeFile, String deploymentName) {
-        LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
-        exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
-    }
-
-
-    void swarmJoin(String machine, String advertiseIp, String token, String managerIp) {
-        LOGGER.info("machine: machine $machine is joining swarm at $managerIp")
+    void swarmJoin(String advertiseIp, String token, String managerIp) {
         exec.executeForOutput("swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${token} ${managerIp}:2377")
     }
 
-    String getJoinTokenForManager() {
+    void swarmInit(String advertiseIp) {
+        exec.executeForOutput("swarm init --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp}")
+    }
+
+    String swarmTokenForManager() {
         return exec.executeForOutput("swarm join-token -q manager")
     }
 
-    String getJoinTokenForWorker() {
+    String swarmTokenForWorker() {
         return exec.executeForOutput("swarm join-token -q worker")
     }
 
-    boolean isServiceRunning(String containerName) {
-        return "" != exec.executeForOutput("service ls -q -f name=$containerName")
-    }
 
     boolean isReachable() {
         exec.executeForOutput("ps")
     }
 
 
+    void containerStart(String containerName) {
+        exec.executeForOutput("start $containerName")
+    }
+
+    void containerStop(String containerName) {
+        exec.executeForOutput("stop $containerName")
+    }
+
+    String containerExec(String containerName, String command) {
+        exec.executeForOutput("exec $containerName $command")
+    }
+
+    void containerScp(String from, String to) {
+        exec.executeForOutput("cp $from $to")
+    }
+
+    Map containerInspect(String containerName) {
+        new JsonSlurper().parseText(exec.executeForOutput("inspect $containerName"))[0]
+    }
+
+    String containerGetIpInNetwork(String containerName, String networkName) {
+        containerInspect(containerName).NetworkSettings.Networks[networkName].IPAddress
+    }
+
+    void networkCreate(String networkName, String subnet) {
+        exec.executeForOutput("network create --subnet $subnet $networkName")
+    }
+
+    boolean containerExists(String containerName) {
+        return "" != exec.executeForOutput("ps -a -q -f name=${containerName}").trim()
+
+    }
+
+    void containerCreate(String s) {
+        exec.executeForOutput("run $s")
+    }
 }

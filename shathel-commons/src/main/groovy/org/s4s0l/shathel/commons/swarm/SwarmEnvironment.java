@@ -1,14 +1,9 @@
-package org.s4s0l.shathel.commons.core.swarm;
+package org.s4s0l.shathel.commons.swarm;
 
 import groovy.lang.Tuple;
-import org.s4s0l.shathel.commons.core.environment.Environment;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
+import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
+import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
-import org.s4s0l.shathel.commons.core.security.SafeStorage;
-import org.s4s0l.shathel.commons.core.swarm.SwarmContainerRunner;
-import org.s4s0l.shathel.commons.core.swarm.SwarmStackIntrospectionProvider;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.MachineEnvironmentProvisionExecutor;
@@ -18,6 +13,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,22 +24,15 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class SwarmEnvironment implements Environment {
     private static final Logger LOGGER = getLogger(SwarmEnvironment.class);
-    private final String solutionName;
-    private final File temporaryDir;
-    private final SafeStorage safeStorage;
-    private final EnvironmentDescription environmentDescription;
-    private final MachineSettingsImporterExporter machineSettingsImporterExporter;
+    private final EnvironmentContext environmentContext;
+    private final SettingsImporterExporter machineSettingsImporterExporter;
     private final SwarmClusterWrapper swarmClusterWrapper;
 
 
-    public SwarmEnvironment(String solutionName, File temporaryDir, SafeStorage safeStorage,
-                            EnvironmentDescription environmentDescription,
-                            MachineSettingsImporterExporter machineSettingsImporterExporter,
+    public SwarmEnvironment(EnvironmentContext environmentContext,
+                            SettingsImporterExporter machineSettingsImporterExporter,
                             SwarmClusterWrapper swarmClusterWrapper, NodeProvisioner nodeProvisioner) {
-        this.solutionName = solutionName;
-        this.temporaryDir = temporaryDir;
-        this.safeStorage = safeStorage;
-        this.environmentDescription = environmentDescription;
+        this.environmentContext = environmentContext;
         this.machineSettingsImporterExporter = machineSettingsImporterExporter;
         this.swarmClusterWrapper = swarmClusterWrapper;
         this.nodeProvisioner = nodeProvisioner;
@@ -54,9 +43,7 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public File getExecutionDirectory() {
-        File execution = new File(temporaryDir, "execution");
-        execution.mkdirs();
-        return execution;
+        return environmentContext.getExecutionDirectory();
     }
 
 
@@ -70,14 +57,14 @@ public class SwarmEnvironment implements Environment {
     public void save() {
         String safeStoreKey = getSafeStorageKey();
         getImporterExporter().saveSettings(getDockerMachineStorageDir(),
-                safeStorage.outputStream(safeStoreKey));
+                environmentContext.getSafeStorage().outputStream(safeStoreKey));
     }
 
     @Override
     public void load() {
         stop();
         String safeStoreKey = getSafeStorageKey();
-        Optional<InputStream> inputStream = safeStorage.inputStream(safeStoreKey);
+        Optional<InputStream> inputStream = environmentContext.getSafeStorage().inputStream(safeStoreKey);
         if (inputStream.isPresent()) {
             if (isStarted()) {
                 stop();
@@ -95,10 +82,7 @@ public class SwarmEnvironment implements Environment {
         try {
             boolean changed = getNodeProvisioner().createMachines(
                     getDockerMachineStorageDir(),
-                    getBaseMachineName(),
-                    environmentDescription.getName(),
-                    getManagersCount(),
-                    getWorkersCount());
+                    environmentContext);
 
             if (changed) {
                 LOGGER.info("Remember to save docker machine settings");
@@ -108,9 +92,6 @@ public class SwarmEnvironment implements Environment {
         }
     }
 
-    private String getBaseMachineName() {
-        return solutionName + "-" + environmentDescription.getName();
-    }
 
     private String getSafeStorageKey() {
         return "machines";
@@ -146,13 +127,13 @@ public class SwarmEnvironment implements Environment {
                 .stream()
                 .map(swarmClusterWrapper::getNode)
                 .filter(x -> x.isStarted() || x.isReachable())
-                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).getInfo(), x.getName()))
+                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).daemonInfo(), x.getName()))
                 .collect(Collectors.toList());
 
         //can we ssh to theese dockers
         machines
                 .stream()
-                .forEach(x -> swarmClusterWrapper.ssh(x.getName(), "ls /"));
+                .forEach(x -> swarmClusterWrapper.ssh(x.getName(), "echo ssh-test"));
 
 
         //is there at least one manager
@@ -169,9 +150,10 @@ public class SwarmEnvironment implements Environment {
 
         //all must belong to same cluster and have same managers visibility
         List<Tuple> collect = machines.stream()
-                .map(x -> new Tuple(new Object[]{x.getSwarmClusterId(), x.getRemoteManagers()}))
+                .map(x -> new Tuple(new Object[]{x.isSwarmActive(), x.getRemoteManagers()}))
                 .distinct().collect(Collectors.toList());
-        if (collect.size() != 1) {
+        if (collect.size() != 1 ||
+                ((Map) collect.get(0).get(1)).size() != machines.stream().filter(x -> x.isManager()).count()) {
             throw new RuntimeException("Inconsistent swarm cluster detected");
         }
 
@@ -181,8 +163,8 @@ public class SwarmEnvironment implements Environment {
         return swarmClusterWrapper.getAllNodeNames().stream()
                 .map(x -> swarmClusterWrapper.getNode(x))
                 .filter(x -> x.isStarted() && x.isReachable())
-                .map(x-> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).getInfo(), x.getName()))
-                .filter(x-> x.isManager())
+                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).daemonInfo(), x.getName()))
+                .filter(x -> x.isManager())
                 .findFirst()
                 .map(x -> swarmClusterWrapper.getWrapperForNode(x.getName()))
                 .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
@@ -205,21 +187,21 @@ public class SwarmEnvironment implements Environment {
 
 
     private File getDockerMachineStorageDir() {
-        return new File(temporaryDir, "settings");
+        return environmentContext.getSettingsDirectory();
     }
 
-    private MachineSettingsImporterExporter getImporterExporter() {
+    private SettingsImporterExporter getImporterExporter() {
         return machineSettingsImporterExporter;
     }
 
     private int getManagersCount() {
-        return environmentDescription
+        return environmentContext.getEnvironmentDescription()
                 .getParameterAsInt("managers")
                 .orElse(1);
     }
 
     private int getWorkersCount() {
-        return environmentDescription
+        return environmentContext.getEnvironmentDescription()
                 .getParameterAsInt("workers")
                 .orElse(0);
     }

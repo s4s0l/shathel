@@ -4,11 +4,12 @@ import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
 import groovyx.net.http.Status
+import org.apache.commons.lang.StringUtils
 import org.apache.http.entity.mime.FormBodyPart
 import org.apache.http.entity.mime.HttpMultipartMode
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
-import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
+import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -23,17 +24,15 @@ class PortainerCustomizer {
     }
 
 
-    def customizePortainer(String clusterName,
-                           String adminPassword,
-                           int portainerPort,
-                           String ip, DockerMachineWrapper machine) {
-
+    def customizePortainer(int portainerPort,
+                           String ip, SwarmClusterWrapper machine) {
+        String adminPassword = "qwerty"
         def json = new JsonSlurper()
 
         def portainer = new RESTClient("http://${ip}:${portainerPort}")
         portainer.handler['404'] = portainer.handler.get(Status.SUCCESS)
 
-        int attempt = 0, maxAttempts = 10;
+        int attempt = 0, maxAttempts = 15;
         while (true) {
             attempt++
             try {
@@ -99,12 +98,13 @@ class PortainerCustomizer {
                 e
         }
 
-        machine.getMachinesByName("${clusterName}-.*")
+        machine.getAllNodeNames()
                 .each {
             def machineName = it
-            def envs = machine.getMachineEnvs(machineName);
+            def envs = machine.getMachineEnvs(machineName)
             def certPath = envs['DOCKER_CERT_PATH']
             def machineIp = envs['DOCKER_HOST']
+            def tls = !StringUtils.isEmpty(certPath)
             log "Adding $machineName as endpoint"
             result = portainer.post(
                     requestContentType: JSON,
@@ -112,26 +112,28 @@ class PortainerCustomizer {
                     query: [active: false],
                     path: '/api/endpoints',
                     headers: [Authorization: "Bearer $token"],
-                    body: [Name: machineName, URL: machineIp, TLS: true]
+                    body: [Name: machineName, URL: machineIp, TLS: tls]
             )
             assert result.status == 200
-            def endpointId = result.data.Id
-            def uploadFile = { String fileName ->
-                log "Uploading $fileName to $machineName endpoint"
-                result = portainer.post(
-                        requestContentType: 'multipart/form-data',
-                        contentType: JSON,
-                        path: "/api/upload/tls/$endpointId/$fileName",
-                        headers: [Authorization: "Bearer $token"],
-                        body: new File(certPath, "${fileName}.pem"),
-                )
-                assert result.status == 200
+            if (tls) {
+                def endpointId = result.data.Id
+                def uploadFile = { String fileName ->
+                    log "Uploading $fileName to $machineName endpoint"
+                    result = portainer.post(
+                            requestContentType: 'multipart/form-data',
+                            contentType: JSON,
+                            path: "/api/upload/tls/$endpointId/$fileName",
+                            headers: [Authorization: "Bearer $token"],
+                            body: new File(certPath, "${fileName}.pem"),
+                    )
+                    assert result.status == 200
+                }
+
+
+                uploadFile "ca"
+                uploadFile "cert"
+                uploadFile "key"
             }
-
-
-            uploadFile "ca"
-            uploadFile "cert"
-            uploadFile "key"
         }
 
     }
