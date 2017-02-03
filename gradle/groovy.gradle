@@ -6,3 +6,6 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
 }
+//groovydoc {
+//    exclude "**/*.java"
+//}

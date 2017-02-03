@@ -21,9 +21,7 @@ class DockerMachineWrapper {
         exec = new ExecWrapper(LOGGER, "docker-machine")
     }
 
-    private DockerWrapper getDockerWrapperOverSsh(String machineName) {
-        return new DockerWrapper(new ExecWrapper(LOGGER, "${exec.command} ssh $machineName docker"))
-    }
+
 
     DockerWrapper getDockerWrapperOn(String machineName) {
         def envs = getMachineEnvs(machineName)
@@ -123,25 +121,9 @@ class DockerMachineWrapper {
         return false;
     }
 
-    /**
-     * call info on docker on machine
-     * @see DockerWrapper#getInfo()
-     * @param machineName
-     * @return
-     */
-    Map getInfo(String machineName) {
-        return getDockerWrapperOverSsh(machineName).getInfo()
-    }
 
-    /**
-     * Runs node ls on docker on given machine
-     * @see DockerWrapper#getNodes()
-     * @param machineName
-     * @return
-     */
-    Map getNodes(String machineName) {
-        return getDockerWrapperOverSsh(machineName).getNodes();
-    }
+
+
 
     /**
      * returns docker-machine ls statuses
@@ -165,54 +147,7 @@ class DockerMachineWrapper {
     }
 
 
-    String getJoinTokenForManager(String machineName) {
-        return ssh(machineName, "docker swarm join-token -q manager")
-    }
-
-    String getJoinTokenForWorker(String machineName) {
-        return ssh(machineName, "docker swarm join-token -q worker")
-    }
-
-    boolean isServiceRunning(String machineName, String containerName) {
-        return "" != ssh(machineName, "docker service ls -q -f name=$containerName")
-    }
-
-    boolean isReachable(String machine) {
-        ssh(machine, "docker ps")
-    }
 
 
-    boolean isSwarmManager(String machine) {
-        def info = getInfo(machine)
-        def thisNodeInSwarm = info.Swarm.NodeID
-        def managers = info.Swarm.RemoteManagers
-        if (info.Swarm.LocalNodeState != "active"
-                || info.Swarm.ControlAvailable != true
-                || managers.find { it.NodeID == thisNodeInSwarm } == null) {
-            return false
-        }
-        return true
-    }
 
-    boolean isSwarmWorker(String machine) {
-        def info = getInfo(machine)
-        def managers = info.Swarm.RemoteManagers
-        if (info.Swarm.LocalNodeState != "active"
-                || info.Swarm.ControlAvailable != false
-                || managers.isEmpty()) {
-            return false
-        }
-        return true
-    }
-
-    boolean isSwarmActive(String machine) {
-        return ssh(machine, "docker info") =~ /Swarm: active/;
-    }
-
-    void swarmJoin(String machine, String advertiseIp, String token, String managerIp) {
-        LOGGER.info("machine: machine $machine is joining swarm at $managerIp")
-        ssh(machine,
-                "docker swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${token} ${managerIp}:2377"
-        )
-    }
 }

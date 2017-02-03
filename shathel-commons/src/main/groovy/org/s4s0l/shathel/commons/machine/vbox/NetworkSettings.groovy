@@ -3,10 +3,10 @@ package org.s4s0l.shathel.commons.machine.vbox
 /**
  * @author Matcin Wielgus
  */
-class VBoxNetworkSettings {
+class NetworkSettings {
     private final String network;
 
-    VBoxNetworkSettings(String network) {
+    NetworkSettings(String network) {
         this.network = network
     }
 

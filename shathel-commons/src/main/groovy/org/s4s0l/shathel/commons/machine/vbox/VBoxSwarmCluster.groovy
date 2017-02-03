@@ -2,7 +2,6 @@ package org.s4s0l.shathel.commons.machine.vbox
 
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.OpenSslWrapper
-import org.s4s0l.shathel.commons.machine.MachineProvisioner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -15,7 +14,7 @@ class VBoxSwarmCluster {
     private final int numberOfManagers
     private final int numberOfWorkers
     private final String net
-    private final VBoxNetworkSettings ns
+    private final NetworkSettings ns
     private final String tmpDir
     private final String MACHINE_OPTS
 
@@ -24,7 +23,7 @@ class VBoxSwarmCluster {
         this.numberOfManagers = numberOfManagers
         this.numberOfWorkers = numberOfWorkers
         this.net = net
-        ns = new VBoxNetworkSettings(net)
+        ns = new NetworkSettings(net)
         tmpDir = workDir. with {
             mkdirs()
             absolutePath

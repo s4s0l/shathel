@@ -1,8 +1,6 @@
 package org.s4s0l.shathel.commons.machine
 
 import org.apache.commons.io.FileUtils
-import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
-import org.s4s0l.shathel.commons.docker.VBoxManageWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
 
 import java.nio.file.Files

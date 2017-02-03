@@ -70,12 +70,12 @@ class DockerWrapper {
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
             return []
         }
-        dockerIds.collect{
+        dockerIds.collect {
             String inspect = exec.executeForOutput("inspect ${dockerIds[0]}")
             def val = new JsonSlurper().parseText(inspect);
             def ret = [:]
             ret << val[0].Config.Labels
-            ret << [name:val[0].Name]
+            ret << [name: val[0].Name]
         }
     }
 
@@ -84,12 +84,12 @@ class DockerWrapper {
         if (dockerIds.size() == 0 || "" == dockerIds[0]) {
             return []
         }
-        dockerIds.collect{
+        dockerIds.collect {
             String inspect = exec.executeForOutput("service inspect ${dockerIds[0]}")
             def val = new JsonSlurper().parseText(inspect);
             def ret = [:]
             ret << val[0].Spec.Labels
-            ret << [name:val[0].Spec.Name]
+            ret << [name: val[0].Spec.Name]
         }
     }
 
@@ -106,7 +106,7 @@ class DockerWrapper {
      * Returns all swarm nodes
      * @return
      */
-    Map getNodes() {
+    Map<String, Map<String, String>> getNodes() {
         String output = exec.executeForOutput("node list")
         output.readLines()
                 .findAll { !it.startsWith("ID") }
@@ -131,6 +131,28 @@ class DockerWrapper {
     void stackUnDeploy(File composeFile, String deploymentName) {
         LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
         exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
+    }
+
+
+    void swarmJoin(String machine, String advertiseIp, String token, String managerIp) {
+        LOGGER.info("machine: machine $machine is joining swarm at $managerIp")
+        exec.executeForOutput("swarm join --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp} --token ${token} ${managerIp}:2377")
+    }
+
+    String getJoinTokenForManager() {
+        return exec.executeForOutput("swarm join-token -q manager")
+    }
+
+    String getJoinTokenForWorker() {
+        return exec.executeForOutput("swarm join-token -q worker")
+    }
+
+    boolean isServiceRunning(String containerName) {
+        return "" != exec.executeForOutput("service ls -q -f name=$containerName")
+    }
+
+    boolean isReachable() {
+        exec.executeForOutput("ps")
     }
 
 
