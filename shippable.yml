@@ -11,6 +11,8 @@ build:
   cache: true
   cache_dir_list:
     - $SHIPPABLE_BUILD_DIR/.cache
+  pre_ci:
+    - sudo modprobe xt_ipvs
   pre_ci_boot:
     options: "-v $SHIPPABLE_BUILD_DIR:$SHIPPABLE_BUILD_DIR"
   ci:
