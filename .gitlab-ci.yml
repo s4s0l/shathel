@@ -10,6 +10,7 @@ build:
     - >
       docker run --privileged -w /build -v $(pwd):/build --rm sasol/dind4j:latest
       ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean assemble
+      --info --stacktrace
   allow_failure: false
   tags:
   - shared
@@ -20,5 +21,6 @@ test:
     - >
       docker run --privileged -w /build -v $(pwd):/build --rm sasol/dind4j:latest
       ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test
+       --info --stacktrace
   tags:
   - shared    
