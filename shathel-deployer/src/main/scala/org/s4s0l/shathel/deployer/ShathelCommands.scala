@@ -1,8 +1,10 @@
 package org.s4s0l.shathel.deployer
 
+import org.s4s0l.shathel.commons.utils.ExtensionInterface
 import org.s4s0l.shathel.commons.{DefaultExtensionContext, Shathel}
 import org.springframework.shell.core.CommandMarker
 import org.yaml.snakeyaml.Yaml
+
 import scala.collection.JavaConverters._
 import scala.util.Try
 
@@ -15,9 +17,8 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
   def shathel(map: java.util.Map[String, String], extra: DeployerParameters.Builder = new DeployerParameters.Builder())(work: (DeployerParameters.ShathelCommandContext) => String): String = {
     val build = extra.build()
     val buildParameters = parametersCommands.buildParameters(map, build)
-    val extensionContext = DefaultExtensionContext.getExtensionBuilder(buildParameters)
-    extensionContext.extension(new MvnDependencyDownloader(buildParameters))
-    val shathel = new Shathel(buildParameters, extensionContext.build())
+    val extensionContext = DefaultExtensionContext.create(buildParameters, List[ExtensionInterface](new MvnDependencyDownloader(buildParameters)).asJava)
+    val shathel = new Shathel(buildParameters, extensionContext)
     val context = new DeployerParameters.ShathelCommandContext(shathel, () => buildParameters)
     val ret = work(context)
     parametersCommands.setParameters(map, build)

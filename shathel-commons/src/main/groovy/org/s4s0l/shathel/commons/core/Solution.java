@@ -11,8 +11,6 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
-import java.io.File;
-
 /**
  * @author Matcin Wielgus
  */
@@ -42,7 +40,7 @@ public class Solution {
 
     public SolutionDescription getSolutionDescription() {
         SolutionFileModel model = SolutionFileModel.load(storage.getConfiguration());
-        return new SolutionDescription(model);
+        return new SolutionDescription(params, model);
     }
 
 

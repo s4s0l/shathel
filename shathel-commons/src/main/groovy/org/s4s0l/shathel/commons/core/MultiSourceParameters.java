@@ -1,9 +1,8 @@
 package org.s4s0l.shathel.commons.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Matcin Wielgus
@@ -26,5 +25,13 @@ public class MultiSourceParameters implements Parameters {
         List<Parameters> nl = new ArrayList<>(params);
         nl.add(x);
         return new MultiSourceParameters(nl);
+    }
+
+    @Override
+    public Set<String> getAllParameters() {
+        return params.stream()
+                .map(Parameters::getAllParameters)
+                .flatMap(x -> x.stream())
+                .collect(Collectors.toSet());
     }
 }

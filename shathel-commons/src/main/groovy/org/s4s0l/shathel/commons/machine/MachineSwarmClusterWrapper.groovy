@@ -55,8 +55,10 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    void destroy(String node) {
-        getWrapper().remove(node)
+    void destroy() {
+        getAllNodeNames().each {
+            getWrapper().remove(it)
+        }
     }
 
     @Override

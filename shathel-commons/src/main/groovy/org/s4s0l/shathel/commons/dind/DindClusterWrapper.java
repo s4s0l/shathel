@@ -62,8 +62,10 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    public void destroy(String node) {
-        getLocalWrapper().containerRemoveIfPresent(node);
+    public void destroy() {
+        getAllNodeNames().forEach(it ->
+                getLocalWrapper().containerRemoveIfPresent(it)
+        );
         getLocalWrapper().networkRemove(getNetworkName());
     }
 

@@ -3,10 +3,12 @@ package org.s4s0l.shathel.commons;
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.Solution;
+import org.s4s0l.shathel.commons.core.model.DefaultSolutiuonFileProvider;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.filestorage.FileStorage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.TemplateUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.util.HashMap;
@@ -44,7 +46,7 @@ public class Shathel {
             File configuration = fileStorage.getConfiguration();
             if (configuration.exists()) {
                 if (failIfExists)
-                    throw new RuntimeException("Configuration already present!");
+                    throw new RuntimeException("Configuration already present! ( " + configuration.getAbsolutePath());
                 return getStorage(f);
             }
             String solutionName = params.getParameter("shathel.solution.name")
@@ -57,6 +59,10 @@ public class Shathel {
         }
     }
 
+    private String getDefaultConfig(String solutionName) {
+        return new DefaultSolutiuonFileProvider().getDefaultConfig(solutionName, params);
+    }
+
     private FileStorage createFileStorage(File f) {
         if (new File(f, ".git").exists()) {
             throw new RuntimeException("git storage unsupported?");
@@ -64,13 +70,7 @@ public class Shathel {
         return new FileStorage(f, params);
     }
 
-    private String getDefaultConfig(String projectName) {
-        Map x = new HashMap();
-        x.put("SOLLUTION_NAME", projectName);
-        return TemplateUtils.generateTemplate(
-                this.getClass().getResource("/default-shathel-solution.yml"),
-                x);
-    }
+
 
     public Solution getSolution(Storage storage) {
         storage.verify();

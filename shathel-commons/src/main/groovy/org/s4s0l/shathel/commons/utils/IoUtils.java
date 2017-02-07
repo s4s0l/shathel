@@ -17,7 +17,10 @@ import java.util.zip.ZipOutputStream;
  */
 public class IoUtils {
 
-
+    /**
+     * @param srcDir source directory
+     * @param dstDir target directory
+     */
     public static void copyContents(File srcDir, File dstDir) {
         try {
             FileUtils.copyDirectoryToDirectory(srcDir, dstDir);
@@ -87,8 +90,8 @@ public class IoUtils {
     /**
      * http://stackoverflow.com/a/32052016
      *
-     * @param sourceDirPath
-     * @param zipFilePath
+     * @param sourceDirPath path to dir
+     * @param zipFilePath path to zip file
      */
     public static void zipIt(File sourceDirPath, File zipFilePath) {
         Path p = null;

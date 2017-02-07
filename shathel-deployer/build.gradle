@@ -56,3 +56,12 @@ task(type: GitHubReleaseUploadAsset, dependsOn: assemble, "uploadGithubRelease")
              label: "Runnable $project.name jar"]
     )
 }
+
+apply from: '../gradle/integration.gradle'
+
+install.dependsOn assemble
+integrationTest.dependsOn install
+project.rootProject.subprojects.findAll {it.name.startsWith("shathel-stack-")}.each {
+    evaluationDependsOn("$it.path")
+    integrationTest.dependsOn it.install
+}

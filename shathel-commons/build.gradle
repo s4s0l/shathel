@@ -19,9 +19,7 @@ dependencies {
 
 }
 
-//Needed by tests in gradle-plugin
-ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
-System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
+
 
 test {
     environment "SHT_ENV_OVER_BY_MAP", "from env"

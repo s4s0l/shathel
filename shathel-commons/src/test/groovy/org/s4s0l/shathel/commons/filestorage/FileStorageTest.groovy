@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.filestorage
 
 import org.apache.commons.io.FileUtils
+import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import spock.lang.Specification
 
@@ -89,7 +90,7 @@ class FileStorageTest extends Specification {
 
     private FileStorage create(String where, LinkedHashMap params) {
         FileUtils.deleteDirectory(new File(where))
-        new FileStorage(new File(where), Parameters.builder().parameters(params).build())
+        new FileStorage(new File(where), MapParameters.builder().parameters(params).build())
     }
 
 

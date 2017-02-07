@@ -18,11 +18,12 @@ public interface Environment {
      * requirements. These nodes don't need to be started.
      * Just need to exist.
      *
-     * @return
+     * @return see abbove
      */
     boolean isInitialized();
 
     /**
+     * Starts all nodes.
      * Creates missing nodes.
      */
     void initialize();
@@ -35,7 +36,7 @@ public interface Environment {
     /**
      * Are all known nodes started.
      *
-     * @return
+     * @return see above
      */
     boolean isStarted();
 

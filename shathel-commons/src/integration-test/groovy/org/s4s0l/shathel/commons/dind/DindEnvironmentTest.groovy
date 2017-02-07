@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.dind
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
@@ -133,10 +134,10 @@ class DindEnvironmentTest extends Specification {
         File src = new File("src/test/$sourceDir")
         def deps = new File(root, "deps")
         deps.mkdirs()
-        Parameters parameters = Parameters.builder()
+        Parameters parameters = MapParameters.builder()
                 .parameter("shathel.storage.tmp.dependencies.dir", deps.absolutePath)
                 .parameter("shathel.solution.name", "DindTest")
-                .parameter("shathel.network.dev.net", "22.22.22")
+                .parameter("shathel.env.dev.net", "22.22.22")
                 .build()
         src.listFiles()
                 .findAll { it.isDirectory() }

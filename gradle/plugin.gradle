@@ -20,8 +20,8 @@ pluginBundle {
 
 
 
-ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
-System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
+//ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
+//System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
 //plugins.withType(MavenPlugin) {
 //    install {
 //        repositories {

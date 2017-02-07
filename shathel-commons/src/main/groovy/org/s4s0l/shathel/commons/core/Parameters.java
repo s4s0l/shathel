@@ -3,6 +3,8 @@ package org.s4s0l.shathel.commons.core;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Matcin Wielgus
@@ -15,19 +17,46 @@ public interface Parameters {
     }
 
     default Parameters overSystemProperties() {
-        return over(name -> Optional.ofNullable(System.getProperty(name)));
+        return over(new Parameters() {
+            @Override
+            public Optional<String> getParameter(String name) {
+                return Optional.ofNullable(System.getProperty(name));
+            }
+
+            @Override
+            public Set<String> getAllParameters() {
+                return System.getProperties().keySet()
+                        .stream()
+                        .filter(x -> x instanceof String)
+                        .map(x -> (String) x)
+                        .filter(x -> x.startsWith("shathel"))
+                        .collect(Collectors.toSet());
+            }
+        });
     }
 
     default Parameters overEnvVariables() {
-        return over(name -> Optional.ofNullable(System.getenv(name.toUpperCase().replaceAll("\\.", "_"))));
+        return over(new Parameters() {
+            @Override
+            public Optional<String> getParameter(String name) {
+                return Optional.ofNullable(System.getenv(name.toUpperCase().replaceAll("\\.", "_")));
+            }
+
+            @Override
+            public Set<String> getAllParameters() {
+                return System.getenv().keySet()
+                        .stream()
+                        .filter(x -> x.startsWith("SHATHEL_"))
+                        .map(x->x.toLowerCase().replace("_", "."))
+                        .collect(Collectors.toSet());
+            }
+        });
     }
 
-    static MapParameters.MapParametersBuilder builder() {
-        return MapParameters.builder();
-    }
+    Set<String> getAllParameters();
 
     static Parameters fromMapWithSysPropAndEnv(Map<String, String> map) {
-        return builder().parameters(map).build().overSystemProperties().overEnvVariables();
+        return MapParameters.builder().parameters(map).build().overSystemProperties().overEnvVariables();
     }
 
 }

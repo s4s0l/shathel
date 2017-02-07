@@ -7,11 +7,13 @@ shathel-solution:
       build-allowed: true
       managers: 2
       workers: 1
+      net: 33.33.33
     itg:
       type: docker-machine-vbox
       build-allowed: true
       managers: 2
       workers: 1
+      net: 22.22.22
     composed:
       type: docker-compose
       build-allowed: true

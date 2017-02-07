@@ -1,0 +1,4 @@
+environment destroy --params shathel.env=dev,shathel.mvn.localRepo=$ROOT/build/localrepo,shathel.storage.file=$ROOT/shathel-deployer/build/TempSolution
+--env-name dev
+stack $COMMAND --name shathel-stack-core --env-name dev --inspect 0
+

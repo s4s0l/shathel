@@ -6,6 +6,11 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
 }
+
+//tasks.withType(org.gradle.api.tasks.compile.GroovyCompile) {
+//    groovyOptions.javaAnnotationProcessing = false
+//    options.javaAnnotationProcessing = false
+//}
 //groovydoc {
 //    exclude "**/*.java"
 //}

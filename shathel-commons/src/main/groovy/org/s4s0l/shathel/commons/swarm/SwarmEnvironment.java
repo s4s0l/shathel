@@ -78,7 +78,7 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public void initialize() {
-        stop(); //why?!?
+        start();
         try {
             boolean changed = getNodeProvisioner().createMachines(
                     getDockerMachineStorageDir(),
@@ -118,7 +118,7 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public void destroy() {
-        swarmClusterWrapper.getAllNodeNames().stream().forEach(swarmClusterWrapper::destroy);
+        swarmClusterWrapper.destroy();
     }
 
     @Override
@@ -161,6 +161,7 @@ public class SwarmEnvironment implements Environment {
 
     DockerWrapper getDockerWrapperForManagementNode() {
         return swarmClusterWrapper.getAllNodeNames().stream()
+                .sorted()
                 .map(x -> swarmClusterWrapper.getNode(x))
                 .filter(x -> x.isStarted() && x.isReachable())
                 .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).daemonInfo(), x.getName()))

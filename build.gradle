@@ -1,3 +1,6 @@
+//Needed by tests in gradle-plugin
+ext.localRepoUrl = new File(rootProject.buildDir, 'localrepo')
+System.setProperty("maven.repo.local", ext.localRepoUrl.getAbsolutePath())
 buildscript {
     apply from: './gradle/buildscript.gradle', to: buildscript
 }

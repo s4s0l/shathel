@@ -41,13 +41,16 @@ public class FileStorage implements Storage {
 
     @Override
     public void verify() {
-        //todo split it with meaningfull messages
-        if (!storageParameters.getRootFile().exists()
-                || !getConfiguration().exists()
-                || !getConfiguration().isFile()
-                || !storageParameters.getRootFile().isDirectory()
-                || !isAncestor(getConfiguration(), storageParameters.getRootFile())) {
-            throw new RuntimeException("Storage verification failed!");
+        assertIt(storageParameters.getRootFile().exists(), "Root storage directory does not exist.");
+        assertIt(getConfiguration().exists(), "Configuration file does not exist.");
+        assertIt(getConfiguration().isFile(), "Config file is not a file.");
+        assertIt(storageParameters.getRootFile().isDirectory(), "Root storage dir is not directory.");
+        assertIt(isAncestor(getConfiguration(), storageParameters.getRootFile()), "Root dir should contain config file!");
+    }
+
+    private void assertIt(boolean condition, String errorMessage) {
+        if (!condition) {
+            throw new RuntimeException("Storage verification failed! Reason:" + errorMessage + " ( " + storageParameters.getRootFile().getAbsolutePath() + " vs " + getConfiguration().getAbsolutePath() + " ) ");
         }
     }
 

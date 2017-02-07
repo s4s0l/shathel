@@ -15,12 +15,12 @@ class DockerComposeWrapper {
 
     boolean up(File project, String projectName) {
         LOGGER.info("compose: starting project $projectName from ${project.absolutePath}")
-        exec.executeForExitValue(project, "-p $projectName up -d") == 0
+        exec.executeForExitValue(project, [:], true, "-p $projectName up -d") == 0
     }
 
     boolean down(File project, String projectName) {
         LOGGER.info("compose: stopping project $projectName from ${project.absolutePath}")
-        exec.executeForExitValue(project, "-p $projectName down --remove-orphans") == 0
+        exec.executeForExitValue(project, [:], true, "-p $projectName down --remove-orphans") == 0
     }
     /**
      * removes all containers,networks for given docker-compose project name

@@ -1,0 +1,4 @@
+parameters add --params shathel.mvn.localRepo=$ROOT/build/localrepo
+parameters add --params shathel.storage.file=$ROOT/shathel-deployer/build/TempSolution
+stack $COMMAND --name shathel-stack-core --env-name composed --inspect 0
+

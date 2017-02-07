@@ -5,6 +5,7 @@ import lombok.Singular;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Matcin Wielgus
@@ -16,6 +17,11 @@ public class MapParameters implements Parameters {
 
     public Optional<String> getParameter(String name) {
         return Optional.ofNullable(parameters.get(name));
+    }
+
+    @Override
+    public Set<String> getAllParameters() {
+        return parameters.keySet();
     }
 
 

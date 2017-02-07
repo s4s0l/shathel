@@ -106,8 +106,8 @@ class SwarmClusterCreator {
 
 
     private void distributeKeys(String to, String repositoriesIp) {
-        swarmClusterWrapper.sudo(to,'mkdir -p /shathel-tmp')
-        swarmClusterWrapper.sudo(to,'chmod a+rw /shathel-tmp')
+        swarmClusterWrapper.sudo(to, 'mkdir -p /shathel-tmp')
+        swarmClusterWrapper.sudo(to, 'chmod a+rw /shathel-tmp')
 
         swarmClusterWrapper.scp("$tmpDir/registries/mirrorcerts/ca.crt",
                 "$to:/shathel-tmp/mirror-ca.crt")

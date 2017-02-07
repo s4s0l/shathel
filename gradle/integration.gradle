@@ -1,13 +1,32 @@
-sourceSets {
-    integrationTest {
-        groovy {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integration-test/groovy')
+
+if(project.plugins.hasPlugin(org.gradle.api.plugins.scala.ScalaPlugin)){
+
+    sourceSets {
+        integrationTest {
+            scala {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integration-test/scala')
+            }
+            resources.srcDir file('src/integration-test/resources')
         }
-        resources.srcDir file('src/integration-test/resources')
     }
+
+}else{
+    sourceSets {
+        integrationTest {
+            groovy {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integration-test/groovy')
+            }
+            resources.srcDir file('src/integration-test/resources')
+        }
+    }
+
 }
+
+
 
 
 configurations {

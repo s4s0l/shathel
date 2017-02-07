@@ -2,13 +2,16 @@ package org.s4s0l.shathel.deployer
 
 import java.util.Collections
 
+import org.junit.runner.RunWith
 import org.scalatest.FeatureSpec
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.JavaConverters._
 
 /**
   * @author Matcin Wielgus
   */
+@RunWith(classOf[JUnitRunner])
 class ParametersCommandsTest extends FeatureSpec {
   feature("Methods tests") {
 

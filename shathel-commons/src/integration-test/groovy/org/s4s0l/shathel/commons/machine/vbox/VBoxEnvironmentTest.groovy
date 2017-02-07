@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.machine.vbox
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
@@ -87,9 +88,9 @@ class VBoxEnvironmentTest
         File src = new File("src/test/$sourceDir")
         def deps = new File(root, "tmp/dependencies")
         deps.mkdirs()
-        Parameters parameters = Parameters.builder()
+        Parameters parameters = MapParameters.builder()
                 .parameter("shathel.safe.itg.password", "MySecretPassword")
-                .parameter("shathel.network.itg.net", "20.20.21")
+                .parameter("shathel.env.itg.net", "20.20.21")
                 .build()
         src.listFiles()
                 .findAll { it.isDirectory() }

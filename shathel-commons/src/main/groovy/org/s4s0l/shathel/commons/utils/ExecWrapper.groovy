@@ -16,15 +16,24 @@ class ExecWrapper {
         this.environment = environment;
     }
 
-    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String args) {
-        executeForExitValue(dir, env, args.split(' '))
+    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String args) {
+        executeForExitValue(dir, env, logOutput, args.split(' '))
     }
 
-    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], String... args) {
+    int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String... args) {
+        StringBuilder sb = new StringBuilder()
         List<?> flatten = fix(args)
+        LOGGER.debug("Running ${flatten.join(",")}")
         Process process = createProcess(flatten, dir, env)
-        process.inputStream.eachLine { LOGGER.debug("$command output:  $it") }
+        process.inputStream.eachLine {
+            LOGGER.debug("output:  [$it]")
+            sb.append(it).append("\n")
+        }
         process.waitFor();
+        if (process.exitValue() != 0 && logOutput) {
+            LOGGER.error("Command failed with output:\n" + sb.toString().trim())
+            throw new Exception("Failed")
+        }
         return process.exitValue()
     }
 
@@ -45,7 +54,7 @@ class ExecWrapper {
         if (process.exitValue() == 0) {
             return sb.toString().trim();
         } else {
-            LOGGER.error("Command failed with output:\n" + sb.toString().trim())
+            LOGGER.error("Command [${flatten.join(" ")}] failed with output:\n" + sb.toString().trim())
             throw new Exception("Failed")
         }
     }

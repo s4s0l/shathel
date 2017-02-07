@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.localcompose
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
@@ -111,7 +112,7 @@ class LocalEnvironmentTest extends Specification {
         File src = new File("src/test/$sourceDir")
         def deps = new File(root, "deps")
         deps.mkdirs()
-        Parameters parameters = Parameters.builder()
+        Parameters parameters = MapParameters.builder()
                 .parameter("shathel.storage.tmp.dependencies.dir", deps.absolutePath)
                 .parameter("shathel.solution.name", "LocalComposeTest")
                 .build()

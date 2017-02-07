@@ -3,3 +3,4 @@ ext {
     displayName = "Shathel Stack:Portainer"
 }
 apply from: '../gradle/bintray.gradle'
+apply plugin: 'maven'

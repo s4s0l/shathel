@@ -23,7 +23,7 @@ class StorageCommands(parametersCommands: ParametersCommands) extends ShathelCom
               specifiedDefaultValue = "", unspecifiedDefaultValue = "")
             map: java.util.Map[String, String]): String = {
 
-    shathel( map, builder()
+    shathel(map, builder()
       .storageFile(file)
       .storageInit(initIfAbsent)
     )(context => {
@@ -38,7 +38,7 @@ class StorageCommands(parametersCommands: ParametersCommands) extends ShathelCom
             file: File,
             @CliOption(key = Array("params"), mandatory = false, help = "map of parameters to set for this command only, format name1=value,name2=value")
             map: java.util.Map[String, String]): String = {
-    shathel( map, builder()
+    shathel(map, builder()
       .storageFile(file)
       .storageInit(true)
     )(context => {
@@ -54,7 +54,7 @@ class StorageCommands(parametersCommands: ParametersCommands) extends ShathelCom
               @CliOption(key = Array("params"), mandatory = false, help = "map of parameters to set for this command only, format name1=value,name2=value",
                 specifiedDefaultValue = "", unspecifiedDefaultValue = "")
               map: java.util.Map[String, String]): String = {
-    shathel( map, builder()
+    shathel(map, builder()
       .storageFile(file)
     )(context => {
       getStorage(context).verify()

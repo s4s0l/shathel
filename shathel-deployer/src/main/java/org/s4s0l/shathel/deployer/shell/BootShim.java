@@ -14,6 +14,7 @@ import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

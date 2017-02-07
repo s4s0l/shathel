@@ -10,7 +10,7 @@ class ParametersTest extends Specification {
     def "overing should work"(String variable, String expected) {
 
         given:
-        def variables = Parameters.builder()
+        def variables = MapParameters.builder()
                 .parameter("sht.env.over.by.map", "from map")
                 .parameter("sht.prop.over.by.map", "from map")
                 .parameter("sht.map.noover", "from map")

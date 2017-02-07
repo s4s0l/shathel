@@ -23,14 +23,21 @@ public interface SwarmClusterWrapper {
 
     void scp(String from, String to);
 
-    void destroy(String node);
+
+
+    void destroy();
 
     Node getNode(String nodeName);
 
     DockerWrapper getWrapperForNode(String node);
 
     String getNonRootUser();
+
     /**
+     * @param machineName        name of machine
+     * @param ns                 network setting s to use for ip generation
+     * @param expectedIp         number to pass to ns to get ip address
+     * @param registryMirrorHost url to registry mirror to set in engine daemon
      * @return ip of machine created
      */
     CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost);
@@ -44,8 +51,8 @@ public interface SwarmClusterWrapper {
      * returns DOCKER_* environment variables used to talk with
      * docker daemon running on given node
      *
-     * @param node
-     * @return
+     * @param node node name
+     * @return see above
      */
     Map<String, String> getMachineEnvs(String node);
 

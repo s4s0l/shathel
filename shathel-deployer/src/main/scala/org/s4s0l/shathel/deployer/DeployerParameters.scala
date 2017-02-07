@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.deployer
 
 import java.io.File
+import java.util
 import java.util.Optional
 
 import org.s4s0l.shathel.commons.Shathel
@@ -22,8 +23,10 @@ object DeployerParameters {
     "shathel.storage.file",
     "shathel.storage.init",
     "shathel.solution.name",
-//    "shathel.safe.{env}.password",
-    "shathel.network.{env}.net",
+    //    "shathel.safe.{env}.password",
+    "shathel.env.{env}.net",
+    "shathel.env.{env}.managers",
+    "shathel.env.{env}.workers",
     "shathel.storage.tmp.dependencies.dir",
     "shathel.storage.tmp.{env}.dir",
     "shathel.storage.work.{env}.dir",
@@ -47,7 +50,7 @@ object DeployerParameters {
 
   val defaults: Map[String, String] = Map(
     "shathel.storage.file" -> ".",
-    "shathel.storage.init" -> "false"
+    "shathel.storage.init" -> "true"
   )
 
   class Builder(values: Map[String, String] = Map()) {
@@ -73,21 +76,24 @@ object DeployerParameters {
     def environment(): String = mandatoryParam("shathel.env")
 
 
-
-
     override def getParameter(name: String): Optional[String] = provider().getParameter(name);
 
     def getNoDefault(name: String): Option[String] =
       provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => None)
 
-    def getWithDefault(name: String): Option[String] =
-      provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => defaults.get(name))
+    def getWithDefault(name: String): Option[String] = {
+      provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => {
+        defaults.get(name)
+      })
+    }
 
     def mandatoryParam(name: String): String =
       getWithDefault(name).getOrElse(missing(name))
 
-    def mandatoryBoolean(name: String): Boolean =
+    def mandatoryBoolean(name: String): Boolean = {
       getWithDefault(name).map((s) => Try(s.toBoolean).getOrElse(invalid(name))) getOrElse (missing(name))
+    }
+
 
     private def missing(name: String) =
       throw new RuntimeException(s"Parameter named ${name} was needed but missing")
@@ -98,6 +104,8 @@ object DeployerParameters {
 
     def optionalParam(name: String): Option[String] =
       this getWithDefault (name)
+
+    override def getAllParameters: util.Set[String] = provider().getAllParameters;
   }
 
 

@@ -6,8 +6,10 @@ import java.util
 
 import org.s4s0l.shathel.commons.core.{Stack, StackOperations}
 import org.s4s0l.shathel.commons.core.environment.Environment
+import org.s4s0l.shathel.commons.core.model.GavUtils
 import org.s4s0l.shathel.commons.core.provision.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
+import org.s4s0l.shathel.deployer.shell.customization.CustomBanner
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 import scala.collection.JavaConverters._
@@ -75,7 +77,7 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
       .storageInit(initIfAbsent)
     )(context => {
       val (storage, solution, environment) = environmentCommands.getEnvironment(context)
-      val openStack = solution.openStack(environment, new StackReference(name))
+      val openStack = solution.openStack(environment, getStackReference(name))
       val command = factory(openStack)
 
       val output = this.inspect(command, inspectLong)
@@ -83,6 +85,16 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
         openStack.run(command)
       }
       return response(output)
+    })
+  }
+
+  private def getStackReference(name: String) = {
+    val groupNoVersion = "org.s4s0l.shathel:([a-zA-Z-0-9\\.]+)".r
+    val noGroupNoVersion = "([a-zA-Z-0-9\\.]+)".r
+    new StackReference(name match {
+      case groupNoVersion(_) => s"X${name}:${CustomBanner.versionInfo()}"
+      case noGroupNoVersion(_) => s"${name}:${CustomBanner.versionInfo()}"
+      case _ => name
     })
   }
 

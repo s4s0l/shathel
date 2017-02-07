@@ -17,7 +17,7 @@ class SwarmNodeProvisioner implements NodeProvisioner {
 
     @Override
     boolean createMachines(File workDir, EnvironmentContext context) {
-        String net = parameters.getParameter("shathel.network." + context.getEnvironmentDescription().name + ".net").orElse("20.20.20")
+        String net = context.getEnvironmentDescription().getParameter("net").orElse("42.42.42")
 
         return new SwarmClusterCreator(clusterWrapper, workDir,
                 context.contextName,
