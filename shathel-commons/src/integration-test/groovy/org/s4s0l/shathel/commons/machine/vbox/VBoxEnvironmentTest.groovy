@@ -48,8 +48,8 @@ class VBoxEnvironmentTest
         if (!environment.isStarted()) {
             environment.start()
         }
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        def command = stack.createStartCommand();
+        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"), false)
+        def command = stack.createStartCommand(false);
 
         then:
         command.commands.size() == 2
@@ -58,7 +58,7 @@ class VBoxEnvironmentTest
         stack.run(command)
 
         then:
-        stack.createStartCommand().commands.isEmpty()
+        stack.createStartCommand(false).commands.isEmpty()
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -70,7 +70,7 @@ class VBoxEnvironmentTest
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand().commands.size() == 2
+        stack.createStartCommand(false).commands.size() == 2
 
         cleanOnEnd()
     }

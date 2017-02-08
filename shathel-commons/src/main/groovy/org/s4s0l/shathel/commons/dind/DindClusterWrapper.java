@@ -118,8 +118,9 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
             modified = true;
         }
         if (!getLocalWrapper().containerExists(machineName)) {
-            getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=true --name "
-                    + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind");
+            getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=true "
+                    + " --hostname "+ machineName
+                    + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind");
             modified = true;
         }
         getLocalWrapper().containerStart(machineName);
@@ -130,7 +131,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     public Map<String, String> getMachineEnvs(String node) {
         HashMap<String, String> ret = new HashMap<>();
         ret.put("DOCKER_CERT_PATH", "");
-        ret.put("DOCKER_HOST", getIp(node));
+        ret.put("DOCKER_HOST", "tcp://" + getIp(node) + ":2375");
         ret.put("DOCKER_TLS_VERIFY", "");
         ret.put("DOCKER_MACHINE_NAME", "");
         ret.put("DOCKER_API_VERSION", "");

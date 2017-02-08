@@ -1,9 +1,4 @@
-Przenieść do integration service4
-
-
-
-TODO: Zrobic bazową prawdziwą paczkę shathela
-paczka dla portainera (mechanizm post provision
+TODO: paczka dla portainera (mechanizm post provision
  + hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
  jak urucahamiac graooviego aby grape dzialal
 

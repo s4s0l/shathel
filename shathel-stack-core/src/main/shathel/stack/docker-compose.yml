@@ -3,9 +3,9 @@ services:
   metadata:
     image: ianneub/network-tools
     command: /bin/bash -c "until false; do ping tasks.metadata; sleep 1; done"
-    networks:
-      - network
+    hostname: "{{.Node.ID}}-metadata"
     deploy:
+      mode: global
       placement:
             constraints: [node.role == manager]
 networks:

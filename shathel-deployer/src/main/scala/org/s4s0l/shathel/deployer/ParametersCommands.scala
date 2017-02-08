@@ -40,10 +40,10 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
 
   def buildParameters(paramMap: java.util.Map[String, String], extra: Map[String, String] = Map()): Parameters = {
     val map = new util.HashMap[String, String]();
-    map.putAll(extra.asJava)
     if (paramMap != null) {
       map.putAll(paramMap)
     }
+    map.putAll(extra.asJava)
     MapParameters.builder().parameters(map).build().over(parameters)
   }
 

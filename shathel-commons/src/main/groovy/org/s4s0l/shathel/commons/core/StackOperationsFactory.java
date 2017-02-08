@@ -39,12 +39,12 @@ public class StackOperationsFactory {
         this.enricherProvider = enricherProvider;
     }
 
-    public StackOperations createStartSchedule() {
+    public StackOperations createStartSchedule(boolean forcefull) {
 
         Stream<StackDescription> stream = descriptionTree.stream();
 
         Stream<StackCommand> stackCommandStream = stream
-                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack)))
+                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack,forcefull)))
                 .filter(e -> e.getValue() != StackCommand.Type.NOOP)
                 .map(e -> createStackCommand(e.getKey(), e.getValue()));
 
@@ -90,11 +90,13 @@ public class StackOperationsFactory {
         ).collect(Collectors.toList());
     }
 
-    private StackCommand.Type getCommandType(StackDescription stack) {
+    private StackCommand.Type getCommandType(StackDescription stack, boolean forcefull) {
         Optional<StackIntrospection> introspection = introspectionProvider.getIntrospection(stack.getReference());
         StackCommand.Type commandType = StackCommand.Type.NOOP;
         if (introspection.isPresent()) {
-            if (new VersionComparator().compare(introspection.get().getReference().getVersion(), stack.getVersion()) < 0) {
+            if (forcefull) {
+                commandType = StackCommand.Type.UPDATE;
+            } else if (new VersionComparator().compare(introspection.get().getReference().getVersion(), stack.getVersion()) < 0) {
                 commandType = StackCommand.Type.UPDATE;
             }
         } else {

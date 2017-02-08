@@ -3,3 +3,4 @@ parameters add --params shathel.storage.file=$ROOT/shathel-deployer/build/TempSo
 environment init --env-name dev
 stack $COMMAND --name shathel-stack-core --env-name dev --inspect 0
 
+

@@ -49,7 +49,7 @@ class LocalEnvironmentTest extends Specification {
         environment != null;
 
         when:
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
+        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"),false)
 
         then:
         stack != null
@@ -57,7 +57,7 @@ class LocalEnvironmentTest extends Specification {
         new File(root, "deps/shathel-core-stack-1.2.3-shathel").isDirectory()
 
         when:
-        def command = stack.createStartCommand();
+        def command = stack.createStartCommand(false);
 
         then:
         command != null
@@ -80,11 +80,12 @@ class LocalEnvironmentTest extends Specification {
 
 
         when:
-        command = stack.createStartCommand()
+        command = stack.createStartCommand(false)
 
         then:
         command != null
         command.commands.isEmpty()
+        stack.createStartCommand(true).commands.size() == 2
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -98,7 +99,7 @@ class LocalEnvironmentTest extends Specification {
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand().commands.size() == 2
+        stack.createStartCommand(false).commands.size() == 2
 
 
     }

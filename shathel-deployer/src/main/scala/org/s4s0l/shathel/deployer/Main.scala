@@ -34,6 +34,9 @@ class Main {
   @Bean
   def DockerCommands: DockerCommands = new DockerCommands(ParametersCommands, EnvironmentCommands)
 
+  @Bean
+  def WorkingDirectoryCommand: WorkingDirectoryCommand = new WorkingDirectoryCommand
+
 
   @Bean
   def mapConverter: MapConverter = {

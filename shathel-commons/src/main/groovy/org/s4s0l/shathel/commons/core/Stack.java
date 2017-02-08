@@ -21,10 +21,10 @@ public class Stack {
         this.enricherProvider = enricherProvider;
     }
 
-    public StackOperations createStartCommand() {
+    public StackOperations createStartCommand(boolean forcefull) {
         return new StackOperationsFactory(stackDescriptionTree,
                 environment.getIntrospectionProvider(), enricherProvider)
-                .createStartSchedule();
+                .createStartSchedule(forcefull);
     }
 
     public StackOperations createStopCommand(boolean withDependencies) {

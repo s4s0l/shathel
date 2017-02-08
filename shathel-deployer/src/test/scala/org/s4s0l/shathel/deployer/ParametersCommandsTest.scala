@@ -35,11 +35,13 @@ class ParametersCommandsTest extends FeatureSpec {
       assert(cmds.list(false).contains("shathel.env="))
 
       System.setProperty("shathel.env", "dev")
-      assert(cmds.list(false).contains("shathel.env=itg"))
+      assert(cmds.list(false).contains("shathel.env=dev"))
 
       cmds.add(Map("dupa" -> "eeee").asJava)
-      assert(cmds.list(false).contains("dupa=eeee"))
+      assert(!cmds.list(false).contains("dupa=eeee"))
 
+      cmds.add(Map("dupa" -> "eeee").asJava)
+      assert(!cmds.list(true).contains("dupa=eeee"))
     }
 
 

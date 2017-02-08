@@ -22,6 +22,7 @@ object DeployerParameters {
     "shathel.mvn.localRepo",
     "shathel.storage.file",
     "shathel.storage.init",
+    "shathel.stack.forceful",
     "shathel.solution.name",
     //    "shathel.safe.{env}.password",
     "shathel.env.{env}.net",
@@ -50,7 +51,8 @@ object DeployerParameters {
 
   val defaults: Map[String, String] = Map(
     "shathel.storage.file" -> ".",
-    "shathel.storage.init" -> "true"
+    "shathel.storage.init" -> "true",
+    "shathel.stack.forceful" -> "false"
   )
 
   class Builder(values: Map[String, String] = Map()) {
@@ -63,7 +65,9 @@ object DeployerParameters {
 
     def environment(f: String): Builder = this ("shathel.env" -> Option(f).map(_.toString))
 
-    def build(): Map[String, String] = values
+    def forceful(f:java.lang.Boolean): Builder = this ("shathel.stack.forceful" -> Option(f).map(_.toString))
+
+    def build(): Map[String, String] = values.filter(e => e._2 != null)
   }
 
   class Provider(provider: () => Parameters) extends Parameters {
@@ -75,6 +79,8 @@ object DeployerParameters {
 
     def environment(): String = mandatoryParam("shathel.env")
 
+    def forceful(): Boolean = mandatoryBoolean("shathel.stack.forceful")
+
 
     override def getParameter(name: String): Optional[String] = provider().getParameter(name);
 
@@ -82,6 +88,7 @@ object DeployerParameters {
       provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => None)
 
     def getWithDefault(name: String): Option[String] = {
+      println(s"${name} = ${provider().getParameter(name)}")
       provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => {
         defaults.get(name)
       })
@@ -104,6 +111,9 @@ object DeployerParameters {
 
     def optionalParam(name: String): Option[String] =
       this getWithDefault (name)
+
+    def optionalBoolean(name: String): Option[Boolean] =
+      getWithDefault (name).map((s) => Try(s.toBoolean).getOrElse(invalid(name)))
 
     override def getAllParameters: util.Set[String] = provider().getAllParameters;
   }

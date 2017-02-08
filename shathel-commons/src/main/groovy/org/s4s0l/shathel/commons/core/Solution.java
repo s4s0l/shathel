@@ -44,16 +44,16 @@ public class Solution {
     }
 
 
-    public Stack openStack(Environment e, StackReference reference) {
+    public Stack openStack(Environment e, StackReference reference, boolean forcefull) {
         e.verify();
         StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
         EnrichersFasade enricherProvider = new EnrichersFasade(context);
-        DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider);
+        DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider, forcefull);
         StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
         return new Stack(stackDescriptionTree, e, enricherProvider);
     }
 
-    private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider) {
+    private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider, boolean forcefull) {
         DependencyManager.VersionOverrider overrider = desc ->
                 stackIntrospectionProvider.getIntrospection(desc)
                         .filter(x -> new VersionComparator().compare(x.getReference().getVersion(), desc.getVersion()) > 0)
@@ -61,7 +61,7 @@ public class Solution {
                         .orElse(desc.getVersion());
         return new DependencyManager(
                 storage.getTemporaryDirectory("dependencies"),
-                context.lookupOne(DependencyDownloader.class).get(), overrider);
+                context.lookupOne(DependencyDownloader.class).get(), overrider, forcefull);
     }
 
 

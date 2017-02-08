@@ -22,36 +22,41 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
 
 
   @CliCommand(value = Array("stack start"), help = "Displays what will be done with given stack.")
-  def load(
-            @CliOption(key = Array("name"), mandatory = true, help = "Package name in form of group:name:version to be run")
-            name: String,
-            @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
-              specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
-            inspect: Boolean,
-            @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
-              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
-            inspectLong: Boolean,
-            @CliOption(key = Array("env-name"), mandatory = false, help = "see environment use command for details")
-            environment: String,
-            @CliOption(key = Array("storage-file"), mandatory = false, help = "see storage open command for details")
-            file: File,
-            @CliOption(key = Array("storage-init"), mandatory = false, help = "see storage open command for details")
-            initIfAbsent: java.lang.Boolean,
-            @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
-            map: java.util.Map[String, String]
-          ): String = {
-    runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map)((s) => s.createStartCommand())
+  def start(
+             @CliOption(key = Array("name"), mandatory = true, help = "Package name in form of group:name:version to be run")
+             name: String,
+             @CliOption(key = Array("forceful"), mandatory = false, help = "is start forceful (re download, update even i version unchanged)")
+             forceful: java.lang.Boolean,
+             @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
+               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+             inspect: Boolean,
+             @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
+             inspectLong: Boolean,
+             @CliOption(key = Array("env-name"), mandatory = false, help = "see environment use command for details")
+             environment: String,
+             @CliOption(key = Array("storage-file"), mandatory = false, help = "see storage open command for details")
+             file: File,
+             @CliOption(key = Array("storage-init"), mandatory = false, help = "see storage open command for details")
+             initIfAbsent: java.lang.Boolean,
+             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
+             map: java.util.Map[String, String]
+           ): String = {
+    runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map, forceful)((s, c) => {
+      println(c.forceful() + " " + forceful)
+      s.createStartCommand(c.forceful())
+    })
   }
 
   @CliCommand(value = Array("stack stop"), help = "Displays what will be done with given stack.")
-  def load(
+  def stop(
             @CliOption(key = Array("name"), mandatory = true, help = "Package name in form of group:name:version to be run")
             name: String,
             @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
-              specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
+              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
             inspect: Boolean,
             @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
-              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
             inspectLong: Boolean,
             @CliOption(key = Array("with-dependencies"), mandatory = false, help = "If true will stop all dependencies also",
               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
@@ -65,20 +70,23 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
             map: java.util.Map[String, String]
           ): String = {
-    runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map)((s) => s.createStopCommand(withDependencies))
+    runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map, false)((s, c) => s.createStopCommand(withDependencies))
   }
 
 
-  private def runCommand(name: String, inspect: Boolean, inspectLong: Boolean, environment: String, file: File, initIfAbsent: Boolean, map: util.Map[String, String])
-                        (factory: (Stack) => StackOperations): String = {
+  private def runCommand(name: String, inspect: Boolean, inspectLong: Boolean,
+                         environment: String, file: File, initIfAbsent: Boolean,
+                         map: util.Map[String, String], forceful: Boolean)
+                        (factory: (Stack, DeployerParameters.ShathelCommandContext) => StackOperations): String = {
     shathel(map, builder()
       .environment(environment)
       .storageFile(file)
       .storageInit(initIfAbsent)
+      .forceful(forceful)
     )(context => {
       val (storage, solution, environment) = environmentCommands.getEnvironment(context)
-      val openStack = solution.openStack(environment, getStackReference(name))
-      val command = factory(openStack)
+      val openStack = solution.openStack(environment, getStackReference(name), context.forceful())
+      val command = factory(openStack, context)
 
       val output = this.inspect(command, inspectLong)
       if (!inspect) {
