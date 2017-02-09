@@ -38,11 +38,11 @@ public class StackCommand {
         return description;
     }
 
-    public ComposeFileModel getMutableModel() {
+    public ComposeFileModel getComposeModel() {
         return mutableModel;
     }
 
-    public List<StackProvisionerDefinition> getProvisioners() {
+    public List<StackProvisionerDefinition> getEnricherPreProvisioners() {
         return provisioners;
     }
 }

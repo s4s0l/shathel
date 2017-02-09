@@ -63,9 +63,9 @@ class LocalEnvironmentTest extends Specification {
         command != null
         command.commands.size() == 2
         command.commands[0].description.name == 'shathel-core-stack'
-        command.commands[0].mutableModel.parsedYml.networks['00shathel_network'] == null //tests if enricher does not apply to self
+        command.commands[0].composeModel.parsedYml.networks['00shathel_network'] == null //tests if enricher does not apply to self
         command.commands[1].description.name == 'dummy'
-        def preparedCompose = command.commands[1].mutableModel.parsedYml
+        def preparedCompose = command.commands[1].composeModel.parsedYml
         preparedCompose.networks['00shathel_network'].external == true
         preparedCompose.services.dummy.networks == ['00shathel_network']
         preparedCompose.services.dummy.labels['org.shathel.stack.gav'] == 'test.group:dummy:2.0'
@@ -77,7 +77,8 @@ class LocalEnvironmentTest extends Specification {
         def preparedCompose2 = new Yaml().load(new File(root, "tmp/composed/execution/dummy-2.0-shathel/stack/docker-compose.yml").text)
         preparedCompose2.networks['00shathel_network'].external == true
         preparedCompose2.services.dummy.networks == ['00shathel_network']
-
+        new File(root, "tmp/composed/execution/shathel-core-stack-1.2.3-shathel/post-provision").text == "Done"
+        new File(root, "tmp/composed/execution/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
         command = stack.createStartCommand(false)

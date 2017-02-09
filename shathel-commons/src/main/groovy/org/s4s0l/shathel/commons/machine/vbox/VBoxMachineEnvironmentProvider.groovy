@@ -30,21 +30,14 @@ class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
     }
 
     @Override
-    Environment getEnvironment(Storage s, EnvironmentDescription environmentDescription,
-                               ExtensionContext ctxt, SolutionDescription solutionDescription) {
-        String name = environmentDescription.getName()
-        SafeStorage safeStorage = ctxt.lookupOne(SafeStorageProvider.class)
-                .get().getSafeStorage(s, name)
-        File rootEnvironmentDir = s.getTemporaryDirectory(name)
-        EnvironmentContext context = new EnvironmentContext(environmentDescription, solutionDescription,
-                safeStorage, rootEnvironmentDir)
+    Environment getEnvironment(EnvironmentContext environmentContext) {
 
         def machineSettingsImporterExporter = new VBoxMachineSettingsImporterExporter(context.getTempDirectory())
 
         MachineSwarmClusterWrapper clusterWrapper = new MachineSwarmClusterWrapper(
-                context, new VBoxMachineSwarmClusterFlavour())
+                environmentContext, new VBoxMachineSwarmClusterFlavour())
 
-        return new SwarmEnvironment(context, machineSettingsImporterExporter,
+        return new SwarmEnvironment(environmentContext, machineSettingsImporterExporter,
                 clusterWrapper, new SwarmNodeProvisioner(params, clusterWrapper))
     }
 }

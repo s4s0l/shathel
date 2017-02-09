@@ -25,8 +25,13 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    List<String> getAllNodeNames() {
+    List<String> getNodeNames() {
         return getWrapper().getMachines().collect { it.key }
+    }
+
+    @Override
+    String getIp(String nodeName) {
+        return getWrapper().getIp(nodeName);
     }
 
     @Override
@@ -56,7 +61,7 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
 
     @Override
     void destroy() {
-        getAllNodeNames().each {
+        getNodeNames().each {
             getWrapper().remove(it)
         }
     }
@@ -67,16 +72,16 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         return new SwarmClusterWrapper.Node(
                 machines.name,
                 machines.state == "Running",
-                getWrapperForNode(nodeName).isReachable()
+                getDocker(nodeName).isReachable()
         )
     }
 
-    String getNonRootUser(){
+    String getNonRootUser() {
         return "docker"
     }
 
     @Override
-    DockerWrapper getWrapperForNode(String node) {
+    DockerWrapper getDocker(String node) {
         return getWrapper().getDockerWrapperOn(node)
     }
     private static
@@ -100,7 +105,7 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    Map<String, String> getMachineEnvs(String node) {
+    Map<String, String> getDockerEnvs(String node) {
         return getWrapper().getMachineEnvs(node)
     }
 }

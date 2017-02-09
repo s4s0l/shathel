@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.dind;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -31,7 +33,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    public List<String> getAllNodeNames() {
+    public List<String> getNodeNames() {
         List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=true");
         return maps.stream().map(x -> x.get("Names")).collect(Collectors.toList());
     }
@@ -63,7 +65,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
 
     @Override
     public void destroy() {
-        getAllNodeNames().forEach(it ->
+        getNodeNames().forEach(it ->
                 getLocalWrapper().containerRemoveIfPresent(it)
         );
         getLocalWrapper().networkRemove(getNetworkName());
@@ -92,7 +94,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    public DockerWrapper getWrapperForNode(String node) {
+    public DockerWrapper getDocker(String node) {
         String ip = getIp(node);
         return new DockerWrapper(new ExecWrapper(LOGGER, "docker --host " + ip));
     }
@@ -102,9 +104,14 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
         return "root";
     }
 
-    private String getIp(String node) {
+
+    @Override
+    public String getIp(String node) {
         return getLocalWrapper().containerGetIpInNetwork(node, getNetworkName());
     }
+
+
+
 
     private String getNetworkName() {
         return ("shathel-" + context.getContextName()).toLowerCase();
@@ -117,10 +124,12 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
             getLocalWrapper().networkCreate(getNetworkName(), ns.getCidr(0));
             modified = true;
         }
+
         if (!getLocalWrapper().containerExists(machineName)) {
             getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=true "
-                    + " --hostname "+ machineName
-                    + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind");
+                    + " --hostname " + machineName + " -v volume-" + machineName.toLowerCase() + ":/shathel-data "
+                    + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind "
+                    + " --registry-mirror " + registryMirrorHost);
             modified = true;
         }
         getLocalWrapper().containerStart(machineName);
@@ -128,7 +137,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    public Map<String, String> getMachineEnvs(String node) {
+    public Map<String, String> getDockerEnvs(String node) {
         HashMap<String, String> ret = new HashMap<>();
         ret.put("DOCKER_CERT_PATH", "");
         ret.put("DOCKER_HOST", "tcp://" + getIp(node) + ":2375");

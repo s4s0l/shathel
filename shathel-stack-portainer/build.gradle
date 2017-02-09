@@ -4,3 +4,7 @@ ext {
 }
 apply from: '../gradle/bintray.gradle'
 apply plugin: 'maven'
+
+dependencies {
+    compile project(":shathel-commons")
+}

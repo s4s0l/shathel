@@ -13,8 +13,12 @@ import org.springframework.shell.core.ExitShellRequest;
 import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.util.StopWatch;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -70,33 +74,72 @@ public class BootShim {
         JLineShellComponent shell = this.ctx.getBean("shell", JLineShellComponent.class);
         //TODO handle --wrkDir argument and change user.home, see WorkingDirectoryCommand
         ExitShellRequest exitShellRequest;
-        if (null != commandsToExecuteAndThenQuit) {
-            boolean successful = false;
+
+        Cuntinue cuntinue = carryOn(commandsToExecuteAndThenQuit);
+
+
+        if (!cuntinue.commands.isEmpty()) {
+            boolean successful;
             exitShellRequest = ExitShellRequest.FATAL_EXIT;
-            for (String cmd : commandsToExecuteAndThenQuit) {
+            for (String cmd : cuntinue.commands) {
                 successful = shell.executeCommand(cmd).isSuccess();
                 if (!successful) {
                     exitShellRequest = ExitShellRequest.FATAL_EXIT;
                     break;
+                }else{
+                    exitShellRequest = ExitShellRequest.NORMAL_EXIT;
                 }
             }
-            if (successful) {
-                exitShellRequest = ExitShellRequest.NORMAL_EXIT;
+            if (exitShellRequest == ExitShellRequest.NORMAL_EXIT
+                    && cuntinue.carryOn) {
+                exitShellRequest = regularStart(shell);
+                shell.waitForComplete();
             }
         } else {
-            shell.start();
-            shell.promptLoop();
-            exitShellRequest = shell.getExitShellRequest();
-            if (exitShellRequest == null) {
-                exitShellRequest = ExitShellRequest.NORMAL_EXIT;
-            }
+            exitShellRequest = regularStart(shell);
             shell.waitForComplete();
+        }
+        if (exitShellRequest == null) {
+            exitShellRequest = ExitShellRequest.NORMAL_EXIT;
         }
         sw.stop();
         if (shell.isDevelopmentMode()) {
             LOGGER.debug("Total execution time: " + sw.getLastTaskTimeMillis() + " ms");
         }
         return exitShellRequest;
+    }
+
+    private ExitShellRequest regularStart(JLineShellComponent shell) {
+        ExitShellRequest exitShellRequest;
+        shell.start();
+        shell.promptLoop();
+        exitShellRequest = shell.getExitShellRequest();
+        return exitShellRequest;
+    }
+
+    private Cuntinue carryOn(String[] commandsToExecuteAndThenQuit) {
+        if (commandsToExecuteAndThenQuit == null) {
+            return new Cuntinue(Collections.emptyList(), false);
+        } else {
+
+            List<String> asList = new ArrayList<>(Arrays.asList(commandsToExecuteAndThenQuit));
+            int wrk = asList.indexOf("--continue");
+            if (wrk >= 0) {
+                asList.remove(wrk);
+                return new Cuntinue(asList, true);
+            }
+            return new Cuntinue(asList, false);
+        }
+    }
+
+    class Cuntinue {
+        List<String> commands;
+        boolean carryOn;
+
+        public Cuntinue(List<String> commands, boolean carryOn) {
+            this.commands = commands;
+            this.carryOn = carryOn;
+        }
     }
 
 }

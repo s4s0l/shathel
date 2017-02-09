@@ -15,11 +15,9 @@ class WorkingDirectoryCommand extends CommandMarker {
          path: File): String = {
     if (path.isAbsolute) {
       System.setProperty("user.dir", path.getAbsolutePath);
-      System.setProperty("shathel.working.directory", path.getAbsolutePath);
     } else {
       val path1 = new File(".", path.getPath).getAbsolutePath
       System.setProperty("user.dir", path1);
-      System.setProperty("shathel.working.directory", path1);
     }
     return new File(".").getAbsolutePath
   }

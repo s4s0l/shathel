@@ -3,20 +3,10 @@ package org.s4s0l.shathel.commons.core.stack;
 /**
  * @author Matcin Wielgus
  */
-public class StackProvisionerDefinition {
-    public final String name;
-    public final String type;
+public class StackProvisionerDefinition extends ScriptDefinition   {
 
-    public StackProvisionerDefinition(String name, String type) {
-        this.name = name;
-        this.type = type;
+    public StackProvisionerDefinition(StackDescription origin, String category, String name, String inline, String type) {
+        super(origin, category, name, inline, type);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getType() {
-        return type;
-    }
 }

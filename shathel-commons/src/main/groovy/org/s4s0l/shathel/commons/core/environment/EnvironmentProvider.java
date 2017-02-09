@@ -7,14 +7,13 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 /**
- *
  * TODO tu ma być getEnvironment(EnvDesc)
+ *
  * @author Matcin Wielgus
  */
-public interface EnvironmentProvider extends ExtensionInterface{
+public interface EnvironmentProvider extends ExtensionInterface {
     String getType();
 
-    Environment getEnvironment(Storage s, EnvironmentDescription environmentDescription,
-                               ExtensionContext ctxt,SolutionDescription solutionDescription);
+    Environment getEnvironment(EnvironmentContext environmentContext);
 
 }

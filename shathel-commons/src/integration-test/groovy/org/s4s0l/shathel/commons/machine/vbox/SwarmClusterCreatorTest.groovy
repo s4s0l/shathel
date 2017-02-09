@@ -29,7 +29,7 @@ class SwarmClusterCreatorTest extends Specification {
     def "Schould create and destroy machine swarm cluster"() {
         given:
         SwarmClusterCreator c = new SwarmClusterCreator(
-                new MachineSwarmClusterWrapper(new EnvironmentContext(null, null, null, new File(getRootDir())), new VBoxMachineSwarmClusterFlavour()),
+                new MachineSwarmClusterWrapper(new EnvironmentContext(extensionContext, null, null, null, new File(getRootDir()), new File(getRootDir())), new VBoxMachineSwarmClusterFlavour()),
                 new File(getRootDir()),
                 "$clusterName", 2, 1, "20.20.20")
         when:

@@ -47,13 +47,11 @@ class DeployerTest extends FeatureSpec {
 
     scenario("in dind environment") {
       def cmd1 = s"${getPath()} --cmdfile ${prepareScript("start", "script-dind")}";
-      println(cmd1)
       assert(0 == ((cmd1) !))
       assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("stop", "script-dind")}".toString) !))
 
       def cmd3 = s"${getPath()} ${destroyCommand}"
 
-      println(cmd3)
       assert(0 == ((cmd3) !))
     }
   }

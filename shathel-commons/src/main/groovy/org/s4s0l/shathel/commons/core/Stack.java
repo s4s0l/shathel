@@ -1,10 +1,8 @@
 package org.s4s0l.shathel.commons.core;
 
-import org.s4s0l.shathel.commons.core.enricher.EnrichersFasade;
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
-
-import java.io.File;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 /**
  * @author Matcin Wielgus
@@ -12,25 +10,26 @@ import java.io.File;
 public class Stack {
     private final StackTreeDescription stackDescriptionTree;
     private final Environment environment;
-    private final EnrichersFasade enricherProvider;
 
-    public Stack(StackTreeDescription stackDescriptionTree, Environment environment,
-                 EnrichersFasade enricherProvider) {
+
+    public Stack(StackTreeDescription stackDescriptionTree, Environment environment) {
         this.stackDescriptionTree = stackDescriptionTree;
         this.environment = environment;
-        this.enricherProvider = enricherProvider;
+
     }
 
     public StackOperations createStartCommand(boolean forcefull) {
-        return new StackOperationsFactory(stackDescriptionTree,
-                environment.getIntrospectionProvider(), enricherProvider)
+        return getStackOperationsFactory()
                 .createStartSchedule(forcefull);
     }
 
     public StackOperations createStopCommand(boolean withDependencies) {
-        return new StackOperationsFactory(stackDescriptionTree,
-                environment.getIntrospectionProvider(), enricherProvider)
+        return getStackOperationsFactory()
                 .createStopSchedule(withDependencies);
+    }
+
+    private StackOperationsFactory getStackOperationsFactory() {
+        return new StackOperationsFactory(stackDescriptionTree, environment);
     }
 
     public void run(StackOperations schedule) {

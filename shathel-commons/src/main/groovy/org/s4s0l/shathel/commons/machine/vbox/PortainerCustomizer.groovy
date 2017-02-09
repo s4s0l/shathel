@@ -98,10 +98,10 @@ class PortainerCustomizer {
                 e
         }
 
-        machine.getAllNodeNames()
+        machine.getNodeNames()
                 .each {
             def machineName = it
-            def envs = machine.getMachineEnvs(machineName)
+            def envs = machine.getDockerEnvs(machineName)
             def certPath = envs['DOCKER_CERT_PATH']
             def machineIp = envs['DOCKER_HOST']
             def tls = !StringUtils.isEmpty(certPath)

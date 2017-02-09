@@ -1,14 +1,18 @@
+
+
 TODO: paczka dla portainera (mechanizm post provision
  + hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
- jak urucahamiac graooviego aby grape dzialal
+
 
 TODO: test czy mirror w ogole dziala - pierdolnac normalny przykład
-(do tego celu trzeba zrobic plugin dobry)
+(do tego celu trzeba zrobic plugin dobry:
+    - bootcker niech tylko dockery robi i je pushuje lokalnie do repo)
 
+Zabezpieczyć repo
 TODO: authentiacation proxy... dconf + własne metadata service?
 
 TODO: Password manager
-TODO: Zrobic paczke dla consula
+TODO: Zrobic paczke dla consula (persystencja)
 
 TODO: Zrobic paczke dla vaulta
 

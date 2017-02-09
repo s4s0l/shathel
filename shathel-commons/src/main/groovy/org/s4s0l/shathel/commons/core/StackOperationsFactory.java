@@ -1,9 +1,7 @@
 package org.s4s0l.shathel.commons.core;
 
-import groovy.lang.Tuple;
-import groovy.util.MapEntry;
-import org.s4s0l.shathel.commons.core.enricher.Enricher;
-import org.s4s0l.shathel.commons.core.enricher.EnrichersFasade;
+import org.apache.commons.collections.map.HashedMap;
+import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
@@ -12,14 +10,13 @@ import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackEnricherDefinition;
 import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
-import org.s4s0l.shathel.commons.utils.StreamUtils;
+import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,14 +26,13 @@ import java.util.stream.Stream;
 public class StackOperationsFactory {
     private final StackTreeDescription descriptionTree;
     private final StackIntrospectionProvider introspectionProvider;
-    private final EnrichersFasade enricherProvider;
+    private final Environment environment;
 
     public StackOperationsFactory(StackTreeDescription descriptionTree,
-                                  StackIntrospectionProvider introspectionProvider,
-                                  EnrichersFasade enricherProvider) {
+                                   Environment environment) {
         this.descriptionTree = descriptionTree;
-        this.introspectionProvider = introspectionProvider;
-        this.enricherProvider = enricherProvider;
+        this.environment = environment;
+        this.introspectionProvider = environment.getIntrospectionProvider();
     }
 
     public StackOperations createStartSchedule(boolean forcefull) {
@@ -44,7 +40,7 @@ public class StackOperationsFactory {
         Stream<StackDescription> stream = descriptionTree.stream();
 
         Stream<StackCommand> stackCommandStream = stream
-                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack,forcefull)))
+                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack, forcefull)))
                 .filter(e -> e.getValue() != StackCommand.Type.NOOP)
                 .map(e -> createStackCommand(e.getKey(), e.getValue()));
 
@@ -62,19 +58,38 @@ public class StackOperationsFactory {
     }
 
     private StackCommand createStackCommand(StackDescription stack, StackCommand.Type commandType) {
-        ComposeFileModel shathelStackFileModel = stack.getStackResources().getComposeFileModel();
+        ComposeFileModel composeModel = stack.getStackResources().getComposeFileModel();
         List<StackEnricherDefinition> enricherDefinitions = getEnricherDefinitions(stack);
-        List<StackProvisionerDefinition> allProvisioners = new ArrayList<>();
-        allProvisioners.addAll(stack.getProvisioners());
+        List<StackProvisionerDefinition> enricherProvisioners = new ArrayList<>();
+
         for (StackEnricherDefinition enricherDefinition : enricherDefinitions) {
-            Enricher enricher = enricherProvider.getEnricher(enricherDefinition);
-            allProvisioners.addAll(enricher.enrich(stack, shathelStackFileModel));
+            Optional<Executor> executor = ScriptExecutorProvider.findExecutor(getExtensionContext(), enricherDefinition);
+            enricherProvisioners.addAll(execute(executor, composeModel, stack));
         }
-        List<Enricher> globalEnrichers = enricherProvider.getGlobalEnrichers();
-        for (Enricher enricher : globalEnrichers) {
-            allProvisioners.addAll(enricher.enrich(stack, shathelStackFileModel));
+        List<Executor> globalEnrichers = GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext());
+        for (Executor enricher : globalEnrichers) {
+            enricherProvisioners.addAll(execute(Optional.of(enricher), composeModel, stack));
         }
-        return new StackCommand(commandType, shathelStackFileModel, stack, allProvisioners);
+        return new StackCommand(commandType, composeModel, stack, enricherProvisioners);
+    }
+
+    private ExtensionContext getExtensionContext() {
+        return environment.getEnvironmentContext().getExtensionContext();
+    }
+
+    private List<StackProvisionerDefinition> execute(Optional<Executor> executor,
+                                                     ComposeFileModel composeModel,
+                                                     StackDescription stack) {
+        Map<String, Object> ctxt = new HashedMap();
+        ctxt.put("context", environment.getEnvironmentContext());
+        ctxt.put("env", environment.getEnvironmentApiFacade());
+        ctxt.put("compose", composeModel);
+        ctxt.put("stack", stack);
+
+        return executor
+                .map(x -> x.execute(ctxt))
+                .map(o -> (List<StackProvisionerDefinition>) o)
+                .orElse(Collections.emptyList());
     }
 
     private StackOperations buildOperations(Stream<StackCommand> stackCommandStream) {

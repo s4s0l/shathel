@@ -1,17 +1,17 @@
 package org.s4s0l.shathel.commons.swarm;
 
+import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade;
+import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
  */
-public interface SwarmClusterWrapper {
+public interface SwarmClusterWrapper extends EnvironmentApiFacade {
 
-    List<String> getAllNodeNames();
 
     void start(String node);
 
@@ -24,14 +24,38 @@ public interface SwarmClusterWrapper {
     void scp(String from, String to);
 
 
-
     void destroy();
 
     Node getNode(String nodeName);
 
-    DockerWrapper getWrapperForNode(String node);
 
     String getNonRootUser();
+
+
+    @Override
+    default String getIpForManagementNode() {
+        return getManager()
+                .map(x -> getIp(x.getName()))
+                .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
+    }
+
+    @Override
+    default DockerWrapper getDockerForManagementNode() {
+        return getManager()
+                .map(x -> getDocker(x.getName()))
+                .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
+    }
+
+    default Optional<DockerInfoWrapper> getManager() {
+        return getNodeNames().stream()
+                .sorted()
+                .map(x -> getNode(x))
+                .filter(x -> x.isStarted() && x.isReachable())
+                .map(x -> new DockerInfoWrapper(getDocker(x.getName()).daemonInfo(), x.getName()))
+                .filter(x -> x.isManager())
+                .findFirst();
+    }
+
 
     /**
      * @param machineName        name of machine
@@ -43,18 +67,8 @@ public interface SwarmClusterWrapper {
     CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost);
 
     default boolean isInitialized(int managersCount, int workersCount) {
-        return getAllNodeNames().size() >= managersCount + workersCount;
+        return getNodeNames().size() >= managersCount + workersCount;
     }
-
-
-    /**
-     * returns DOCKER_* environment variables used to talk with
-     * docker daemon running on given node
-     *
-     * @param node node name
-     * @return see above
-     */
-    Map<String, String> getMachineEnvs(String node);
 
 
     class CreationResult {

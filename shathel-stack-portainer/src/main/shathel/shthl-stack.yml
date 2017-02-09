@@ -1,8 +1,6 @@
 version: 1
 shathel-stack:
   deployName: portainer
-#  dependencies:
-#    shathel-stack-core:$version:
-  postdeploy:
+  post-provisioners:
     configure:
       type: groovy

@@ -49,8 +49,8 @@ class SwarmClusterCreator {
         initSwarm("${CLUSTER_NAME}-manager-1", MANAGER_IP)
 
         log "Saving tokens"
-        String manager_token = swarmClusterWrapper.getWrapperForNode("${CLUSTER_NAME}-manager-1").swarmTokenForManager()
-        String worker_token = swarmClusterWrapper.getWrapperForNode("${CLUSTER_NAME}-manager-1").swarmTokenForWorker()
+        String manager_token = swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").swarmTokenForManager()
+        String worker_token = swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").swarmTokenForWorker()
 
 
         (numberOfManagers < 2 ? [] : 2..numberOfManagers).each { n ->
@@ -76,20 +76,20 @@ class SwarmClusterCreator {
 
 
 
-        new PortainerCustomizer().with {
-            log "Launching Portainer"
-            if (!swarmClusterWrapper.getWrapperForNode("${CLUSTER_NAME}-manager-1").serviceRunning("portainer")) {
-                swarmClusterWrapper.getWrapperForNode("${CLUSTER_NAME}-manager-1").serviceCreate(
-                        """--name portainer 
-                        --publish 9000:9000 
-                        --constraint node.role==manager 
-                        --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock 
-                        portainer/portainer 
-                        -H unix:///var/run/docker.sock""".replace("\n", ""))
-            }
-            log "Initiating portainer configuration"
-            customizePortainer(9000, MANAGER_IP, swarmClusterWrapper)
-        }
+//        new PortainerCustomizer().with {
+//            log "Launching Portainer"
+//            if (!swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").serviceRunning("portainer")) {
+//                swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").serviceCreate(
+//                        """--name portainer
+//                        --publish 9000:9000
+//                        --constraint node.role==manager
+//                        --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
+//                        portainer/portainer
+//                        -H unix:///var/run/docker.sock""".replace("\n", ""))
+//            }
+//            log "Initiating portainer configuration"
+//            customizePortainer(9000, MANAGER_IP, swarmClusterWrapper)
+//        }
 
         return modified;
     }
@@ -125,21 +125,21 @@ class SwarmClusterCreator {
 
     private void joinSwarm(String nodeName, String advertiseIp, String manager_token, String MANAGER_IP) {
         log "Swarm Manager Join"
-        if (swarmClusterWrapper.getWrapperForNode(nodeName).swarmActive()) {
+        if (swarmClusterWrapper.getDocker(nodeName).swarmActive()) {
             log "Swarm already present"
         } else {
             log "Joining swarm on node $nodeName"
-            swarmClusterWrapper.getWrapperForNode(nodeName).swarmJoin(advertiseIp, manager_token, MANAGER_IP)
+            swarmClusterWrapper.getDocker(nodeName).swarmJoin(advertiseIp, manager_token, MANAGER_IP)
         }
     }
 
     private void initSwarm(String nodeName, String advertiseIp) {
         log "Swarm Init"
-        if (swarmClusterWrapper.getWrapperForNode(nodeName).swarmActive()) {
+        if (swarmClusterWrapper.getDocker(nodeName).swarmActive()) {
             log "Swarm already present"
         } else {
             log "Initializing swarm on node $nodeName"
-            swarmClusterWrapper.getWrapperForNode(nodeName).swarmInit(advertiseIp)
+            swarmClusterWrapper.getDocker(nodeName).swarmInit(advertiseIp)
         }
     }
 
@@ -161,10 +161,10 @@ class SwarmClusterCreator {
         swarmClusterWrapper.scp("${tmpDir}/registries/certs/domain.key", "${nodeName}:/registry/certs/domain.key")
 
         log "Run mirror repository container"
-        swarmClusterWrapper.getWrapperForNode(nodeName).containerRemoveIfPresent("shathel-mirror-registry")
-        swarmClusterWrapper.getWrapperForNode(nodeName).exec.executeForOutput("""
+        swarmClusterWrapper.getDocker(nodeName).containerRemoveIfPresent("shathel-mirror-registry")
+        swarmClusterWrapper.getDocker(nodeName).exec.executeForOutput("""
           run -d --restart=always -p 4001:5000 --name shathel-mirror-registry 
-         -v /registry/mirrordata:/var/lib/registry 
+         -v /shathel-data/mirror:/var/lib/registry 
          -v /registry/mirrorcerts:/certs 
          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.crt 
          -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key 
@@ -173,10 +173,10 @@ class SwarmClusterCreator {
         """.replace("\n", ""))
 
         log "Run repository container"
-        swarmClusterWrapper.getWrapperForNode(nodeName).containerRemoveIfPresent("shathel-registry")
-        swarmClusterWrapper.getWrapperForNode(nodeName).exec.executeForOutput("""
+        swarmClusterWrapper.getDocker(nodeName).containerRemoveIfPresent("shathel-registry")
+        swarmClusterWrapper.getDocker(nodeName).exec.executeForOutput("""
              run -d --restart=always -p 4000:5000 --name shathel-registry 
-             -v /registry/data:/var/lib/registry 
+             -v /shathel-data/registry:/var/lib/registry 
              -v /registry/certs:/certs 
              -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.crt 
              -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key 

@@ -46,7 +46,6 @@ public class OsCommands2 implements CommandMarker {
     public void command(
             @CliOption(key = { "", "command" }, mandatory = false, specifiedDefaultValue = "", unspecifiedDefaultValue = "", help = "The command to execute") final String command) {
 
-    	System.out.println("command2 is:" + command);
         if (command != null && command.length() > 0) {
             try {
                 osOperations.executeCommand(command);

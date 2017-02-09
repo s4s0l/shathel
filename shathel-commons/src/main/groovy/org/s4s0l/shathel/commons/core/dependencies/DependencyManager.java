@@ -52,7 +52,6 @@ public class DependencyManager {
 
         File destFile = new File(dependenciesDir, (stackReference.getStackFileName()));
         boolean downloaded = false;
-        System.out.println("FOOOOOORCE" + forcefull);
         if (forcefull || !destFile.exists()) {
             downloader.download(stackReference, dependenciesDir);
             downloaded = true;

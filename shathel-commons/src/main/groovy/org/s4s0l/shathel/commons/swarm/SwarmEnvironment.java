@@ -3,11 +3,10 @@ package org.s4s0l.shathel.commons.swarm;
 import groovy.lang.Tuple;
 import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
 import org.s4s0l.shathel.commons.core.environment.*;
+import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
-import org.s4s0l.shathel.commons.docker.DockerWrapper;
-import org.s4s0l.shathel.commons.machine.MachineEnvironmentProvisionExecutor;
-import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -99,12 +98,13 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public void start() {
-        swarmClusterWrapper.getAllNodeNames().stream().forEach(swarmClusterWrapper::start);
+        swarmClusterWrapper.getNodeNames().stream().forEach(swarmClusterWrapper::start);
     }
 
     @Override
     public boolean isStarted() {
-        return !swarmClusterWrapper.getAllNodeNames().stream()
+        List<String> nodeNames = swarmClusterWrapper.getNodeNames();
+        return !nodeNames.isEmpty() && !nodeNames.stream()
                 .map(swarmClusterWrapper::getNode)
                 .filter(x -> !x.isStarted())
                 .findFirst()
@@ -113,7 +113,7 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public void stop() {
-        swarmClusterWrapper.getAllNodeNames().stream().forEach(swarmClusterWrapper::stop);
+        swarmClusterWrapper.getNodeNames().stream().forEach(swarmClusterWrapper::stop);
     }
 
     @Override
@@ -123,11 +123,11 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public void verify() {
-        List<DockerInfoWrapper> machines = swarmClusterWrapper.getAllNodeNames()
+        List<DockerInfoWrapper> machines = swarmClusterWrapper.getNodeNames()
                 .stream()
                 .map(swarmClusterWrapper::getNode)
                 .filter(x -> x.isStarted() || x.isReachable())
-                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).daemonInfo(), x.getName()))
+                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getDocker(x.getName()).daemonInfo(), x.getName()))
                 .collect(Collectors.toList());
 
         //can we ssh to theese dockers
@@ -159,31 +159,30 @@ public class SwarmEnvironment implements Environment {
 
     }
 
-    DockerWrapper getDockerWrapperForManagementNode() {
-        return swarmClusterWrapper.getAllNodeNames().stream()
-                .sorted()
-                .map(x -> swarmClusterWrapper.getNode(x))
-                .filter(x -> x.isStarted() && x.isReachable())
-                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getWrapperForNode(x.getName()).daemonInfo(), x.getName()))
-                .filter(x -> x.isManager())
-                .findFirst()
-                .map(x -> swarmClusterWrapper.getWrapperForNode(x.getName()))
-                .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
-    }
 
     @Override
     public StackIntrospectionProvider getIntrospectionProvider() {
-        return new SwarmStackIntrospectionProvider(getDockerWrapperForManagementNode());
+        return new SwarmStackIntrospectionProvider(swarmClusterWrapper.getDockerForManagementNode());
     }
 
     @Override
     public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return new MachineEnvironmentProvisionExecutor();
+        return new DefaultProvisionerExecutor( this);
     }
 
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
-        return new SwarmContainerRunner(getDockerWrapperForManagementNode());
+        return new SwarmContainerRunner(swarmClusterWrapper.getDockerForManagementNode());
+    }
+
+    @Override
+    public EnvironmentContext getEnvironmentContext() {
+        return environmentContext;
+    }
+
+    @Override
+    public EnvironmentApiFacade getEnvironmentApiFacade() {
+        return swarmClusterWrapper;
     }
 
 

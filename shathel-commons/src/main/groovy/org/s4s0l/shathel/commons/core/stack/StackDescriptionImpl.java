@@ -58,18 +58,33 @@ public class StackDescriptionImpl implements StackDescription {
     }
 
     @Override
-    public List<StackProvisionerDefinition> getProvisioners() {
-        return Collections.EMPTY_LIST;
+    public List<StackProvisionerDefinition> getPreProvisioners() {
+        return fileModel.getPreProvisioners().stream()
+                .map(map -> new StackProvisionerDefinition(this,"pre-provisioners",
+                        map.get("name"),
+                        map.get("inline"),
+                        map.get("type"))
+                ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StackProvisionerDefinition> getPostProvisioners() {
+        return fileModel.getPostProvisioners().stream()
+                .map(map -> new StackProvisionerDefinition(this,"post-provisioners",
+                        map.get("name"),
+                        map.get("inline"),
+                        map.get("type"))
+                ).collect(Collectors.toList());
     }
 
     @Override
     public List<StackEnricherDefinition> getEnricherDefinitions() {
         return fileModel.getEnrichers().stream()
                 .map(map -> new StackEnricherDefinition(this,
-                        StackEnricherDefinition.Target.valueOf(map.get("target")),
                         map.get("name"),
                         map.get("inline"),
-                        map.get("type")
+                        map.get("type"),
+                        StackEnricherDefinition.Target.valueOf(map.get("target"))
                 )).collect(Collectors.toList());
     }
 

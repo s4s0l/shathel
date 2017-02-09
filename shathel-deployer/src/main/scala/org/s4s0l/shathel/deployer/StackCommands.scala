@@ -43,7 +43,6 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
              map: java.util.Map[String, String]
            ): String = {
     runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map, forceful)((s, c) => {
-      println(c.forceful() + " " + forceful)
       s.createStartCommand(c.forceful())
     })
   }
@@ -113,8 +112,8 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
       elem.getDescription.getDeployName -> Map(
         "gav" -> elem.getDescription.getGav,
         "type" -> elem.getType.name(),
-        "provisioners" -> elem.getProvisioners.asScala.map((p) => s"${p.name}:${p.`type`}").asJava,
-        "compose" -> (if (inspectLong) elem.getMutableModel.getParsedYml else "<hidden>")
+        "provisioners" -> elem.getEnricherPreProvisioners.asScala.map((p) => s"${p.getName}.${p.getType}").asJava,
+        "compose" -> (if (inspectLong) elem.getComposeModel.getParsedYml else "<hidden>")
       ).asJava
     })(arrayToMap)
   }

@@ -15,13 +15,16 @@ public interface StackDescription {
     String getDeployName();
 
     default StackReference getReference() {
-        return new StackReference( getGroup(),getName(), getVersion());
+        return new StackReference(getGroup(), getName(), getVersion());
     }
+
     StackResources getStackResources();
 
     List<StackReference> getDependencies();
 
-    List<StackProvisionerDefinition> getProvisioners();
+    List<StackProvisionerDefinition> getPreProvisioners();
+
+    List<StackProvisionerDefinition> getPostProvisioners();
 
     List<StackEnricherDefinition> getEnricherDefinitions();
 

@@ -41,10 +41,11 @@ public class StackOperationsExecutor {
                         File dstStackDir = new File(executionDir, stackCommand.getDescription().getReference().getStackDirecctoryName());
                         IoUtils.copyContents(srcStackDirectory, executionDir);
                         File composeFile = new File(dstStackDir, "stack/docker-compose.yml");
-                        ComposeFileModel.dump(stackCommand.getMutableModel(), composeFile);
+                        ComposeFileModel.dump(stackCommand.getComposeModel(), composeFile);
                         if(stackCommand.getType() != StackCommand.Type.STOP){
-                            epec.executeCommands(dstStackDir, stackCommand);
+                            epec.executePreProvisioners(dstStackDir, stackCommand);
                             ecrc.startContainers(stackCommand.getDescription(), composeFile);
+                            epec.executePostProvisioners(dstStackDir, stackCommand);
                         }else {
                             ecrc.stopContainers(stackCommand.getDescription(), composeFile);
                         }

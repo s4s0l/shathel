@@ -2,9 +2,10 @@ package org.s4s0l.shathel.commons.core;
 
 import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
-import org.s4s0l.shathel.commons.core.enricher.EnrichersFasade;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
+import org.s4s0l.shathel.commons.core.security.LazyInitiableSafeStorage;
+import org.s4s0l.shathel.commons.core.security.SafeStorageProvider;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.core.storage.Storage;
@@ -15,12 +16,12 @@ import org.s4s0l.shathel.commons.utils.VersionComparator;
  * @author Matcin Wielgus
  */
 public class Solution {
-    private final ExtensionContext context;
+    private final ExtensionContext extensionContext;
     private final Parameters params;
     private final Storage storage;
 
-    public Solution(ExtensionContext context, Parameters params, Storage storage) {
-        this.context = context;
+    public Solution(ExtensionContext extensionContext, Parameters params, Storage storage) {
+        this.extensionContext = extensionContext;
         this.params = params;
         this.storage = storage;
     }
@@ -31,11 +32,20 @@ public class Solution {
         EnvironmentDescription environmentDescription = solutionDescription.getEnvironmentDescription(environmentName);
         String type = environmentDescription.getType();
 
-        EnvironmentProvider environmentProvider = context
+        EnvironmentProvider environmentProvider = extensionContext
                 .lookupOneMatching(EnvironmentProvider.class, x -> x.getType().equals(type))
                 .get();
-        return environmentProvider.getEnvironment(storage, environmentDescription,
-                context, solutionDescription);
+
+        String name = environmentDescription.getName();
+
+        LazyInitiableSafeStorage safeStorage = new LazyInitiableSafeStorage(() ->
+                extensionContext.lookupOne(SafeStorageProvider.class).get().getSafeStorage(storage, name));
+
+
+        EnvironmentContext environmentContext = new EnvironmentContext(extensionContext, environmentDescription, solutionDescription,
+                safeStorage, storage.getTemporaryDirectory(name), storage.getWorkDirectory(name));
+
+        return environmentProvider.getEnvironment(environmentContext);
     }
 
     public SolutionDescription getSolutionDescription() {
@@ -47,10 +57,10 @@ public class Solution {
     public Stack openStack(Environment e, StackReference reference, boolean forcefull) {
         e.verify();
         StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
-        EnrichersFasade enricherProvider = new EnrichersFasade(context);
+
         DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider, forcefull);
         StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
-        return new Stack(stackDescriptionTree, e, enricherProvider);
+        return new Stack(stackDescriptionTree, e);
     }
 
     private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider, boolean forcefull) {
@@ -61,7 +71,7 @@ public class Solution {
                         .orElse(desc.getVersion());
         return new DependencyManager(
                 storage.getTemporaryDirectory("dependencies"),
-                context.lookupOne(DependencyDownloader.class).get(), overrider, forcefull);
+                extensionContext.lookupOne(DependencyDownloader.class).get(), overrider, forcefull);
     }
 
 

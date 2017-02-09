@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core.model
 
+import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition
 import org.yaml.snakeyaml.Yaml
 
 /**
@@ -75,6 +76,8 @@ class StackFileModel implements Cloneable {
 
     Collection<Map<String, String>> getEnrichers() {
         def deps = parsedYml['shathel-stack'].enrichers
+        if(deps == null)
+            return Collections.emptyList()
         deps.collect {
             kv ->
                 [
@@ -89,4 +92,28 @@ class StackFileModel implements Cloneable {
     }
 
 
+    Collection<Map<String, String>> getPreProvisioners() {
+        def deps = parsedYml['shathel-stack']['pre-provisioners']
+        return collectProvisioners(deps)
+    }
+
+    Collection<Map<String, String>> getPostProvisioners() {
+        def deps = parsedYml['shathel-stack']['post-provisioners']
+        return collectProvisioners(deps)
+    }
+
+    private List<? extends Map<String, String>> collectProvisioners(deps) {
+        if (deps == null)
+            return Collections.emptyList()
+        deps.collect {
+            kv ->
+                [
+                        name  : kv.key,
+                        type  : kv.value?.type ?: 'groovy',
+                        inline: kv.value?.inline,
+
+                ]
+
+        }
+    }
 }

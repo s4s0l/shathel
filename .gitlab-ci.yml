@@ -5,7 +5,7 @@ services:
   - docker:dind
 build:
   stage: build
-  script:
+  typedScript:
     - docker pull sasol/dind4j:latest
     - >
       docker run --privileged -w /build -v $(pwd):/build --rm sasol/dind4j:latest
@@ -16,7 +16,7 @@ build:
   - shared
 test:
   stage: test
-  script:
+  typedScript:
     - docker pull sasol/dind4j:latest
     - >
       docker run --privileged -w /build -v $(pwd):/build --rm sasol/dind4j:latest

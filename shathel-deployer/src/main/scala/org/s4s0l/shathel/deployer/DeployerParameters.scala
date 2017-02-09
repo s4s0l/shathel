@@ -88,7 +88,6 @@ object DeployerParameters {
       provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => None)
 
     def getWithDefault(name: String): Option[String] = {
-      println(s"${name} = ${provider().getParameter(name)}")
       provider().getParameter(name).map[Option[String]]((t: String) => Option(t)).orElseGet(() => {
         defaults.get(name)
       })

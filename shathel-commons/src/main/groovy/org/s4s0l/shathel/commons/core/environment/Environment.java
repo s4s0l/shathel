@@ -66,5 +66,8 @@ public interface Environment {
 
     EnvironmentContainerRunner getContainerRunner();
 
+    EnvironmentContext getEnvironmentContext();
+
+    EnvironmentApiFacade getEnvironmentApiFacade();
 
 }

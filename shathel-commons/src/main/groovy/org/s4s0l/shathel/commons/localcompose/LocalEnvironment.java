@@ -1,35 +1,32 @@
 package org.s4s0l.shathel.commons.localcompose;
 
-import org.s4s0l.shathel.commons.core.environment.Environment;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
+import org.s4s0l.shathel.commons.core.environment.*;
+import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
-import org.s4s0l.shathel.commons.core.security.SafeStorage;
-import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
+import org.s4s0l.shathel.commons.docker.DockerWrapper;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matcin Wielgus
  */
 public class LocalEnvironment implements Environment {
 
-    private final File temporaryDir;
-    private final File workDir;
+    private final EnvironmentContext context;
 
-
-    public LocalEnvironment(File temporaryDir, File workDir) {
-        this.temporaryDir = temporaryDir;
-        this.workDir = workDir;
+    public LocalEnvironment(EnvironmentContext context) {
+        this.context = context;
     }
 
 
     @Override
     public File getExecutionDirectory() {
-        File execution = new File(temporaryDir, "execution");
-        execution.mkdirs();
-        return execution;
+        return context.getExecutionDirectory();
     }
 
     @Override
@@ -87,14 +84,56 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public EnvironmentProvisionExecutor getProvisionExecutor() {
-        File execution = new File(workDir, "mounts");
-        execution.mkdirs();
-        return new LocalEnvironmentProvisionExecutor(execution);
+        return new DefaultProvisionerExecutor( this);
     }
 
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
         return new LocalEnvironmentContainerRunner();
+    }
+
+    @Override
+    public EnvironmentContext getEnvironmentContext() {
+        return context;
+    }
+
+    @Override
+    public EnvironmentApiFacade getEnvironmentApiFacade() {
+        return new EnvironmentApiFacade() {
+            @Override
+            public List<String> getNodeNames() {
+                return Collections.singletonList("localhost");
+            }
+
+            @Override
+            public String getIp(String nodeName) {
+                return "localhost";
+            }
+
+            @Override
+            public String getIpForManagementNode() {
+                return "localhost";
+            }
+
+            @Override
+            public DockerWrapper getDockerForManagementNode() {
+                return new DockerWrapper();
+            }
+
+            @Override
+            public DockerWrapper getDocker(String nodeName) {
+                if ("localhost".equals(nodeName)) {
+                    return getDockerForManagementNode();
+                } else {
+                    throw new RuntimeException("Unknown node name " + nodeName);
+                }
+            }
+
+            @Override
+            public Map<String, String> getDockerEnvs(String nodeName) {
+                return Collections.emptyMap();
+            }
+        };
     }
 
 }
