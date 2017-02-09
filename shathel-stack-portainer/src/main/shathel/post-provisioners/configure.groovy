@@ -1,5 +1,3 @@
-
-
 import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
@@ -12,6 +10,7 @@ import org.apache.http.entity.mime.content.FileBody
 import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.core.provision.StackCommand
+import org.s4s0l.shathel.commons.scripts.HttpApis
 
 import static groovyx.net.http.ContentType.JSON
 
@@ -23,37 +22,14 @@ def log(String x) {
 
 EnvironmentContext environmentContext = context;
 EnvironmentApiFacade api = env;
-StackCommand stackCommand  = command;
+StackCommand stackCommand = command;
+HttpApis httpApi = http
 
 String ip = api.getIpForManagementNode();
 int portainerPort = 9000
 String adminPassword = "qwerty"
-def portainer = new RESTClient("http://${ip}:${portainerPort}")
-portainer.handler['404'] = portainer.handler.get(Status.SUCCESS)
-
-int attempt = 0, maxAttempts = 15;
-while (true) {
-    attempt++
-    try {
-        log "testing http://${ip}:${portainerPort}..."
-        HttpResponseDecorator result = portainer.get(
-                path: '/'
-        )
-        if (result.status != 200) {
-            throw new Exception("Non 200 resp")
-        } else {
-            log "http://${ip}:${portainerPort} ready."
-            break;
-        }
-    } catch (Exception e) {
-        log "http://${ip}:${portainerPort} not ready..."
-        if (attempt < maxAttempts) {
-            sleep(1000)
-        } else {
-            throw new Exception("http://${ip}:${portainerPort} not ready!")
-        }
-    }
-}
+def address = "http://${ip}:${portainerPort}"
+def portainer = httpApi.waitAndGetClient(address)
 
 log "Checking if already initialized"
 
@@ -103,8 +79,8 @@ api.getNodeNames()
     def envs = api.getDockerEnvs(machineName)
     def certPath = envs['DOCKER_CERT_PATH']
     def machineIp = envs['DOCKER_HOST']
-    if(machineIp == null){
-        return ;
+    if (machineIp == null) {
+        return;
     }
     def tls = !StringUtils.isEmpty(certPath)
     log "Adding $machineName as endpoint"

@@ -254,7 +254,8 @@ class DockerWrapper {
     }
 
     String containerGetIpInNetwork(String containerName, String networkName) {
-        containerInspect(containerName).NetworkSettings.Networks[networkName].IPAddress
+        def inspect = containerInspect(containerName)
+        inspect.NetworkSettings.Networks[networkName].IPAddress
     }
 
     void networkCreate(String networkName, String subnet) {

@@ -34,7 +34,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
 
     @Override
     public List<String> getNodeNames() {
-        List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=true");
+        List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=" + getNetworkName());
         return maps.stream().map(x -> x.get("Names")).collect(Collectors.toList());
     }
 
@@ -126,7 +126,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
         }
 
         if (!getLocalWrapper().containerExists(machineName)) {
-            getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=true "
+            getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=" + getNetworkName() + " "
                     + " --hostname " + machineName + " -v volume-" + machineName.toLowerCase() + ":/shathel-data "
                     + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind "
                     + " --registry-mirror " + registryMirrorHost);

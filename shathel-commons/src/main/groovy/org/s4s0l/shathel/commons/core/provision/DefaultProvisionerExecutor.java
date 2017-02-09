@@ -4,6 +4,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
 import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.HttpApis;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 
 import java.io.File;
@@ -55,6 +56,7 @@ public class DefaultProvisionerExecutor implements EnvironmentProvisionExecutor,
         ctxt.put("env", environment.getEnvironmentApiFacade());
         ctxt.put("command", stackCommand);
         ctxt.put("dir", dstStackDir);
+        ctxt.put("http", new HttpApis());
         executor.execute(ctxt);
     }
 
