@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.Yaml
  */
 class ShathelPackagerPlugin implements Plugin<Project> {
 
-    def getLocalProjectNameFromGav(String gav){
+    def getLocalProjectNameFromGav(String gav) {
         def of = gav.lastIndexOf(":")
         def ret = gav.substring(0, of)
         ret.startsWith(":") ? ret : ":$ret"
@@ -45,11 +45,11 @@ class ShathelPackagerPlugin implements Plugin<Project> {
 
         }
         deps.each { d ->
-            if (d.version == '$version' && project.findProject(getLocalProjectNameFromGav(d.gav))){
+            if (d.version == '$version' && project.findProject(getLocalProjectNameFromGav(d.gav))) {
                 project.dependencies {
                     shathel project.dependencies.project(path: getLocalProjectNameFromGav(d.gav), configuration: 'shathel')
                 }
-            }else{
+            } else {
                 project.dependencies.shathel group: d.group, name: d.name, version: d.version, classifier: 'shathel', ext: 'zip'
             }
         }
@@ -59,15 +59,9 @@ class ShathelPackagerPlugin implements Plugin<Project> {
             apply plugin: 'maven'
             def shtTemporaryDirectory = new File(buildDir, 'shtTemporary/package')
 
-            task([type: Copy], 'shtPrepareSources') {
-                from 'src/main/shathel'
-                exclude 'stack/docker-compose.yml'
-                exclude 'shthl-stack.yml'
-                into shtTemporaryDirectory
 
-            }
 
-            task([dependsOn: 'shtPrepareSources'], 'shtProcessSources') {
+            task('shtProcessSources') {
                 doLast {
                     //bootcker magic
                     def preparator = new BootckerComposePreparator(project, 'shtTemporary/package/stack')
@@ -80,11 +74,24 @@ class ShathelPackagerPlugin implements Plugin<Project> {
                     //make sure version and project name are same as project
                     def parsedYml = new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text)
                     parsedYml['shathel-stack']['gav'] = "${project.group}:${project.name}:${project.version}".toString()
+                    if(shtlStackModel['shathel-stack'].dependencies!=null){
+                        parsedYml['shathel-stack'].dependencies = shtlStackModel['shathel-stack'].dependencies.collectEntries {
+                            [(it.key.replace('$version', project.version)): it.value]
+                        }
+                    }
                     new File(shtTemporaryDirectory, 'shthl-stack.yml').text = new Yaml().dump(parsedYml)
                 }
             }
 
-            task([type: Zip, dependsOn: 'shtProcessSources'], 'shtAssemble') {
+            task([type: Copy,dependsOn: shtProcessSources], 'shtPrepareSources') {
+                from 'src/main/shathel'
+                include '**/*'
+                exclude 'stack/docker-compose.yml'
+                exclude 'shthl-stack.yml'
+                into shtTemporaryDirectory
+            }
+
+            task([type: Zip, dependsOn: 'shtPrepareSources'], 'shtAssemble') {
                 classifier = 'shathel'
                 from shtTemporaryDirectory
                 destinationDir file('build/libs')

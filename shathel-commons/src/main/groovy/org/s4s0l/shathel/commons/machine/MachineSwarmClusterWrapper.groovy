@@ -5,6 +5,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings
+import org.s4s0l.shathel.commons.swarm.SwarmEnvironmentDescription
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -26,7 +27,9 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
 
     @Override
     List<String> getNodeNames() {
-        return getWrapper().getMachines().collect { it.key }
+        def collect = getWrapper().getMachines().collect { it.key }
+        Collections.sort(collect)
+        return collect;
     }
 
     @Override
@@ -67,6 +70,11 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
+    String getDataDirectory() {
+        return "/mnt/sda1/shathel-data";
+    }
+
+    @Override
     SwarmClusterWrapper.Node getNode(String nodeName) {
         def machines = getWrapper().getMachines()[nodeName]
         return new SwarmClusterWrapper.Node(
@@ -78,6 +86,30 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
 
     String getNonRootUser() {
         return "docker"
+    }
+
+    @Override
+    void setKernelParam(String param) {
+        getNodeNames().each { node ->
+            getWrapper().sudo(node, "sysctl -w $param")
+            String cont = getWrapper().sudo(node, "cat /etc/sysctl.conf")
+            def name = param.split("=")[0]
+            if (cont.contains("${name}=")) {
+                getWrapper().sudo(node, "sed -i.bak s/${name}=.*/$param/g /etc/sysctl.conf")
+            } else {
+                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                        "\"echo '$param' >> /etc/sysctl.conf\"")
+            }
+            cont = getWrapper().sudo(node, "cat /var/lib/boot2docker/profile")
+            if (cont.contains("sysctl -w ${name}=")) {
+                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                        "\"sed -i.bak s/sysctl\\ -w\\ ${name}=.*/sysctl\\ -w\\ $param/g /var/lib/boot2docker/profile\"")
+            } else {
+                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                        "\"echo 'sysctl -w $param' >> /var/lib/boot2docker/profile\"")
+            }
+
+        }
     }
 
     @Override
@@ -107,5 +139,15 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     @Override
     Map<String, String> getDockerEnvs(String node) {
         return getWrapper().getMachineEnvs(node)
+    }
+
+    @Override
+    int getExpectedNodeCount() {
+        return SwarmEnvironmentDescription.getNodesCount(environmentContext)
+    }
+
+    @Override
+    int getExpectedManagerNodeCount() {
+        return SwarmEnvironmentDescription.getManagersCount(environmentContext)
     }
 }

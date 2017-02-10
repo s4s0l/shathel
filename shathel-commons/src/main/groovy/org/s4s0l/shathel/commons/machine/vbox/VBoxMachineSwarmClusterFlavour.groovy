@@ -15,16 +15,16 @@ class VBoxMachineSwarmClusterFlavour implements MachineSwarmClusterFlavour {
 
     @Override
     String getMachineOpts(NetworkSettings ns) {
-        "-d virtualbox --virtualbox-hostonly-cidr=${ns.getCidr(254)} " +
-                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.1-rc1/boot2docker.iso"
+        "-d virtualbox --virtualbox-hostonly-cidr=${ns.getCidr(254)} --virtualbox-disk-size=20000 " +
+                "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.1/boot2docker.iso"
     }
 
-    /**
-     * Sets machine ip, if already static does nothing and returns it
-     * @param machineName
-     * @param ipNum
-     * @return
-     */
+/**
+ * Sets machine ip, if already static does nothing and returns it
+ * @param machineName
+ * @param ipNum
+ * @return
+ */
     SwarmClusterWrapper.CreationResult staticIp(DockerMachineWrapper wrapper, File tmpDir, String machineName, NetworkSettings ns, int ipNum) {
         boolean modified = false;
         wrapper.sudo(machineName, "touch /var/lib/boot2docker/bootsync.sh")

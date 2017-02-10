@@ -17,6 +17,8 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
   private var parameters: Parameters = Parameters.fromMapWithSysPropAndEnv(Map[String, String]().asJava)
   private val globalParameters = new DeployerParameters.Provider(() => parameters);
 
+  def getParameters = globalParameters
+
   override def getParameter(name: String): Option[String] = {
     return globalParameters.getNoDefault(name)
   }

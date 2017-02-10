@@ -152,20 +152,20 @@ class SwarmClusterCreator {
 
         log "Prepare ${nodeName} for hosting registry and mirror containers"
 
-        swarmClusterWrapper.sudo("${nodeName}", "mkdir -p /registry/certs")
-        swarmClusterWrapper.sudo("${nodeName}", "mkdir -p /registry/mirrorcerts")
-        swarmClusterWrapper.sudo("${nodeName}", "chown -R ${swarmClusterWrapper.getNonRootUser()} /registry")
-        swarmClusterWrapper.scp("${tmpDir}/registries/mirrorcerts/ca.crt", "${nodeName}:/registry/mirrorcerts/ca.crt")
-        swarmClusterWrapper.scp("${tmpDir}/registries/mirrorcerts/domain.key", "${nodeName}:/registry/mirrorcerts/domain.key")
-        swarmClusterWrapper.scp("${tmpDir}/registries/certs/ca.crt", "${nodeName}:/registry/certs/ca.crt")
-        swarmClusterWrapper.scp("${tmpDir}/registries/certs/domain.key", "${nodeName}:/registry/certs/domain.key")
+        swarmClusterWrapper.sudo("${nodeName}", "mkdir -p ${swarmClusterWrapper.getDataDirectory()}/certs/registry")
+        swarmClusterWrapper.sudo("${nodeName}", "mkdir -p ${swarmClusterWrapper.getDataDirectory()}/certs/mirror")
+        swarmClusterWrapper.sudo("${nodeName}", "chown -R ${swarmClusterWrapper.getNonRootUser()} ${swarmClusterWrapper.getDataDirectory()}/certs")
+        swarmClusterWrapper.scp("${tmpDir}/registries/mirrorcerts/ca.crt", "${nodeName}:${swarmClusterWrapper.getDataDirectory()}/certs/mirror/ca.crt")
+        swarmClusterWrapper.scp("${tmpDir}/registries/mirrorcerts/domain.key", "${nodeName}:${swarmClusterWrapper.getDataDirectory()}/certs/mirror/domain.key")
+        swarmClusterWrapper.scp("${tmpDir}/registries/certs/ca.crt", "${nodeName}:${swarmClusterWrapper.getDataDirectory()}/certs/registry/ca.crt")
+        swarmClusterWrapper.scp("${tmpDir}/registries/certs/domain.key", "${nodeName}:${swarmClusterWrapper.getDataDirectory()}/certs/registry/domain.key")
 
         log "Run mirror repository container"
         swarmClusterWrapper.getDocker(nodeName).containerRemoveIfPresent("shathel-mirror-registry")
         swarmClusterWrapper.getDocker(nodeName).exec.executeForOutput("""
           run -d --restart=always -p 4001:5000 --name shathel-mirror-registry 
-         -v /shathel-data/mirror:/var/lib/registry 
-         -v /registry/mirrorcerts:/certs 
+         -v ${swarmClusterWrapper.getDataDirectory()}/mirror:/var/lib/registry 
+         -v ${swarmClusterWrapper.getDataDirectory()}/certs/mirror:/certs 
          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.crt 
          -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key 
          -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io 
@@ -176,8 +176,8 @@ class SwarmClusterCreator {
         swarmClusterWrapper.getDocker(nodeName).containerRemoveIfPresent("shathel-registry")
         swarmClusterWrapper.getDocker(nodeName).exec.executeForOutput("""
              run -d --restart=always -p 4000:5000 --name shathel-registry 
-             -v /shathel-data/registry:/var/lib/registry 
-             -v /registry/certs:/certs 
+             -v ${swarmClusterWrapper.getDataDirectory()}/registry:/var/lib/registry 
+             -v ${swarmClusterWrapper.getDataDirectory()}/certs/registry:/certs 
              -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.crt 
              -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key 
             registry:2.5""".replace("\n", ""))

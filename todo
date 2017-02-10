@@ -1,8 +1,19 @@
+TODO: elastic nie słucha na tym interfejsie co powinien
 
+
+TODO: shell ma pokazywac jakie srodowisko i solution
+
+TODO: sudo sysctl -w vm.max_map_count=262144 <- dla elk
+
+TODO: full cleanup: docker volume rm $(docker volume ls -q | grep play)
+
+
+TODO: logstash
 
 TODO: paczka dla portainera (mechanizm post provision
  + hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
 
+TODO DINDY nie da sie stop start: Error starting daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid
 
 TODO: test czy mirror w ogole dziala - pierdolnac normalny przykład
 (do tego celu trzeba zrobic plugin dobry:
@@ -32,3 +43,9 @@ TODO: uprawnienia do repozytorium
 TODO: szkielet odpalania docker machine na Digital Ocean
 
 
+
+TODO: start --forcefull powinno byc rozbite na no-cache + with-dependencies
+TODO: operacja rolling update force , reload która by robiła service update --force na serwisach w stacku
+
+
+TODO: dodananie nodea ponad minimum -> musi ogarnac mounty zanim sie doda do swarma

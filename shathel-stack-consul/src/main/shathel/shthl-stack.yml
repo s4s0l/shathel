@@ -1,0 +1,7 @@
+version: 1
+shathel-stack:
+  deployName: consul
+  dependencies:
+      org.s4s0l.shathel:shathel-stack-core:$version:
+      org.s4s0l.shathel:shathel-stack-elk:$version:
+

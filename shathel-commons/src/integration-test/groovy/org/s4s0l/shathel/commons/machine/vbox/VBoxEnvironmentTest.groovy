@@ -58,7 +58,7 @@ class VBoxEnvironmentTest
         stack.run(command)
 
         then:
-        stack.createStartCommand(false).commands.isEmpty()
+        stack.createStartCommand(false).commands.size()==1
 
         when:
         def stopCommand = stack.createStopCommand(true)

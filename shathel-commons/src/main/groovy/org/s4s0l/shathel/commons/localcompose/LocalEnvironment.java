@@ -5,12 +5,16 @@ import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
+import org.s4s0l.shathel.commons.scripts.Executor;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Matcin Wielgus
@@ -84,7 +88,7 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return new DefaultProvisionerExecutor( this);
+        return new DefaultProvisionerExecutor(this);
     }
 
     @Override
@@ -96,6 +100,13 @@ public class LocalEnvironment implements Environment {
     public EnvironmentContext getEnvironmentContext() {
         return context;
     }
+
+    @Override
+    public List<Executor> getEnvironmentEnrichers() {
+        return Collections.emptyList();
+    }
+
+    private static final Logger LOGGER = getLogger(LocalEnvironment.class);
 
     @Override
     public EnvironmentApiFacade getEnvironmentApiFacade() {
@@ -129,9 +140,25 @@ public class LocalEnvironment implements Environment {
                 }
             }
 
+
+            @Override
+            public void setKernelParam(String param) {
+                LOGGER.warn("!Set parameter like: sudo sysctl -w " + param);
+            }
+
             @Override
             public Map<String, String> getDockerEnvs(String nodeName) {
                 return Collections.emptyMap();
+            }
+
+            @Override
+            public int getExpectedNodeCount() {
+                return 1;
+            }
+
+            @Override
+            public int getExpectedManagerNodeCount() {
+                return 1;
             }
         };
     }

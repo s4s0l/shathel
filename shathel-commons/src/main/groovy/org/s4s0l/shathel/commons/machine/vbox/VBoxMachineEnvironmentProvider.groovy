@@ -32,7 +32,7 @@ class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
     @Override
     Environment getEnvironment(EnvironmentContext environmentContext) {
 
-        def machineSettingsImporterExporter = new VBoxMachineSettingsImporterExporter(context.getTempDirectory())
+        def machineSettingsImporterExporter = new VBoxMachineSettingsImporterExporter(environmentContext.getTempDirectory())
 
         MachineSwarmClusterWrapper clusterWrapper = new MachineSwarmClusterWrapper(
                 environmentContext, new VBoxMachineSwarmClusterFlavour())

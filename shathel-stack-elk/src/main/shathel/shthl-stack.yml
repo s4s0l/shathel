@@ -1,0 +1,23 @@
+version: 1
+shathel-stack:
+  deployName: elk
+
+  enrichers:
+      logDriver:
+        target: ALL
+        inline: >
+          compose.yml.services.each { it->
+            it.value.logging = [
+                       driver: 'gelf',
+                       options: [
+                          'gelf-address':"udp://${env.getIpForManagementNode()}:12201".toString(),
+                          tag:stack.name
+                       ]
+
+                    ]
+          }
+          []
+  pre-provisioners:
+    configure:
+      inline: env.setKernelParam('vm.max_map_count=262144')
+

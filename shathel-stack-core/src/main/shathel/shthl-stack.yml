@@ -5,4 +5,4 @@ shathel-stack:
       addNetwork:
         target: ALL
         inline: >
-          s.compose.addExternalNetwork("00shathel_network")
+          compose.addExternalNetwork("00shathel_network")

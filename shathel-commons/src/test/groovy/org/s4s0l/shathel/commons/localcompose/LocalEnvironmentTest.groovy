@@ -85,7 +85,7 @@ class LocalEnvironmentTest extends Specification {
 
         then:
         command != null
-        command.commands.isEmpty()
+        command.commands.size() == 1
         stack.createStartCommand(true).commands.size() == 2
 
         when:

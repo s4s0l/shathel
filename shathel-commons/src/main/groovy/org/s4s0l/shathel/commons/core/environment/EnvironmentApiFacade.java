@@ -19,6 +19,8 @@ public interface EnvironmentApiFacade {
 
     DockerWrapper getDocker(String nodeName);
 
+
+    void setKernelParam(String param);
     /**
      * returns DOCKER_* environment variables used to talk with
      * docker daemon running on given node
@@ -27,4 +29,8 @@ public interface EnvironmentApiFacade {
      * @return see above
      */
     Map<String, String> getDockerEnvs(String nodeName);
+
+    int getExpectedNodeCount();
+
+    int getExpectedManagerNodeCount();
 }

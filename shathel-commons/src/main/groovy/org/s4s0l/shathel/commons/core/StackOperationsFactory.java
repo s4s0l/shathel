@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core;
 
+import com.google.common.collect.Streams;
 import org.apache.commons.collections.map.HashedMap;
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
@@ -29,18 +30,18 @@ public class StackOperationsFactory {
     private final Environment environment;
 
     public StackOperationsFactory(StackTreeDescription descriptionTree,
-                                   Environment environment) {
+                                  Environment environment) {
         this.descriptionTree = descriptionTree;
         this.environment = environment;
         this.introspectionProvider = environment.getIntrospectionProvider();
     }
 
-    public StackOperations createStartSchedule(boolean forcefull) {
+    public StackOperations createStartSchedule() {
 
         Stream<StackDescription> stream = descriptionTree.stream();
 
         Stream<StackCommand> stackCommandStream = stream
-                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack, forcefull)))
+                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack)))
                 .filter(e -> e.getValue() != StackCommand.Type.NOOP)
                 .map(e -> createStackCommand(e.getKey(), e.getValue()));
 
@@ -59,25 +60,23 @@ public class StackOperationsFactory {
 
     private StackCommand createStackCommand(StackDescription stack, StackCommand.Type commandType) {
         ComposeFileModel composeModel = stack.getStackResources().getComposeFileModel();
-        List<StackEnricherDefinition> enricherDefinitions = getEnricherDefinitions(stack);
-        List<StackProvisionerDefinition> enricherProvisioners = new ArrayList<>();
-
-        for (StackEnricherDefinition enricherDefinition : enricherDefinitions) {
-            Optional<Executor> executor = ScriptExecutorProvider.findExecutor(getExtensionContext(), enricherDefinition);
-            enricherProvisioners.addAll(execute(executor, composeModel, stack));
-        }
-        List<Executor> globalEnrichers = GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext());
-        for (Executor enricher : globalEnrichers) {
-            enricherProvisioners.addAll(execute(Optional.of(enricher), composeModel, stack));
-        }
-        return new StackCommand(commandType, composeModel, stack, enricherProvisioners);
+        List<Executor> provisionersExtra = commandType.willRun ? Streams.concat(
+                getEnricherDefinitions(stack).stream()
+                        .map(x -> ScriptExecutorProvider.findExecutor(getExtensionContext(), x)),
+                GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext()).stream()
+                        .map(Optional::of),
+                environment.getEnvironmentEnrichers().stream()
+                        .map(Optional::of)
+        ).flatMap(x -> execute(x, composeModel, stack).stream())
+                .collect(Collectors.toList()) : Collections.emptyList();
+        return new StackCommand(commandType, composeModel, stack, provisionersExtra);
     }
 
     private ExtensionContext getExtensionContext() {
         return environment.getEnvironmentContext().getExtensionContext();
     }
 
-    private List<StackProvisionerDefinition> execute(Optional<Executor> executor,
+    private List<Executor> execute(Optional<Executor> executor,
                                                      ComposeFileModel composeModel,
                                                      StackDescription stack) {
         Map<String, Object> ctxt = new HashedMap();
@@ -88,7 +87,7 @@ public class StackOperationsFactory {
 
         return executor
                 .map(x -> x.execute(ctxt))
-                .map(o -> (List<StackProvisionerDefinition>) o)
+                .map(o -> (List<Executor>) o)
                 .orElse(Collections.emptyList());
     }
 
@@ -105,11 +104,13 @@ public class StackOperationsFactory {
         ).collect(Collectors.toList());
     }
 
-    private StackCommand.Type getCommandType(StackDescription stack, boolean forcefull) {
+    private StackCommand.Type getCommandType(StackDescription stack) {
+        boolean self = stack.getReference().equals(descriptionTree.getRoot().getReference());
+
         Optional<StackIntrospection> introspection = introspectionProvider.getIntrospection(stack.getReference());
         StackCommand.Type commandType = StackCommand.Type.NOOP;
         if (introspection.isPresent()) {
-            if (forcefull) {
+            if (self ) {
                 commandType = StackCommand.Type.UPDATE;
             } else if (new VersionComparator().compare(introspection.get().getReference().getVersion(), stack.getVersion()) < 0) {
                 commandType = StackCommand.Type.UPDATE;

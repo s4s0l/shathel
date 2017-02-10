@@ -6,11 +6,12 @@ import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
+import org.s4s0l.shathel.commons.scripts.Executor;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +49,9 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public boolean isInitialized() {
-        return swarmClusterWrapper.isInitialized(getManagersCount(), getWorkersCount());
+        int managersCount = SwarmEnvironmentDescription.getManagersCount(environmentContext);
+        int workersCount = SwarmEnvironmentDescription.getWorkersCount(environmentContext);
+        return swarmClusterWrapper.isInitialized(managersCount, workersCount);
     }
 
 
@@ -167,7 +170,7 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return new DefaultProvisionerExecutor( this);
+        return new DefaultProvisionerExecutor(this);
     }
 
     @Override
@@ -185,6 +188,16 @@ public class SwarmEnvironment implements Environment {
         return swarmClusterWrapper;
     }
 
+    @Override
+    public List<Executor> getEnvironmentEnrichers() {
+        String repository = swarmClusterWrapper.getIp(environmentContext.getContextName() + "-manager-1") + ":4000";
+        return Arrays.asList(
+                new SwarmMountingPermissionsEnricher(swarmClusterWrapper),
+                new SwarmMountingEnricher(swarmClusterWrapper),
+                new SwarmBuildingEnricher(swarmClusterWrapper, repository),
+                new SwarmPullingEnricher(swarmClusterWrapper)
+        );
+    }
 
     private File getDockerMachineStorageDir() {
         return environmentContext.getSettingsDirectory();
@@ -194,17 +207,6 @@ public class SwarmEnvironment implements Environment {
         return machineSettingsImporterExporter;
     }
 
-    private int getManagersCount() {
-        return environmentContext.getEnvironmentDescription()
-                .getParameterAsInt("managers")
-                .orElse(1);
-    }
-
-    private int getWorkersCount() {
-        return environmentContext.getEnvironmentDescription()
-                .getParameterAsInt("workers")
-                .orElse(0);
-    }
 
     public NodeProvisioner getNodeProvisioner() {
         return nodeProvisioner;

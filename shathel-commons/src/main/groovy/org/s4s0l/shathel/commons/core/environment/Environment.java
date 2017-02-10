@@ -3,8 +3,10 @@ package org.s4s0l.shathel.commons.core.environment;
 import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
 import org.s4s0l.shathel.commons.core.storage.Storage;
+import org.s4s0l.shathel.commons.scripts.Executor;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author Matcin Wielgus
@@ -69,5 +71,7 @@ public interface Environment {
     EnvironmentContext getEnvironmentContext();
 
     EnvironmentApiFacade getEnvironmentApiFacade();
+
+    List<Executor> getEnvironmentEnrichers();
 
 }

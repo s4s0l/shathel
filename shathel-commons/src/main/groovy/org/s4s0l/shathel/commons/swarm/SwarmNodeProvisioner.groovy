@@ -21,21 +21,11 @@ class SwarmNodeProvisioner implements NodeProvisioner {
 
         return new SwarmClusterCreator(clusterWrapper, workDir,
                 context.contextName,
-                getManagersCount(context),
-                getWorkersCount(context), net).createMachines();
+                SwarmEnvironmentDescription.getManagersCount(context),
+                SwarmEnvironmentDescription.getWorkersCount(context), net).createMachines();
     }
 
-    private int getManagersCount(EnvironmentContext context) {
-        return context.getEnvironmentDescription()
-                .getParameterAsInt("managers")
-                .orElse(1);
-    }
 
-    private int getWorkersCount(EnvironmentContext context) {
-        return context.getEnvironmentDescription()
-                .getParameterAsInt("workers")
-                .orElse(0);
-    }
 
 
 }

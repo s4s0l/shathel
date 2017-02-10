@@ -8,8 +8,9 @@ import org.s4s0l.shathel.commons.core.{Stack, StackOperations}
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.model.GavUtils
 import org.s4s0l.shathel.commons.core.provision.StackCommand
-import org.s4s0l.shathel.commons.core.stack.StackReference
+import org.s4s0l.shathel.commons.core.stack.{StackProvisionerDefinition, StackReference}
 import org.s4s0l.shathel.deployer.shell.customization.CustomBanner
+import org.slf4j.LoggerFactory
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 import scala.collection.JavaConverters._
@@ -19,7 +20,7 @@ import scala.collection.JavaConverters._
   */
 class StackCommands(parametersCommands: ParametersCommands, environmentCommands: EnvironmentCommands)
   extends ShathelCommands(parametersCommands) {
-
+  val LOGGER = LoggerFactory.getLogger(classOf[StackCommands]);
 
   @CliCommand(value = Array("stack start"), help = "Displays what will be done with given stack.")
   def start(
@@ -43,7 +44,7 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
              map: java.util.Map[String, String]
            ): String = {
     runCommand(name, inspect, inspectLong, environment, file, initIfAbsent, map, forceful)((s, c) => {
-      s.createStartCommand(c.forceful())
+      s.createStartCommand()
     })
   }
 
@@ -89,7 +90,14 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
 
       val output = this.inspect(command, inspectLong)
       if (!inspect) {
-        openStack.run(command)
+        try {
+          openStack.run(command)
+        } catch {
+          case e: Exception => {
+            LOGGER.warn(response(output))
+            throw e
+          }
+        }
       }
       return response(output)
     })
@@ -108,11 +116,16 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
   private def inspect(command: StackOperations, inspectLong: Boolean): Map[String, AnyRef] = {
     def arrayToMap = collection.breakOut[Seq[StackCommand], (String, util.Map[String, AnyRef]), Map[String, util.Map[String, AnyRef]]]
 
+    def display = (p: Object) => s"${p.getClass.getSimpleName}:${p.toString}"
+    def displayProv = (p: StackProvisionerDefinition) => s"${p.getName}:${p.getType}"
+
     return command.getCommands.asScala.map((elem) => {
       elem.getDescription.getDeployName -> Map(
         "gav" -> elem.getDescription.getGav,
         "type" -> elem.getType.name(),
-        "provisioners" -> elem.getEnricherPreProvisioners.asScala.map((p) => s"${p.getName}.${p.getType}").asJava,
+        "pre-provisioners" -> elem.getDescription.getPreProvisioners.asScala.map(displayProv).asJava,
+        "enriching-provisioners" -> elem.getEnricherPreProvisioners.asScala.map(display).asJava,
+        "post-provisioners" -> elem.getDescription.getPostProvisioners.asScala.map(displayProv).asJava,
         "compose" -> (if (inspectLong) elem.getComposeModel.getParsedYml else "<hidden>")
       ).asJava
     })(arrayToMap)

@@ -37,6 +37,9 @@ class Main {
   @Bean
   def WorkingDirectoryCommand: WorkingDirectoryCommand = new WorkingDirectoryCommand
 
+  @Bean
+  def PromptProvider: PromptProvider = new PromptProvider(ParametersCommands)
+
 
   @Bean
   def mapConverter: MapConverter = {

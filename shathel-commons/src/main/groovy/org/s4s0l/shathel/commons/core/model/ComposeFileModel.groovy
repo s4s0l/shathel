@@ -2,11 +2,48 @@ package org.s4s0l.shathel.commons.core.model
 
 import org.yaml.snakeyaml.Yaml
 
+import java.util.function.BiFunction
+import java.util.function.Function
+
 /**
  * @author Matcin Wielgus
  */
 class ComposeFileModel {
-    final Object parsedYml;
+    Object parsedYml;
+
+    void replaceInAllStrings(String what, String with) {
+        parsedYml = replaceInAllObject(parsedYml, what, with)
+    }
+
+    Map getYml(){
+        return parsedYml
+    }
+
+    private Object replaceInAllObject(Object map, String what, String with) {
+        if (map instanceof String) {
+            return map.replace(what, with);
+        }
+        if (map instanceof List) {
+            return replaceInAllList(map, what, with)
+        }
+        if (map instanceof Map) {
+            return replaceInAllMap(map, what, with)
+        }
+        return map;
+    }
+
+    private Map replaceInAllMap(Map map, String what, String with) {
+        map.keySet().each { it ->
+            map.replace(it, replaceInAllObject(map.get(it), what, with))
+        }
+        map
+    }
+
+    private List replaceInAllList(List map, String what, String with) {
+        return map.collect {
+            replaceInAllObject(it, what, with)
+        }
+    }
 
     static ComposeFileModel load(File f) {
         return load(f.text)
@@ -32,6 +69,41 @@ class ComposeFileModel {
 
     static void dump(ComposeFileModel model, File f) {
         f.text = new Yaml().dump(model.parsedYml);
+    }
+
+    void mapMounts(BiFunction<String, String, String> mapper) {
+        parsedYml.services.each {
+            it.value.volumes = (it.value.volumes ?: []).collect { v ->
+                mapper.apply(it.key, v)
+            }
+            if (it.value.volumes.isEmpty()) {
+                it.value.remove('volumes')
+            }
+        }
+    }
+
+    void mapBuilds(BiFunction<String, Map<String, Object>, String> mapper) {
+        parsedYml.services.each {
+            if (it.value.build != null) {
+                def map = [args: [:], dockerfile: 'Dockerfile']
+                if (it.value.build instanceof String) {
+                    map.context = it.value.build
+                } else {
+                    map.context = it.value.build.context
+                    map.dockerfile = it.value.build.dockerfile
+                    map.args = it.value.build.args ?: [:]
+                }
+                def image = mapper.apply(it.key, map)
+                it.value.remove('build')
+                it.value.image = image
+            }
+        }
+    }
+
+    void mapImages(Function<String,  String> mapper) {
+        parsedYml.services.each {
+            it.value.image = mapper.apply(it.value.image)
+        }
     }
 
     void addLabelToServices(String key, String value) {

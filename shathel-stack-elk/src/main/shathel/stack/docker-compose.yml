@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  elasticsearch:
+    build: ./elasticsearch/
+    command: -Enetwork.host=0.0.0.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+        - /shathel-data/elastic:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xms300m -Xmx300m"
+    deploy:
+      resources:
+        limits:
+            cpus: '0.5'
+            memory: 700M
+  logstash:
+    build: logstash/
+    command: -f /etc/logstash/conf.d/
+    volumes:
+      - ./logstash/config:/etc/logstash/conf.d
+    ports:
+      - "12201:12201/udp"
+  kibana:
+    build: kibana/
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config
+    ports:
+      - "5601:5601"

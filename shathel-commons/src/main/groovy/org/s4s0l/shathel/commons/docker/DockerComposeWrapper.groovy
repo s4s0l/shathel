@@ -22,6 +22,8 @@ class DockerComposeWrapper {
         LOGGER.info("compose: stopping project $projectName from ${project.absolutePath}")
         exec.executeForExitValue(project, [:], true, "-p $projectName down --remove-orphans") == 0
     }
+
+
     /**
      * removes all containers,networks for given docker-compose project name
      * @param projectName

@@ -49,7 +49,6 @@ public class DependencyManager {
 
     private StackDescription getStackDescription(File dependenciesDir, StackReference ref, VersionOverrider overrider) {
         StackReference stackReference = new StackReference(ref.getGroup(), ref.getName(), overrider.overridenVersion(ref));
-
         File destFile = new File(dependenciesDir, (stackReference.getStackFileName()));
         boolean downloaded = false;
         if (forcefull || !destFile.exists()) {

@@ -30,6 +30,13 @@ public class StackReference {
         return group;
     }
 
+    public String getSimpleName() {
+        return new StringBuilder()
+                .append(getName())
+                .append("-")
+                .append(getVersion())
+                .toString();
+    }
 
     public String getStackDirecctoryName() {
         return new StringBuilder()
@@ -49,5 +56,35 @@ public class StackReference {
 
     public String getGav() {
         return getGroup() + ":" + getName() + ":" + getVersion();
+    }
+
+    @Override
+    public String toString() {
+        return "StackReference{" +
+                "group='" + group + '\'' +
+                ", name='" + name + '\'' +
+                ", version='" + version + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StackReference that = (StackReference) o;
+
+        if (group != null ? !group.equals(that.group) : that.group != null)
+            return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return version != null ? version.equals(that.version) : that.version == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = group != null ? group.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        return result;
     }
 }

@@ -72,7 +72,6 @@ public class BootShim {
         sw.start();
         String[] commandsToExecuteAndThenQuit = commandLine.getShellCommandsToExecute();
         JLineShellComponent shell = this.ctx.getBean("shell", JLineShellComponent.class);
-        //TODO handle --wrkDir argument and change user.home, see WorkingDirectoryCommand
         ExitShellRequest exitShellRequest;
 
         Cuntinue cuntinue = carryOn(commandsToExecuteAndThenQuit);

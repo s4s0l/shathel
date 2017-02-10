@@ -264,10 +264,21 @@ class DockerWrapper {
 
     boolean containerExists(String containerName) {
         return "" != exec.executeForOutput("ps -a -q -f name=${containerName}").trim()
-
     }
 
     void containerCreate(String s) {
         exec.executeForOutput("run $s")
+    }
+
+    void buildAndPush(File file, String dockerfile, Map<String, String> args, String tag) {
+        LOGGER.info("docker: building $tag")
+        def a = args.collect { "--build-arg $it.key=$it.value" }.join(" ")
+        exec.executeForOutput(file, [:], "build -t $tag -f $dockerfile $a ${file.getAbsolutePath()}")
+        exec.executeForOutput("push $tag")
+    }
+
+    void pull(String tag) {
+        LOGGER.info("docker: pulling $tag")
+        exec.executeForOutput("pull $tag")
     }
 }

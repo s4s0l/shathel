@@ -31,7 +31,9 @@ public class DefaultProvisionerExecutor implements EnvironmentProvisionExecutor,
     public void executePreProvisioners(File dstStackDir, StackCommand stackCommand) {
         List<StackProvisionerDefinition> preProvisioners = stackCommand.getDescription().getPreProvisioners();
         executeProvisioners(dstStackDir,stackCommand, preProvisioners);
-        executeProvisioners(dstStackDir,stackCommand, stackCommand.getEnricherPreProvisioners());
+        for (Executor executor : stackCommand.getEnricherPreProvisioners()) {
+            execute(dstStackDir, executor,stackCommand);
+        }
     }
 
     @Override

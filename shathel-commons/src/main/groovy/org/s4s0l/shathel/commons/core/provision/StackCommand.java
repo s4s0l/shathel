@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.core.provision;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
+import org.s4s0l.shathel.commons.scripts.Executor;
 
 import java.util.List;
 
@@ -11,19 +12,25 @@ import java.util.List;
  */
 public class StackCommand {
     public enum Type {
-        START,
-        NOOP,
-        STOP,
-        UPDATE
+        START(true),
+        NOOP(false),
+        STOP(false),
+        UPDATE(true);
+
+        Type(boolean willRun) {
+            this.willRun = willRun;
+        }
+
+        public final boolean willRun;
     }
 
     private final Type type;
     private final ComposeFileModel mutableModel;
     private final StackDescription description;
-    private final List<StackProvisionerDefinition> provisioners;
+    private final List<Executor> provisioners;
 
 
-    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<StackProvisionerDefinition> provisioners) {
+    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<Executor> provisioners) {
         this.type = type;
         this.mutableModel = mutableModel;
         this.description = description;
@@ -42,7 +49,7 @@ public class StackCommand {
         return mutableModel;
     }
 
-    public List<StackProvisionerDefinition> getEnricherPreProvisioners() {
+    public List<Executor> getEnricherPreProvisioners() {
         return provisioners;
     }
 }

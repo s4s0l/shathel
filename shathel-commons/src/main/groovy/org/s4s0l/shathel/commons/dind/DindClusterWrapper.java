@@ -5,6 +5,7 @@ import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
+import org.s4s0l.shathel.commons.swarm.SwarmEnvironmentDescription;
 import org.s4s0l.shathel.commons.utils.ExecWrapper;
 import org.slf4j.Logger;
 
@@ -35,7 +36,12 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     @Override
     public List<String> getNodeNames() {
         List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=" + getNetworkName());
-        return maps.stream().map(x -> x.get("Names")).collect(Collectors.toList());
+        return maps.stream().map(x -> x.get("Names")).sorted().collect(Collectors.toList());
+    }
+
+    @Override
+    public String getDataDirectory() {
+        return "/shathel-data";
     }
 
     @Override
@@ -62,6 +68,8 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     public void scp(String from, String to) {
         getLocalWrapper().containerScp(from, to);
     }
+
+
 
     @Override
     public void destroy() {
@@ -100,6 +108,11 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
+    public void setKernelParam(String param) {
+        LOGGER.warn("!Set parameter like: sudo sysctl -w " + param + " or set it in file /etc/sysctl.conf");
+    }
+
+    @Override
     public String getNonRootUser() {
         return "root";
     }
@@ -109,8 +122,6 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     public String getIp(String node) {
         return getLocalWrapper().containerGetIpInNetwork(node, getNetworkName());
     }
-
-
 
 
     private String getNetworkName() {
@@ -127,8 +138,11 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
 
         if (!getLocalWrapper().containerExists(machineName)) {
             getLocalWrapper().containerCreate("--privileged --label org.shathel.env.dind=" + getNetworkName() + " "
-                    + " --hostname " + machineName + " -v volume-" + machineName.toLowerCase() + ":/shathel-data "
-                    + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.0-dind "
+                    + " --hostname " + machineName
+                    + " -v " + machineName.toLowerCase() + "-data:/shathel-data "
+                    + " -v " + machineName.toLowerCase() + "-image:/var/lib/docker/image "
+                    + " -v " + machineName.toLowerCase() + "-vfs:/var/lib/docker/vfs "
+                    + " --name " + machineName + " --net " + getNetworkName() + " --ip " + ns.getAddress(expectedIp) + " -d docker:1.13.1-dind "
                     + " --registry-mirror " + registryMirrorHost);
             modified = true;
         }
@@ -145,5 +159,15 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
         ret.put("DOCKER_MACHINE_NAME", "");
         ret.put("DOCKER_API_VERSION", "");
         return ret;
+    }
+
+    @Override
+    public int getExpectedNodeCount() {
+        return SwarmEnvironmentDescription.getNodesCount(context);
+    }
+
+    @Override
+    public int getExpectedManagerNodeCount() {
+        return SwarmEnvironmentDescription.getManagersCount(context);
     }
 }

@@ -54,7 +54,7 @@ class ExecWrapper {
         if (process.exitValue() == 0) {
             return sb.toString().trim();
         } else {
-            LOGGER.error("Command [${flatten.join(" ")}] failed with output:\n" + sb.toString().trim())
+            LOGGER.error("Command [${flatten.join(",")}] failed with output:\n" + sb.toString().trim())
             throw new Exception("Failed")
         }
     }

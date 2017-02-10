@@ -18,9 +18,9 @@ public class Stack {
 
     }
 
-    public StackOperations createStartCommand(boolean forcefull) {
+    public StackOperations createStartCommand() {
         return getStackOperationsFactory()
-                .createStartSchedule(forcefull);
+                .createStartSchedule();
     }
 
     public StackOperations createStopCommand(boolean withDependencies) {

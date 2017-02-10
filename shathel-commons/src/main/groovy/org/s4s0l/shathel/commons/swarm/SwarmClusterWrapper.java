@@ -23,6 +23,7 @@ public interface SwarmClusterWrapper extends EnvironmentApiFacade {
 
     void scp(String from, String to);
 
+    String getDataDirectory();
 
     void destroy();
 

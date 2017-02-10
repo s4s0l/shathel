@@ -18,6 +18,9 @@ public class StackResources {
         return stackDirectory;
     }
 
+    public File getComposeFileDirectory() {
+        return new File(getStackDirectory(), "stack");
+    }
 
     public ComposeFileModel getComposeFileModel() {
         return ComposeFileModel.load(new File(getStackDirectory(), "stack/docker-compose.yml"));
