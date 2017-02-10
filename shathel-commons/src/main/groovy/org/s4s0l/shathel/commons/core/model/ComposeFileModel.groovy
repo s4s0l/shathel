@@ -90,7 +90,7 @@ class ComposeFileModel {
                     map.context = it.value.build
                 } else {
                     map.context = it.value.build.context
-                    map.dockerfile = it.value.build.dockerfile
+                    map.dockerfile = it.value.build.dockerfile ?: 'Dockerfile'
                     map.args = it.value.build.args ?: [:]
                 }
                 def image = mapper.apply(it.key, map)

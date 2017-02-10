@@ -57,7 +57,7 @@ class LocalEnvironmentTest extends Specification {
         new File(root, "deps/shathel-core-stack-1.2.3-shathel").isDirectory()
 
         when:
-        def command = stack.createStartCommand(false);
+        def command = stack.createStartCommand();
 
         then:
         command != null
@@ -81,12 +81,11 @@ class LocalEnvironmentTest extends Specification {
         new File(root, "tmp/composed/execution/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
-        command = stack.createStartCommand(false)
+        command = stack.createStartCommand()
 
         then:
         command != null
         command.commands.size() == 1
-        stack.createStartCommand(true).commands.size() == 2
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -100,7 +99,7 @@ class LocalEnvironmentTest extends Specification {
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand(false).commands.size() == 2
+        stack.createStartCommand().commands.size() == 2
 
 
     }
