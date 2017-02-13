@@ -6,7 +6,7 @@ export SHATHEL_STORAGE_FILE=$(pwd)/build/playground
 export SHATHEL_ENV=itg
 export SHATHEL_STACK_FORCEFUL=true
 export SHATHEL_ENV_ITG_NET=111.111.111
-
+export SHATHEL_SAFE_ITG_PASSWORD=HelloWorld
 
 ./build/localrepo/org/s4s0l/shathel/shathel-deployer/DEVELOPER-SNAPSHOT/shathel-deployer-DEVELOPER-SNAPSHOT.jar --continue\; cd $(pwd)
 

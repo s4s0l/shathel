@@ -65,7 +65,7 @@ public class SwarmMountingEnricher extends EnricherExecutor {
 
 
     private String getDirectory(String volume) {
-        Matcher matcher = Pattern.compile("\\./([^/]+)/?.*").matcher(volume);
+        Matcher matcher = Pattern.compile("\\./([^/:]+)/?.*").matcher(volume);
         if (matcher.matches()) {
             return matcher.group(1);
         } else {
