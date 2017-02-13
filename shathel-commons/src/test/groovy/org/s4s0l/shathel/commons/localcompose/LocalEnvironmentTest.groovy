@@ -47,9 +47,30 @@ class LocalEnvironmentTest extends Specification {
 
         then:
         environment != null;
+        //        SIDEKICK INSTALLATION
+        when:
+        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"),false)
+
+        then:
+        stack != null
+        new File(root, "deps/sidekick-1.0-shathel").isDirectory()
 
         when:
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"),false)
+        def command = stack.createStartCommand();
+
+        then:
+        command != null
+        command.commands.size() == 1
+
+        when:
+        stack.run(command)
+
+        then:
+        environment.getIntrospectionProvider().allStacks.size() == 1
+        //        SIDEKICK INSTALLATION
+
+        when:
+        stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"),false)
 
         then:
         stack != null
@@ -57,7 +78,7 @@ class LocalEnvironmentTest extends Specification {
         new File(root, "deps/shathel-core-stack-1.2.3-shathel").isDirectory()
 
         when:
-        def command = stack.createStartCommand();
+        command = stack.createStartCommand();
 
         then:
         command != null
@@ -69,6 +90,7 @@ class LocalEnvironmentTest extends Specification {
         preparedCompose.networks['00shathel_network'].external == true
         preparedCompose.services.dummy.networks == ['00shathel_network']
         preparedCompose.services.dummy.labels['org.shathel.stack.gav'] == 'test.group:dummy:2.0'
+        preparedCompose.services.dummy.labels['sidekick'] == 'true'
 
         when:
         stack.run(command)

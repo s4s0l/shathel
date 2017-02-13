@@ -25,4 +25,17 @@ class GraphUtilsTest extends Specification {
         list == [4, 2, 3, 1]
     }
 
+    def "Guava samples2"() {
+        given:
+        MutableGraph<Integer> graph = GraphBuilder.directed().allowsSelfLoops(false).build();
+        when:
+        graph.addNode(1)
+        graph.putEdge(1, 2)
+        graph.putEdge(1, 3)
+        graph.putEdge(2, 3)
+        def list = GraphUtils.depthFirst(graph, 1).collect(Collectors.toList())
+        then:
+        list == [3,2,1]
+    }
+
 }

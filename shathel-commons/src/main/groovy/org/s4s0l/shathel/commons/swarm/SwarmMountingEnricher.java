@@ -42,11 +42,20 @@ public class SwarmMountingEnricher extends EnricherExecutor {
                 String toPath = swarmClusterWrapper.getDataDirectory() + "/" + stack.getReference().getSimpleName() + "-" + service + "/" + getDirectory(volume);
                 String[] split = volume.split(":");
                 String remotePart = split[1];
+                File file = new File(stack.getStackResources().getComposeFileDirectory(), split[0]);
+                final File directoryToCopy;
+                String resultingMount = toPath + ":" + remotePart;
+                if(file.isFile()){
+                    resultingMount = toPath + "/" + file.getName()+ ":" + remotePart;
+                    directoryToCopy = file.getParentFile();
+                }else{
+                    directoryToCopy = file;
+                }
                 execs.add(context -> {
-                    prepareMounts(new File(stack.getStackResources().getComposeFileDirectory(), split[0]), toPath);
+                    prepareMounts(directoryToCopy, toPath);
                     return "ok";
                 });
-                return toPath + ":" + remotePart;
+                return resultingMount;
             } else {
                 return volume;
             }

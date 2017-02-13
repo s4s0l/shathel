@@ -65,6 +65,15 @@ assert result.status == 200
 def token = result.data.jwt;
 
 
+result = portainer.get(
+        contentType: JSON,
+        path: '/api/endpoints',
+        headers: [Authorization: "Bearer $token"],
+)
+
+def nodesDefined = result.data.collect  { it.Name }
+
+
 portainer.encoder.'multipart/form-data' = {
     File file ->
         final MultipartEntity e = new MultipartEntity(
@@ -74,7 +83,9 @@ portainer.encoder.'multipart/form-data' = {
 }
 
 api.getNodeNames()
+        .findAll {!nodesDefined.contains(it)}
         .each {
+
     def machineName = it
     def envs = api.getDockerEnvs(machineName)
     def certPath = envs['DOCKER_CERT_PATH']

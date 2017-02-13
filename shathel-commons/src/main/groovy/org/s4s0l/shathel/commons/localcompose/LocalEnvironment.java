@@ -10,6 +10,7 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,7 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public List<Executor> getEnvironmentEnrichers() {
-        return Collections.emptyList();
+        return Arrays.asList(new LocalMountingEnricher());
     }
 
     private static final Logger LOGGER = getLogger(LocalEnvironment.class);

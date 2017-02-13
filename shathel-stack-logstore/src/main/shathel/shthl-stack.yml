@@ -1,0 +1,12 @@
+version: 1
+shathel-stack:
+  deployName: logstore
+
+  pre-provisioners:
+    configure:
+      inline: env.setKernelParam('vm.max_map_count=262144')
+  enrichers:
+      addNetwork:
+        target: DEPS
+        inline: >
+          compose.addExternalNetwork("logstore_network")

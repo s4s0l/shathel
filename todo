@@ -1,51 +1,41 @@
-TODO: elastic nie słucha na tym interfejsie co powinien
+TODO: wyciaganie juz dzialajacych stackow w poszukiwaniu globalnych enricherów
+TODO: Stack tree ma byc forestem - wyciagnac nalezy te juz dzialajace i wsrod nich znalezc
+te co maja enrichera dla ALL
 
-
-TODO: shell ma pokazywac jakie srodowisko i solution
-
-TODO: sudo sysctl -w vm.max_map_count=262144 <- dla elk
-
-TODO: full cleanup: docker volume rm $(docker volume ls -q | grep play)
-
-
-TODO: logstash
-
-TODO: paczka dla portainera (mechanizm post provision
- + hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
-
-TODO DINDY nie da sie stop start: Error starting daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid
-
-TODO: test czy mirror w ogole dziala - pierdolnac normalny przykład
-(do tego celu trzeba zrobic plugin dobry:
-    - bootcker niech tylko dockery robi i je pushuje lokalnie do repo)
-
-Zabezpieczyć repo
+TODO: Zrobic paczke dla consula (persystencja)
+TODO: efk filebeat czytajacy jsony zamontowane z hosta w globalu
 TODO: authentiacation proxy... dconf + własne metadata service?
 
+
 TODO: Password manager
-TODO: Zrobic paczke dla consula (persystencja)
+TODO portainer: hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
+
+TODO: Zrobic paczke dla prometheusza
 
 TODO: Zrobic paczke dla vaulta
 
-TODO: Zrobic paczke dla prometheusza
-TODO: wersja dockera 13 podniesc lokalnie
 
-TODO: wyciaganie juz dzialajacych stackow w poszukiwaniu globalnych enricherów
-TODO: Portainer uruchomić jako pachke sht
-TODO: post provisioning - skrypty grooviego + fajne jaieś api do pobierania info o otoczeniu
+TODO: Zabezpieczyć repo
+
+
 
 TODO: integracja z gitowym storage
-TODO: Zrobic paczke dla ELK
+TODO: full cleanup: docker volume rm $(docker volume ls -q | grep play) + wywalenie lokalnych danych
 TODO: Zrobic paczke dla spring admina
 
 TODO bosluga prywatnych repo - sciaga z repox do repo lokalnego
 TODO: uprawnienia do repozytorium
 TODO: szkielet odpalania docker machine na Digital Ocean
 
+TODO: shell ma pokazywac jakie srodowisko i solution
 
 
 TODO: start --forcefull powinno byc rozbite na no-cache + with-dependencies
+
 TODO: operacja rolling update force , reload która by robiła service update --force na serwisach w stacku
 
 
 TODO: dodananie nodea ponad minimum -> musi ogarnac mounty zanim sie doda do swarma
+
+TODO DINDY nie da sie stop start: Error starting daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid
+    tak sie dzieje jak sie killnie dodac fixa na to

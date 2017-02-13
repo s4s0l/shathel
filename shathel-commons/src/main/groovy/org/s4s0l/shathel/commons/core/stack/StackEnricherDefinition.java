@@ -11,6 +11,8 @@ public class StackEnricherDefinition extends ScriptDefinition {
         }
         if (target == Target.ALL) {
             return true;
+        } else if (target == Target.ALLOTHERS) {
+            return !getOrigin().isDependantOn(forStack.getReference());
         } else {
             return forStack.isDependantOn(getOrigin().getReference());
         }
@@ -18,7 +20,8 @@ public class StackEnricherDefinition extends ScriptDefinition {
 
     public enum Target {
         ALL,
-        DEPS
+        DEPS,
+        ALLOTHERS
     }
 
 

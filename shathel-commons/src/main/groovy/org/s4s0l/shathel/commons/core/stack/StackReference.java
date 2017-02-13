@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core.stack;
 
+import org.apache.commons.lang.StringUtils;
 import org.s4s0l.shathel.commons.core.model.GavUtils;
 
 /**
@@ -15,9 +16,11 @@ public class StackReference {
         this.group = group == null ? GavUtils.DEFAULT_GROUP : group;
         this.version = version;
     }
+
     public StackReference(String gav) {
-        this(GavUtils.getGroup(gav), GavUtils.getName(gav), GavUtils.getVersion(gav) );
+        this(GavUtils.getGroup(gav), GavUtils.getName(gav), GavUtils.getVersion(gav));
     }
+
     public String getName() {
         return name;
     }
@@ -65,6 +68,17 @@ public class StackReference {
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
                 '}';
+    }
+
+    /**
+     * Is same stack, comparest group and name only
+     *
+     * @param o
+     * @return
+     */
+    public boolean isSameStack(StackReference o) {
+        return StringUtils.equals(getGroup(), o.getGroup()) &&
+                StringUtils.equals(getName(), o.getName());
     }
 
     @Override

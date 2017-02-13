@@ -133,19 +133,16 @@ class DockerMachineWrapper {
      * @return
      */
     Map<String, Map<String, String>> getMachines() {
-        def output = exec.executeForOutput("ls")
-        return output.readLines()
-                .findAll { !it.startsWith("NAME") }
-                .collect { it.split("\\s+") }
-                .collectEntries {
-            [
-                    (it[0]):
-                            [
-                                    name  : it[0],
-                                    driver: it[2],
-                                    state : it[3]
-                            ]
-            ]
+        //TODO parsowac jsona nie output!!
+        def output = exec.executeForOutput("ls", "--format",  """{ "name":"{{.Name}}","driver":"{{.DriverName}}", "state":"{{.State}}" }""")
+        def json = DockerWrapper.fixPsOutToJson(output)
+        json.collectEntries {
+            [(it.name):
+                     [
+                             name  : it.name,
+                             driver: it.driver,
+                             state : it.state
+                     ]]
         }
     }
 

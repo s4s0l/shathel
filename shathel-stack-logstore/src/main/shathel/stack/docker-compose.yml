@@ -2,8 +2,10 @@ version: '3'
 
 services:
   elasticsearch:
-    build: ./elasticsearch/
+    image: elasticsearch:5.2.0-alpine
     command: -Enetwork.host=0.0.0.0
+    networks:
+      - network
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -16,16 +18,17 @@ services:
         limits:
             cpus: '0.5'
             memory: 700M
-  logstash:
-    build: logstash/
-    command: -f /etc/logstash/conf.d/
-    volumes:
-      - ./logstash/config:/etc/logstash/conf.d
-    ports:
-      - "12201:12201/udp"
   kibana:
-    build: kibana/
+    image: kibana:5.2.0
+    networks:
+      - network
     volumes:
       - ./kibana/config/:/usr/share/kibana/config
     ports:
       - "5601:5601"
+networks:
+  network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.43.0/24

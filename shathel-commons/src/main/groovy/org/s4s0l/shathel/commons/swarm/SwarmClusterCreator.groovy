@@ -47,6 +47,10 @@ class SwarmClusterCreator {
         startRegistries("${CLUSTER_NAME}-manager-1", MANAGER_IP)
 
         initSwarm("${CLUSTER_NAME}-manager-1", MANAGER_IP)
+        swarmClusterWrapper.labelNode("${CLUSTER_NAME}-manager-1", [
+                "shathel.node.main":"true",
+                "shathel.node.name":"manager-1"
+        ])
 
         log "Saving tokens"
         String manager_token = swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").swarmTokenForManager()
@@ -56,6 +60,10 @@ class SwarmClusterCreator {
         (numberOfManagers < 2 ? [] : 2..numberOfManagers).each { n ->
             String nodeName = "${CLUSTER_NAME}-manager-${n}"
             cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
+            swarmClusterWrapper.labelNode(nodeName, [
+                    "shathel.node.main":"false",
+                    "shathel.node.name":"manager-${n}"
+            ])
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)
@@ -65,6 +73,10 @@ class SwarmClusterCreator {
         (numberOfWorkers < 1 ? [] : 1..numberOfWorkers).each { n ->
             String nodeName = "${CLUSTER_NAME}-worker-${n}"
             cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
+            swarmClusterWrapper.labelNode(nodeName, [
+                    "shathel.node.main":"false",
+                    "shathel.node.name":"worker-${n}"
+            ])
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)

@@ -5,6 +5,8 @@ import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -69,6 +71,12 @@ public interface SwarmClusterWrapper extends EnvironmentApiFacade {
 
     default boolean isInitialized(int managersCount, int workersCount) {
         return getNodeNames().size() >= managersCount + workersCount;
+    }
+
+
+
+    default void labelNode(String nodeName, Map<String, String> labels){
+        getDockerForManagementNode().swarmNodeSetLabels(nodeName, labels);
     }
 
 

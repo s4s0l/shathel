@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  logstash:
+    build: logstash/
+    command: -f /etc/logstash/conf.d/
+    environment:
+      - >
+          LS_JAVA_OPTS=-Xms256m -Xmx256m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC
+          -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly
+          -XX:+DisableExplicitGC -Djava.awt.headless=true -Dfile.encoding=UTF-8
+          -XX:+HeapDumpOnOutOfMemoryError
+    volumes:
+      - ./logstash/config:/etc/logstash/conf.d
+    ports:
+      - "12201:12201/udp"
+

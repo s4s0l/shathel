@@ -33,6 +33,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
             model.addLabelToServices("org.shathel.stack.gav", stack.getGav());
             model.addLabelToServices("org.shathel.stack.deployName", stack.getDeployName());
             model.addLabelToServices("org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
+            model.addLabelToServices("org.shathel.stack.marker", "true");
             model.addLabelToServices("org.shathel.deployer.version", versionInfo());
             List<StackReference> dependencies = stack.getDependencies();
             int i = 0;

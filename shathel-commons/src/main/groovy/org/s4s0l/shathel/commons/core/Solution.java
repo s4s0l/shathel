@@ -6,11 +6,13 @@ import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import org.s4s0l.shathel.commons.core.security.LazyInitiableSafeStorage;
 import org.s4s0l.shathel.commons.core.security.SafeStorageProvider;
+import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
-import org.s4s0l.shathel.commons.utils.VersionComparator;
+
+import java.util.List;
 
 /**
  * @author Matcin Wielgus
@@ -57,21 +59,16 @@ public class Solution {
     public Stack openStack(Environment e, StackReference reference, boolean forcefull) {
         e.verify();
         StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
-
         DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider, forcefull);
         StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
-        return new Stack(stackDescriptionTree, e);
+        List<StackDescription> sidekicks = dependencyManager.getSidekicks(stackDescriptionTree);
+        return new Stack(stackDescriptionTree, sidekicks, e);
     }
 
     private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider, boolean forcefull) {
-        DependencyManager.VersionOverrider overrider = desc ->
-                stackIntrospectionProvider.getIntrospection(desc)
-                        .filter(x -> new VersionComparator().compare(x.getReference().getVersion(), desc.getVersion()) > 0)
-                        .map(x -> x.getReference().getVersion())
-                        .orElse(desc.getVersion());
         return new DependencyManager(
                 storage.getTemporaryDirectory("dependencies"),
-                extensionContext.lookupOne(DependencyDownloader.class).get(), overrider, forcefull);
+                extensionContext.lookupOne(DependencyDownloader.class).get(), stackIntrospectionProvider, forcefull);
     }
 
 

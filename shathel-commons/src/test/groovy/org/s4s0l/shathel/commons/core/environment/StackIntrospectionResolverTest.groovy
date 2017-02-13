@@ -26,6 +26,7 @@ class StackIntrospectionResolverTest extends Specification {
         ga == "GA"
         gav == "GAV"
         rlabels == labels
-
     }
+
+
 }

@@ -1,13 +1,17 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
 import org.apache.commons.io.FileUtils;
+import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
+import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.*;
 import org.s4s0l.shathel.commons.utils.IoUtils;
+import org.s4s0l.shathel.commons.utils.VersionComparator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Matcin Wielgus
@@ -20,15 +24,24 @@ public class DependencyManager {
 
     private final File dependenciesDir;
     private final DependencyDownloader downloader;
-    private final VersionOverrider overrider;
+    private final StackIntrospectionProvider introspectionProvider;
+
     private final boolean forcefull;
 
-
-    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, VersionOverrider overrider, boolean forcefull) {
+    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, StackIntrospectionProvider introspectionProvider, boolean forcefull) {
         this.dependenciesDir = dependenciesDir;
         this.downloader = downloader;
-        this.overrider = overrider;
+        this.introspectionProvider = introspectionProvider;
         this.forcefull = forcefull;
+
+    }
+
+    private VersionOverrider getOverrider() {
+        return desc ->
+                introspectionProvider.getIntrospection(desc)
+                        .filter(x -> new VersionComparator().compare(x.getReference().getVersion(), desc.getVersion()) > 0)
+                        .map(x -> x.getReference().getVersion())
+                        .orElse(desc.getVersion());
     }
 
     public StackTreeDescription downloadDependencies(StackReference root) {
@@ -38,10 +51,17 @@ public class DependencyManager {
         return builder.build();
     }
 
+    public List<StackDescription> getSidekicks(StackTreeDescription tree) {
+        return introspectionProvider.getAllStacks().stream().map(x -> x.getReference())
+                .filter(x -> !tree.contains(x))
+                .map(x -> getStackDescription(dependenciesDir, x, desc1 -> desc1.getVersion()))
+                .collect(Collectors.toList());
+    }
+
     private void addDependencies(StackDescription parent, StackTreeDescription.Builder builder) {
         List<StackReference> dependencies = parent.getDependencies();
         for (StackReference dependency : dependencies) {
-            StackDescription depDesc = getStackDescription(dependenciesDir, dependency, overrider);
+            StackDescription depDesc = getStackDescription(dependenciesDir, dependency, getOverrider());
             builder.addNode(parent.getReference(), depDesc);
             addDependencies(depDesc, builder);
         }

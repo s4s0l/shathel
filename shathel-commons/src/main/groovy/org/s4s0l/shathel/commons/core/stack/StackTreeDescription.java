@@ -16,6 +16,10 @@ import java.util.stream.Stream;
 public class StackTreeDescription {
 
 
+    public boolean contains(StackReference other) {
+        return stream().filter(x -> x.getReference().isSameStack(other)).findFirst().isPresent();
+    }
+
     private static class GraphNode {
         private StackDescription stack;
         private final String id;
@@ -26,6 +30,7 @@ public class StackTreeDescription {
         }
 
     }
+
     public static Builder builder(StackDescription root) {
         return new Builder(new GraphNode(root));
     }
@@ -43,7 +48,6 @@ public class StackTreeDescription {
         public VersionComparator getComparator() {
             return comparator;
         }
-
 
 
         public Optional<GraphNode> findGraphNodeById(String id) {
@@ -68,7 +72,7 @@ public class StackTreeDescription {
             } else {
                 nodeV = new GraphNode(dep);
                 graph.putEdge(parent.get(), nodeV);
-                if(Graphs.hasCycle(graph)){
+                if (Graphs.hasCycle(graph)) {
                     graph.removeNode(nodeV);
                     throw new RuntimeException("Dependency will cause cycle!!");
                 }
@@ -81,11 +85,10 @@ public class StackTreeDescription {
             return GraphUtils.depthFirst(graph, rootNode);
         }
 
-        public StackTreeDescription build(){
+        public StackTreeDescription build() {
             return new StackTreeDescription(ImmutableGraph.copyOf(graph), rootNode);
         }
     }
-
 
 
     private final ImmutableGraph<GraphNode> graph;
@@ -104,18 +107,17 @@ public class StackTreeDescription {
         return GraphUtils.depthFirstReverse(graph, rootNode);
     }
 
-    public StackDescription getRoot(){
+    public StackDescription getRoot() {
         return rootNode.stack;
     }
 
-    public Stream<StackDescription> stream(){
-        return nodeStream().map(x->x.stack);
+    public Stream<StackDescription> stream() {
+        return nodeStream().map(x -> x.stack);
     }
 
-    public Stream<StackDescription> reverseStream(){
-        return nodeReverseStream().map(x->x.stack);
+    public Stream<StackDescription> reverseStream() {
+        return nodeReverseStream().map(x -> x.stack);
     }
-
 
 
 }

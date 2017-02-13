@@ -1,0 +1,9 @@
+version: 1
+shathel-stack:
+  deployName: sidekick
+  gav: org.s4s0l.shathel:sidekick:1.0
+  enrichers:
+      addNetwork:
+        target: ALL
+        inline: >
+          compose.addLabelToServices("sidekick", "true")

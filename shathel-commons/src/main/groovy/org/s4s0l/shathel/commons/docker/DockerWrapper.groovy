@@ -93,7 +93,7 @@ class DockerWrapper {
         return fixPsOutToJson(out)
     }
 
-    private Object fixPsOutToJson(String out) {
+    static Object fixPsOutToJson(String out) {
         new JsonSlurper().parseText("[${out.replaceAll("\\}\\s+\\{", "},{")}]")
     }
 
@@ -149,7 +149,7 @@ class DockerWrapper {
             return []
         }
         dockerIds.collect {
-            String inspect = exec.executeForOutput("service inspect ${dockerIds[0]}")
+            String inspect = exec.executeForOutput("service inspect ${it}")
             def val = new JsonSlurper().parseText(inspect);
             def ret = [:]
             ret << val[0].Spec.Labels
@@ -280,5 +280,9 @@ class DockerWrapper {
     void pull(String tag) {
         LOGGER.info("docker: pulling $tag")
         exec.executeForOutput("pull $tag")
+    }
+
+    void swarmNodeSetLabels(String nodeName, Map<String, String> labels) {
+        exec.executeForOutput("node update ${labels.collect { "--label-add ${it.key}=${it.value}" }.join(" ")} $nodeName")
     }
 }

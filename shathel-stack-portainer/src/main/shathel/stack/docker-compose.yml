@@ -7,6 +7,10 @@ services:
       - 9000:9000
     volumes:
           - /var/run/docker.sock:/var/run/docker.sock
+          - portainer-data:/data
     deploy:
       placement:
-            constraints: [node.role == manager]
+            constraints: [node.labels.shathel.node.main == true]
+
+volumes:
+  portainer-data:

@@ -1,10 +1,10 @@
 version: 1
 shathel-stack:
-  deployName: elk
+  deployName: logforwardl
 
   enrichers:
       logDriver:
-        target: ALL
+        target: ALLOTHERS
         inline: >
           compose.yml.services.each { it->
             it.value.logging = [
@@ -17,7 +17,6 @@ shathel-stack:
                     ]
           }
           []
-  pre-provisioners:
-    configure:
-      inline: env.setKernelParam('vm.max_map_count=262144')
+  dependencies:
+      org.s4s0l.shathel:shathel-stack-logstore:$version:
 

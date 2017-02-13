@@ -9,7 +9,6 @@ import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.provision.StackCommand;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackEnricherDefinition;
-import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.scripts.Executor;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
@@ -26,20 +25,20 @@ import java.util.stream.Stream;
  */
 public class StackOperationsFactory {
     private final StackTreeDescription descriptionTree;
+    private final List<StackDescription> sidekicks;
     private final StackIntrospectionProvider introspectionProvider;
     private final Environment environment;
 
     public StackOperationsFactory(StackTreeDescription descriptionTree,
-                                  Environment environment) {
+                                  List<StackDescription> sidekicks, Environment environment) {
         this.descriptionTree = descriptionTree;
+        this.sidekicks = sidekicks;
         this.environment = environment;
         this.introspectionProvider = environment.getIntrospectionProvider();
     }
 
     public StackOperations createStartSchedule() {
-
         Stream<StackDescription> stream = descriptionTree.stream();
-
         Stream<StackCommand> stackCommandStream = stream
                 .map(stack -> new SimpleEntry<>(stack, getCommandType(stack)))
                 .filter(e -> e.getValue() != StackCommand.Type.NOOP)
@@ -77,8 +76,8 @@ public class StackOperationsFactory {
     }
 
     private List<Executor> execute(Optional<Executor> executor,
-                                                     ComposeFileModel composeModel,
-                                                     StackDescription stack) {
+                                   ComposeFileModel composeModel,
+                                   StackDescription stack) {
         Map<String, Object> ctxt = new HashedMap();
         ctxt.put("context", environment.getEnvironmentContext());
         ctxt.put("env", environment.getEnvironmentApiFacade());
@@ -99,9 +98,13 @@ public class StackOperationsFactory {
 
 
     private List<StackEnricherDefinition> getEnricherDefinitions(StackDescription forStack) {
-        return descriptionTree.stream().flatMap(stack ->
-                stack.getEnricherDefinitions().stream().filter(def -> def.isApplicableTo(forStack))
-        ).collect(Collectors.toList());
+        return Streams.concat(
+                descriptionTree.stream(),
+                sidekicks.stream())
+                .flatMap(stack ->
+                        stack.getEnricherDefinitions().stream())
+                .filter(def -> def.isApplicableTo(forStack))
+                .collect(Collectors.toList());
     }
 
     private StackCommand.Type getCommandType(StackDescription stack) {
@@ -110,7 +113,7 @@ public class StackOperationsFactory {
         Optional<StackIntrospection> introspection = introspectionProvider.getIntrospection(stack.getReference());
         StackCommand.Type commandType = StackCommand.Type.NOOP;
         if (introspection.isPresent()) {
-            if (self ) {
+            if (self) {
                 commandType = StackCommand.Type.UPDATE;
             } else if (new VersionComparator().compare(introspection.get().getReference().getVersion(), stack.getVersion()) < 0) {
                 commandType = StackCommand.Type.UPDATE;
