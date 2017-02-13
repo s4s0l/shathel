@@ -76,12 +76,21 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
 
     @Override
     SwarmClusterWrapper.Node getNode(String nodeName) {
-        def machines = getWrapper().getMachines()[nodeName]
-        return new SwarmClusterWrapper.Node(
-                machines.name,
-                machines.state == "Running",
-                getDocker(nodeName).isReachable()
-        )
+        try {
+            def machines = getWrapper().getMachines()[nodeName]
+            return new SwarmClusterWrapper.Node(
+                    machines.name,
+                    machines.state == "Running",
+                    getDocker(nodeName).isReachable())
+        }catch(Exception e){
+            //todo log?
+            LOGGER.trace("Not neccecary an error", e);
+            return new SwarmClusterWrapper.Node(
+                    nodeName,
+                    false,
+                    false);
+        }
+
     }
 
     String getNonRootUser() {

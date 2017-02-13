@@ -60,27 +60,29 @@ class SwarmClusterCreator {
         (numberOfManagers < 2 ? [] : 2..numberOfManagers).each { n ->
             String nodeName = "${CLUSTER_NAME}-manager-${n}"
             cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
-            swarmClusterWrapper.labelNode(nodeName, [
-                    "shathel.node.main":"false",
-                    "shathel.node.name":"manager-${n}"
-            ])
+
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)
             joinSwarm(nodeName, ip, manager_token, MANAGER_IP)
+            swarmClusterWrapper.labelNode(nodeName, [
+                    "shathel.node.main":"false",
+                    "shathel.node.name":"manager-${n}"
+            ])
         }
 
         (numberOfWorkers < 1 ? [] : 1..numberOfWorkers).each { n ->
             String nodeName = "${CLUSTER_NAME}-worker-${n}"
             cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
-            swarmClusterWrapper.labelNode(nodeName, [
-                    "shathel.node.main":"false",
-                    "shathel.node.name":"worker-${n}"
-            ])
+
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)
             joinSwarm(nodeName, ip, worker_token, MANAGER_IP)
+            swarmClusterWrapper.labelNode(nodeName, [
+                    "shathel.node.main":"false",
+                    "shathel.node.name":"worker-${n}"
+            ])
 
         }
 

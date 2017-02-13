@@ -14,4 +14,8 @@ services:
       - ./logstash/config:/etc/logstash/conf.d
     ports:
       - "12201:12201/udp"
-
+    deploy:
+      resources:
+        limits:
+            cpus: '0.5'
+            memory: 550M

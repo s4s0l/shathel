@@ -2,3 +2,6 @@ version: 1
 shathel-stack:
   deployName: monitoring
 
+  post-provisioners:
+    configure:
+      type: groovy

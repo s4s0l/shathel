@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -120,7 +121,9 @@ public class IoUtils {
                             ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
                             try {
                                 zs.putNextEntry(zipEntry);
-                                zs.write(Files.readAllBytes(path));
+                                try(FileInputStream x= new FileInputStream(path.toFile())) {
+                                    IOUtils.copyLarge(x,zs);
+                                }
                                 zs.closeEntry();
                             } catch (Exception e) {
                                 throw new RuntimeException("Unable to zip " + sourceDirPath + " to stream", e);
