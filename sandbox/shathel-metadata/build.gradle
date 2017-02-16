@@ -1,0 +1,31 @@
+plugins {
+    id "nebula.clojure" version "4.0.2"
+}
+apply plugin: 'application'
+
+repositories {
+    clojarsRepo()
+}
+mainClassName = 'main'
+clojure {
+    aotCompile = true
+}
+uberjar {
+    enabled = true
+    manifest.attributes("Main-Class": "main")
+}
+dependencies {
+    compile 'org.clojure:clojure:1.8.0'
+    compile "http-kit:http-kit:2.3.0-alpha1"
+    compile 'org.clojure:core.async:0.2.395'
+    compile "cc.qbits:jet:0.7.11"
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'org.slf4j:log4j-over-slf4j:1.7.21'
+    compile 'org.slf4j:jul-to-slf4j:1.7.21'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.21'
+    compile 'ch.qos.logback:logback-classic:1.1.7'
+//    compile "org.clojure:data.json:0.2.6"
+//    compile "camel-snake-kebab:camel-snake-kebab:0.4.0"
+//    compile "bidi:bidi:2.0.16"
+    compile "org.bouncycastle:bcpkix-jdk15on:1.52"
+}
