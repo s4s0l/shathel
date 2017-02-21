@@ -2,6 +2,7 @@ version: "3"
 services:
   portainer:
     image: portainer/portainer:1.11.3
+#    --no-auth
     command: -H unix:///var/run/docker.sock
     ports:
       - 9001:9000

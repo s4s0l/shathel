@@ -1,7 +1,7 @@
 version: "3"
 services:
   proxy:
-    image: vfarcic/docker-flow-proxy
+    image: 111.111.111.99:4000/myproxy
     ports:
       - 8080:8080
       - 80:80

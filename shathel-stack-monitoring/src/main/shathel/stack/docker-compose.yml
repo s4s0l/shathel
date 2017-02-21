@@ -87,5 +87,7 @@ services:
         - ./grafana_dashboards/:/var/lib/grafana/dashboards
       environment:
         - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+        - GF_AUTH_ANONYMOUS_ENABLED=true
+#        - GF_AUTH_BASIC_ENABLED=false
 #          - DASHBOARDS_IMPORT=609:20
 
