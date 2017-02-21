@@ -26,7 +26,7 @@ StackCommand stackCommand = command;
 HttpApis httpApi = http
 
 String ip = api.getIpForManagementNode();
-int portainerPort = 9000
+int portainerPort = 9001
 String adminPassword = "qwerty"
 def address = "http://${ip}:${portainerPort}"
 def portainer = httpApi.waitAndGetClient(address)

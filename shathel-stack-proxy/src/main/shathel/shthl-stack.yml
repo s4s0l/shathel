@@ -1,0 +1,14 @@
+version: 1
+shathel-stack:
+  deployName: proxy
+  enrichers:
+    addNetwork:
+        target: ALL
+        inline: |
+          def x = compose.yml.services.findAll {
+              it.value.deploy?.labels?.find { label -> label.key == "com.df.notify" && label.value=="true"} != null
+          }
+          if(!x.isEmpty()){
+            compose.addExternalNetwork("proxy_network")
+          }
+

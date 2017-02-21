@@ -1,19 +1,10 @@
-TODO: wyciaganie juz dzialajacych stackow w poszukiwaniu globalnych enricherów
-TODO: Stack tree ma byc forestem - wyciagnac nalezy te juz dzialajace i wsrod nich znalezc
-te co maja enrichera dla ALL
 
-TODO: Zrobic paczke dla consula (persystencja)
-TODO: efk filebeat czytajacy jsony zamontowane z hosta w globalu
 TODO: authentiacation proxy... dconf + własne metadata service?
 
 
 TODO: Password manager
-TODO portainer: hasło jak podane to użyte i zapamietane jak nie to wygenerowane i zapisane)
-
-TODO: Zrobic paczke dla prometheusza
 
 TODO: Zrobic paczke dla vaulta
-
 
 TODO: Zabezpieczyć repo
 
@@ -22,18 +13,6 @@ TODO: Zabezpieczyć repo
 TODO: integracja z gitowym storage
 TODO: full cleanup: docker volume rm $(docker volume ls -q | grep play) + wywalenie lokalnych danych
 TODO: Zrobic paczke dla spring admina
-
-TODO bosluga prywatnych repo - sciaga z repox do repo lokalnego
-TODO: uprawnienia do repozytorium
-TODO: szkielet odpalania docker machine na Digital Ocean
-
-TODO: shell ma pokazywac jakie srodowisko i solution
-
-
-TODO: start --forcefull powinno byc rozbite na no-cache + with-dependencies
-
-TODO: operacja rolling update force , reload która by robiła service update --force na serwisach w stacku
-
 
 TODO: dodananie nodea ponad minimum -> musi ogarnac mounty zanim sie doda do swarma
 

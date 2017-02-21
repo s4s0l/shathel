@@ -24,13 +24,13 @@ HttpApis httpApi = http
 String ip = api.getIpForManagementNode();
 int portainerPort = 3000
 def address = "http://${ip}:${portainerPort}"
-def grafana = httpApi.waitAndGetClient(address)
+def grafana = httpApi.waitAndGetClient(address,[401],"/api/datasources")
 
 
 def getClient(address){
     def ret = new RESTClient(address)
-    ret.handler['404'] = ret.handler.get(Status.SUCCESS)
     ret.handler['401'] = ret.handler.get(Status.SUCCESS)
+    ret.handler['404'] = ret.handler.get(Status.SUCCESS)
     ret
 }
 
@@ -55,7 +55,7 @@ if(!initialized){
             body: [
                     name:"Prometheus",
                     type:"prometheus",
-                    url:"http://prometheus:9090",
+                    url:"http://prometheus:9090/prometheus",
                     access:"proxy",
                     isDefault:true
             ]

@@ -3,12 +3,14 @@ shathel-solution:
   name: ${SOLLUTION_NAME}
   environments:
     dev:
+      pull: false
       type: dind
       build-allowed: true
       managers: 2
       workers: 1
       net: 33.33.33
     itg:
+      pull: true
       type: docker-machine-vbox
       build-allowed: true
       managers: 2

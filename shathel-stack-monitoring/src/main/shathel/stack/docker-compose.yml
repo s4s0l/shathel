@@ -4,7 +4,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.44.0/24
+        - subnet: 192.168.45.0/24
 
 volumes:
     grafana-data:
@@ -55,8 +55,15 @@ services:
             -storage.local.path=/prometheus
             -web.console.libraries=/etc/prometheus/console_libraries
             -web.console.templates=/etc/prometheus/consoles
+            -web.external-url=http://localhost/prometheus
+            -web.route-prefix=/prometheus
+      deploy:
+        labels:
+            com.df.notify: "true"
+            com.df.distribute: "true"
+            com.df.servicePath: "/prometheus"
+            com.df.port: "9090"
   grafana:
-#      build: ./grafana
       image: grafana/grafana:4.1.1
       networks:
           - network
@@ -65,6 +72,13 @@ services:
           limits:
               cpus: '0.5'
               memory: 300M
+        labels:
+          com.df.notify: 'true'
+          com.df.distribute: 'true'
+          com.df.servicePath: "/grafana/,/grafana/public,/grafana/api"
+          com.df.reqPathReplace: /
+          com.df.reqPathSearch: /grafana/
+          com.df.port: '3000'
       ports:
         - 3000:3000
       volumes:
@@ -72,8 +86,6 @@ services:
         - ./grafana/grafana.ini:/etc/grafana/grafana.ini
         - ./grafana_dashboards/:/var/lib/grafana/dashboards
       environment:
-          - GF_SERVER_ROOT_URL=http://grafana.swarm
-#          - GF_SECURITY_ADMIN_PASSWORD=adminadmin
-#          - PROMETHEUS_ENDPOINT=http://prometheus:9090
+        - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
 #          - DASHBOARDS_IMPORT=609:20
 

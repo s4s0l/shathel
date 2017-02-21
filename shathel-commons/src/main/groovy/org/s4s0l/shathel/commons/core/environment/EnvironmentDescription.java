@@ -30,6 +30,11 @@ public class EnvironmentDescription {
         return Optional.ofNullable(s);
     }
 
+    public Optional<Boolean> getParameterAsBoolean(String name) {
+        return getParameter(name)
+                .map(Boolean::parseBoolean);
+    }
+
     public String getType() {
         return type;
     }

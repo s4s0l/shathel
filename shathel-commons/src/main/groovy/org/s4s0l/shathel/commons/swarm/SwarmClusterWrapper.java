@@ -76,7 +76,7 @@ public interface SwarmClusterWrapper extends EnvironmentApiFacade {
 
 
     default void labelNode(String nodeName, Map<String, String> labels){
-        getDockerForManagementNode().swarmNodeSetLabels(nodeName, labels);
+        getDocker(nodeName).swarmNodeSetLabels(nodeName, labels);
     }
 
 

@@ -36,17 +36,22 @@ public class SwarmPullingEnricher extends EnricherExecutor {
     @Override
     protected List<Executor> executeProvidingProvisioner(EnvironmentContext environmentContext, EnvironmentApiFacade apiFacade,
                                                          StackDescription stack, ComposeFileModel model) {
+        boolean pull = environmentContext.getEnvironmentDescription()
+                .getParameterAsBoolean("pull")
+                .orElse(true).booleanValue();
         List<Executor> execs = new ArrayList<>();
-        model.mapImages((image) -> {
-            execs.add(executionContext -> {
-                for (String nodeName : swarmClusterWrapper.getNodeNames()) {
-                    swarmClusterWrapper.getDocker(nodeName).pull(image);
-                }
-                return "ok";
-            });
-            return image;
+        if (pull) {
+            model.mapImages((image) -> {
+                execs.add(executionContext -> {
+                    for (String nodeName : swarmClusterWrapper.getNodeNames()) {
+                        swarmClusterWrapper.getDocker(nodeName).pull(image);
+                    }
+                    return "ok";
+                });
+                return image;
 
-        });
+            });
+        }
         return execs;
     }
 
