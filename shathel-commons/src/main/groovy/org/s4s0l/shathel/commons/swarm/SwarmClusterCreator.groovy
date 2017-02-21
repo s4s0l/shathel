@@ -86,25 +86,6 @@ class SwarmClusterCreator {
 
         }
 
-
-
-
-
-//        new PortainerCustomizer().with {
-//            log "Launching Portainer"
-//            if (!swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").serviceRunning("portainer")) {
-//                swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").serviceCreate(
-//                        """--name portainer
-//                        --publish 9000:9000
-//                        --constraint node.role==manager
-//                        --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
-//                        portainer/portainer
-//                        -H unix:///var/run/docker.sock""".replace("\n", ""))
-//            }
-//            log "Initiating portainer configuration"
-//            customizePortainer(9000, MANAGER_IP, swarmClusterWrapper)
-//        }
-
         return modified;
     }
 

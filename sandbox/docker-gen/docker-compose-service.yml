@@ -1,0 +1,16 @@
+version: "3.1"
+services:
+
+  hw:
+    image: crccheck/hello-world
+    command: /bin/sh -c "while true ; do nc -l -p 8000 < /index.html ; echo Called!; done"
+    networks:
+      - socating_discoverablee
+    environment:
+      - VIRTUAL_HOST=helloworld
+      - VIRTUAL_HOST_NETWORK=socating_discoverablee
+
+
+networks:
+  socating_discoverablee:
+    external: true

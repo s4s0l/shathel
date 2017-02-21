@@ -1,0 +1,14 @@
+version: "3.1"
+services:
+  source:
+    image: 111.111.111.99:4000/testvolume
+    volumes:
+      - dupa-volume2:/somedir
+  dest:
+      image: crccheck/hello-world
+      volumes:
+        - dupa-volume2:/somedir:nocopy
+      deploy:
+        replicas: 3
+volumes:
+      dupa-volume2:

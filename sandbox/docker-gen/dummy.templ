@@ -1,0 +1,38 @@
+{{ json . }}
+
+
+{{ define "upstream" }}
+	{{ if .Address }}
+			# over network {{ .Network.Name }}
+			server {{ .Network.IP }}:{{ .Address.Port }};
+	{{ else if .Network }}
+		# {{ .Container.Name }}
+		server {{ .Network.IP }} down;
+	{{ end }}
+{{ end }}
+
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+{{ $is_regexp := hasPrefix "~" $host }}
+{{ $upstream_name := when $is_regexp (sha1 $host) $host }}
+{{ $upstream_name := when $is_regexp (sha1 $host) $host }}
+# {{ $host }}
+upstream {{ $upstream_name }} {
+{{ range $container := $containers }}
+	{{ $addrLen := len $container.Addresses }}
+    {{ $networkToUse := $container.Env.VIRTUAL_HOST_NETWORK }}
+		{{ range $containerNetwork := $container.Networks }}
+			{{ if eq $networkToUse $containerNetwork.Name }}
+
+				{{ range $address := $container.Addresses }}
+				    {{ if eq $address.IP $containerNetwork.IP }}
+				        {{ template "upstream" (dict "Container" $container "Address" $address "Network" $containerNetwork) }}
+				    {{ end }}
+				{{ end }}
+			{{ end }}
+		{{ end }}
+
+{{ end }}
+}
+
+{{ end }}

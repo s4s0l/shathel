@@ -40,6 +40,9 @@ class Main {
   @Bean
   def PromptProvider: PromptProvider = new PromptProvider(ParametersCommands)
 
+  @Bean
+  def SnippetsCommand: SnippetsCommand = new SnippetsCommand(ParametersCommands, EnvironmentCommands)
+
 
   @Bean
   def mapConverter: MapConverter = {
