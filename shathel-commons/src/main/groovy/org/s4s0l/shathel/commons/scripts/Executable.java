@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * @author Matcin Wielgus
  */
-public interface Executor {
+public interface Executable {
 
     Object execute(Map<String, Object> context);
 }

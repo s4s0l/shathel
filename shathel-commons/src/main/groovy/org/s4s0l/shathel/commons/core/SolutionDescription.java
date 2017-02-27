@@ -11,11 +11,11 @@ import java.util.Optional;
  * @author Matcin Wielgus
  */
 public class SolutionDescription {
-    private final Parameters overrides;
+    private final ParameterProvider overrides;
     private final SolutionFileModel model;
     private final Map<String, String> parameters = new HashMap<>();
 
-    public SolutionDescription(Parameters overrides, SolutionFileModel model) {
+    public SolutionDescription(ParameterProvider overrides, SolutionFileModel model) {
         this.overrides = overrides;
         this.model = model;
     }

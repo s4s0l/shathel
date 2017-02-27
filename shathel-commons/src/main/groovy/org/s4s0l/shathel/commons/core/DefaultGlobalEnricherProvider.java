@@ -1,15 +1,14 @@
 package org.s4s0l.shathel.commons.core;
 
-import org.s4s0l.shathel.commons.core.environment.EnricherExecutor;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade;
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
-import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.Executable;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,7 +18,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
 
 
     @Override
-    public List<Executor> getGlobalEnrichers() {
+    public List<Executable> getGlobalEnrichers() {
         return Arrays.asList(
                 new LabelingEnricher(),
                 new VariablesEnricher());
@@ -27,9 +26,9 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
 
     }
 
-    private static class LabelingEnricher extends EnricherExecutor {
+    private static class LabelingEnricher extends EnricherExecutable {
         @Override
-        protected void execute(EnvironmentContext environmentContext, EnvironmentApiFacade apiFacade, StackDescription stack, ComposeFileModel model) {
+        protected void execute(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade, StackDescription stack, ComposeFileModel model) {
             model.addLabelToServices("org.shathel.stack.gav", stack.getGav());
             model.addLabelToServices("org.shathel.stack.deployName", stack.getDeployName());
             model.addLabelToServices("org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
@@ -53,18 +52,19 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         }
     }
 
-    private static class VariablesEnricher extends EnricherExecutor {
+    private static class VariablesEnricher extends EnricherExecutable {
         @Override
-        protected void execute(EnvironmentContext environmentContext, EnvironmentApiFacade apiFacade,
+        protected void execute(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
                                StackDescription stack, ComposeFileModel model) {
-            int size = apiFacade.getExpectedNodeCount();
+
+            int size = environmentContext.getEnvironmentDescription().getNodesCount();
             int quorum = (int) Math.floor(size / 2) + 1;
             model.replaceInAllStrings("${SHATHEL_ENV_SIZE}", "" + size);
             model.replaceInAllStrings("${SHATHEL_ENV_QUORUM}", "" + quorum);
             model.replaceInAllStrings("$SHATHEL_ENV_SIZE", "" + size);
             model.replaceInAllStrings("$SHATHEL_ENV_QUORUM", "" + quorum);
 
-            int msize = apiFacade.getExpectedManagerNodeCount();
+            int msize = environmentContext.getEnvironmentDescription().getManagersCount();
             int mquorum = (int) Math.floor(msize / 2) + 1;
 
             model.replaceInAllStrings("${SHATHEL_ENV_MGM_SIZE}", "" + msize);

@@ -12,17 +12,19 @@ import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
  */
 public class Solution {
     private final ExtensionContext extensionContext;
-    private final Parameters params;
+    private final ParameterProvider params;
     private final Storage storage;
 
-    public Solution(ExtensionContext extensionContext, Parameters params, Storage storage) {
+    public Solution(ExtensionContext extensionContext, ParameterProvider params, Storage storage) {
         this.extensionContext = extensionContext;
         this.params = params;
         this.storage = storage;
@@ -40,12 +42,14 @@ public class Solution {
 
         String name = environmentDescription.getName();
 
+        File safeDirectory = storage.getSafeDirectory(environmentDescription, name);
+
         LazyInitiableSafeStorage safeStorage = new LazyInitiableSafeStorage(() ->
-                extensionContext.lookupOne(SafeStorageProvider.class).get().getSafeStorage(storage, name));
+                extensionContext.lookupOne(SafeStorageProvider.class).get().getSafeStorage(safeDirectory, name));
 
 
         EnvironmentContext environmentContext = new EnvironmentContext(extensionContext, environmentDescription, solutionDescription,
-                safeStorage, storage.getTemporaryDirectory(name), storage.getWorkDirectory(name));
+                safeStorage, storage);
 
         return environmentProvider.getEnvironment(environmentContext);
     }
@@ -56,19 +60,20 @@ public class Solution {
     }
 
 
-    public Stack openStack(Environment e, StackReference reference, boolean forcefull) {
+    public Stack openStack(Environment e, StackReference reference) {
         e.verify();
-        StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
-        DependencyManager dependencyManager = getDependencyManager(stackIntrospectionProvider, forcefull);
+        DependencyManager dependencyManager = getDependencyManager(e);
         StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
         List<StackDescription> sidekicks = dependencyManager.getSidekicks(stackDescriptionTree);
         return new Stack(stackDescriptionTree, sidekicks, e);
     }
 
-    private DependencyManager getDependencyManager(StackIntrospectionProvider stackIntrospectionProvider, boolean forcefull) {
+    private DependencyManager getDependencyManager(Environment e) {
+        Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");
+        StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
         return new DependencyManager(
-                storage.getTemporaryDirectory("dependencies"),
-                extensionContext.lookupOne(DependencyDownloader.class).get(), stackIntrospectionProvider, forcefull);
+                e.getEnvironmentContext().getDependencyCacheDirectory(),
+                extensionContext.lookupOne(DependencyDownloader.class).get(), stackIntrospectionProvider, forceful.orElse(false));
     }
 
 

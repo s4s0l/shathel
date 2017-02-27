@@ -1,9 +1,5 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.core.SolutionDescription;
-import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
-import org.s4s0l.shathel.commons.core.storage.Storage;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 /**

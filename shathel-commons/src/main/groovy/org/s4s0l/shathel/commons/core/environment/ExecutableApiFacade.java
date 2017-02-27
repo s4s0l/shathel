@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author Matcin Wielgus
  */
-public interface EnvironmentApiFacade {
+public interface ExecutableApiFacade {
     List<String> getNodeNames();
 
     String getIp(String nodeName);
@@ -18,7 +18,6 @@ public interface EnvironmentApiFacade {
     DockerWrapper getDockerForManagementNode();
 
     DockerWrapper getDocker(String nodeName);
-
 
     void setKernelParam(String param);
     /**
@@ -30,7 +29,4 @@ public interface EnvironmentApiFacade {
      */
     Map<String, String> getDockerEnvs(String nodeName);
 
-    int getExpectedNodeCount();
-
-    int getExpectedManagerNodeCount();
 }

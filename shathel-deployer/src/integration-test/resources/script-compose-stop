@@ -1,5 +1,5 @@
 parameters add --params shathel.mvn.localRepo=$ROOT/build/localrepo
 parameters add --params shathel.deployer.dir=$ROOT/shathel-deployer/build/TempSolution
 environment use composed
-stack start --name shathel-stack-core
-stack start shathel-stack-portainer --inspect 0
+stack stop shathel-stack-portainer
+stack stop shathel-stack-core

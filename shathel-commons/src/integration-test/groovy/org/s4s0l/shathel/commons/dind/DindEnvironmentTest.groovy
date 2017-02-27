@@ -4,13 +4,8 @@ import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.core.provision.StackCommand
-import org.s4s0l.shathel.commons.core.stack.StackReference
-import org.s4s0l.shathel.commons.docker.DockerComposeWrapper
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import org.s4s0l.shathel.commons.utils.ExecWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
-import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 
 /**
@@ -29,8 +24,8 @@ class DindEnvironmentTest extends Specification {
             containerRemoveIfPresent("DindTest-dev-manager-1")
             containerRemoveIfPresent("DindTest-dev-manager-2")
             containerRemoveIfPresent("DindTest-dev-worker-1")
-            if(networkExistsByFilter("name=shathel-dindtest-dev"))
-            networkRemove("shathel-dindtest-dev")
+            if (networkExistsByFilter("name=shathel-dindtest-dev"))
+                networkRemove("shathel-dindtest-dev")
         }
         true
     }
@@ -135,7 +130,7 @@ class DindEnvironmentTest extends Specification {
         def deps = new File(root, "deps")
         deps.mkdirs()
         Parameters parameters = MapParameters.builder()
-                .parameter("shathel.storage.tmp.dependencies.dir", deps.absolutePath)
+                .parameter("shathel.env.dev.dependenciesDir", deps.absolutePath)
                 .parameter("shathel.solution.name", "DindTest")
                 .parameter("shathel.env.dev.net", "22.22.22")
                 .build()

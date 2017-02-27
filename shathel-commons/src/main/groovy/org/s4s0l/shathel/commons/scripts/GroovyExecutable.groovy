@@ -1,15 +1,14 @@
 package org.s4s0l.shathel.commons.scripts
 
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * @author Matcin Wielgus
  */
-class GroovyExecutor implements Executor {
+class GroovyExecutable implements Executable {
     private final TypedScript script;
 
-    GroovyExecutor(TypedScript script) {
+    GroovyExecutable(TypedScript script) {
         this.script = script
     }
 
@@ -24,7 +23,7 @@ class GroovyExecutor implements Executor {
         variables.each {
             binding.setVariable(it.key, it.value)
         }
-        binding.setVariable("LOGGER", LoggerFactory.getLogger(GroovyExecutor.class))
+        binding.setVariable("LOGGER", LoggerFactory.getLogger(GroovyExecutable.class))
         scrpt.setBinding(binding)
         return scrpt.run()
     }

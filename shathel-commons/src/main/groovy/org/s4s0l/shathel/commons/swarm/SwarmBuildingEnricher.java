@@ -1,11 +1,11 @@
 package org.s4s0l.shathel.commons.swarm;
 
-import org.s4s0l.shathel.commons.core.environment.EnricherExecutor;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade;
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.Executable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author Matcin Wielgus
  */
-public class SwarmBuildingEnricher extends EnricherExecutor {
+public class SwarmBuildingEnricher extends EnricherExecutable {
     private final SwarmClusterWrapper swarmClusterWrapper;
     private final String repository;
 
@@ -25,9 +25,9 @@ public class SwarmBuildingEnricher extends EnricherExecutor {
     }
 
     @Override
-    protected List<Executor> executeProvidingProvisioner(EnvironmentContext environmentContext, EnvironmentApiFacade apiFacade,
-                                                         StackDescription stack, ComposeFileModel model) {
-        List<Executor> execs = new ArrayList<>();
+    protected List<Executable> executeProvidingProvisioner(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
+                                                           StackDescription stack, ComposeFileModel model) {
+        List<Executable> execs = new ArrayList<>();
         model.mapBuilds((service, params) -> {
             String dockerfile = (String) params.get("dockerfile");
             String context = (String) params.get("context");

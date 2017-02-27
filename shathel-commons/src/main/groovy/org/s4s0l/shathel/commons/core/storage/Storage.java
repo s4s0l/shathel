@@ -1,6 +1,6 @@
 package org.s4s0l.shathel.commons.core.storage;
 
-import org.s4s0l.shathel.commons.core.SolutionDescription;
+import org.s4s0l.shathel.commons.core.ParameterProvider;
 
 import java.io.File;
 
@@ -9,19 +9,25 @@ import java.io.File;
  */
 public interface Storage {
 
-    File getTemporaryDirectory(String name);
+    File getDependencyCacheDirectory(ParameterProvider parameterProvider, String env);
 
-    File getWorkDirectory(String name);
+    File getDataDirectory(ParameterProvider parameterProvider, String env);
 
-    File getPersistedDirectory(String name);
+    File getSafeDirectory(ParameterProvider parameterProvider, String env);
+
+    File getSettingsDirectory(ParameterProvider parameterProvider, String env);
+
+    File getEnrichedDirectory(ParameterProvider parameterProvider, String env);
+
+    File getTemptDirectory(ParameterProvider parameterProvider, String env);
 
     void verify();
 
     File getConfiguration();
 
-    boolean isModified();
 
-    void save();
+
+
 
 
 }

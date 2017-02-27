@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.commons.core.model
 
-import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition
 import org.yaml.snakeyaml.Yaml
 
 /**

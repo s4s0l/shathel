@@ -23,23 +23,23 @@ public class Stack {
     }
 
     public StackOperations createStartCommand() {
-        return getStackOperationsFactory()
+        return getEnricherExecutor()
                 .createStartSchedule();
     }
 
     public StackOperations createStopCommand(boolean withDependencies) {
-        return getStackOperationsFactory()
+        return getEnricherExecutor()
                 .createStopSchedule(withDependencies);
     }
 
-    private StackOperationsFactory getStackOperationsFactory() {
-        return new StackOperationsFactory(stackDescriptionTree, sidekicks, environment);
+    private StackEnricherExecutor getEnricherExecutor() {
+        return new StackEnricherExecutor(stackDescriptionTree, sidekicks, environment);
     }
 
     public void run(StackOperations schedule) {
-        new StackOperationsExecutor(environment.getProvisionExecutor(),
-                environment.getContainerRunner(),
-                environment.getExecutionDirectory()).execute(schedule);
+        new StackProvisionerExecutor(environment.getEnvironmentContext(),
+                environment.getEnvironmentApiFacade(),
+                environment.getContainerRunner()).execute(schedule);
     }
 
 }

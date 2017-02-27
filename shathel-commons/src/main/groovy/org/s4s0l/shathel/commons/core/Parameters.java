@@ -9,8 +9,7 @@ import java.util.stream.Collectors;
 /**
  * @author Matcin Wielgus
  */
-public interface Parameters {
-    Optional<String> getParameter(String name);
+public interface Parameters extends ParameterProvider {
 
     default Parameters over(Parameters x) {
         return new MultiSourceParameters(Arrays.asList(this, x));

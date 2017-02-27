@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.core.provision.StackCommand
+import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
@@ -23,6 +23,7 @@ class LocalEnvironmentTest extends Specification {
 
     def cleanupSpec() {
         new DockerComposeWrapper().with {
+            removeAllForComposeProject("sidekick")
             removeAllForComposeProject("dummy")
             removeAllForComposeProject("00shathel")
         }
@@ -49,7 +50,7 @@ class LocalEnvironmentTest extends Specification {
         environment != null;
         //        SIDEKICK INSTALLATION
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"),false)
+        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
 
         then:
         stack != null
@@ -70,7 +71,7 @@ class LocalEnvironmentTest extends Specification {
         //        SIDEKICK INSTALLATION
 
         when:
-        stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"),false)
+        stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
 
         then:
         stack != null
@@ -96,11 +97,11 @@ class LocalEnvironmentTest extends Specification {
         stack.run(command)
 
         then:
-        def preparedCompose2 = new Yaml().load(new File(root, "tmp/composed/execution/dummy-2.0-shathel/stack/docker-compose.yml").text)
+        def preparedCompose2 = new Yaml().load(new File(root, "composed/enriched/dummy-2.0-shathel/stack/docker-compose.yml").text)
         preparedCompose2.networks['00shathel_network'].external == true
         preparedCompose2.services.dummy.networks == ['00shathel_network']
-        new File(root, "tmp/composed/execution/shathel-core-stack-1.2.3-shathel/post-provision").text == "Done"
-        new File(root, "tmp/composed/execution/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
+        new File(root, "composed/enriched/shathel-core-stack-1.2.3-shathel/post-provision").text == "Done"
+        new File(root, "composed/enriched/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
         command = stack.createStartCommand()
@@ -136,7 +137,7 @@ class LocalEnvironmentTest extends Specification {
         def deps = new File(root, "deps")
         deps.mkdirs()
         Parameters parameters = MapParameters.builder()
-                .parameter("shathel.storage.tmp.dependencies.dir", deps.absolutePath)
+                .parameter("shathel.env.composed.dependenciesDir", deps.absolutePath)
                 .parameter("shathel.solution.name", "LocalComposeTest")
                 .build()
         src.listFiles()

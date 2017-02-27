@@ -1,18 +1,15 @@
 package org.s4s0l.shathel.commons.dind;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
-import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
-import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
-import org.s4s0l.shathel.commons.swarm.SwarmEnvironmentDescription;
+import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
 import org.s4s0l.shathel.commons.utils.ExecWrapper;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -161,13 +158,4 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
         return ret;
     }
 
-    @Override
-    public int getExpectedNodeCount() {
-        return SwarmEnvironmentDescription.getNodesCount(context);
-    }
-
-    @Override
-    public int getExpectedManagerNodeCount() {
-        return SwarmEnvironmentDescription.getManagersCount(context);
-    }
 }

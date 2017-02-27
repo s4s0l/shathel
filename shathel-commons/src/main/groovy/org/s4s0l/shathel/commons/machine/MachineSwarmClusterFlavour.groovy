@@ -1,8 +1,8 @@
 package org.s4s0l.shathel.commons.machine
 
-import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings
+import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
 
 /**
  * @author Matcin Wielgus

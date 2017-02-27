@@ -1,11 +1,8 @@
 package org.s4s0l.shathel.commons.localcompose;
 
-import org.s4s0l.shathel.commons.core.SolutionDescription;
-import org.s4s0l.shathel.commons.core.environment.*;
-import org.s4s0l.shathel.commons.core.security.LazyInitiableSafeStorage;
-import org.s4s0l.shathel.commons.core.security.SafeStorageProvider;
-import org.s4s0l.shathel.commons.core.storage.Storage;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
+import org.s4s0l.shathel.commons.core.environment.Environment;
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider;
 
 /**
  * @author Matcin Wielgus

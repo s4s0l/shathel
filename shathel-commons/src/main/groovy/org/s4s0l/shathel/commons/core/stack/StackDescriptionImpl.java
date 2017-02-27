@@ -2,7 +2,6 @@ package org.s4s0l.shathel.commons.core.stack;
 
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

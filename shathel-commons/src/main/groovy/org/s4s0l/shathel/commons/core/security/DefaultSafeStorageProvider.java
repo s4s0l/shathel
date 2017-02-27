@@ -1,22 +1,24 @@
 package org.s4s0l.shathel.commons.core.security;
 
-import org.s4s0l.shathel.commons.core.Parameters;
-import org.s4s0l.shathel.commons.core.storage.Storage;
+import org.s4s0l.shathel.commons.core.ParameterProvider;
+
+import java.io.File;
 
 /**
  * @author Matcin Wielgus
  */
 public class DefaultSafeStorageProvider implements SafeStorageProvider {
-    private final Parameters parameters;
+    private final ParameterProvider parameterProvider;
 
-    public DefaultSafeStorageProvider(Parameters parameters) {
-        this.parameters = parameters;
+    public DefaultSafeStorageProvider(ParameterProvider parameterProvider) {
+        this.parameterProvider = parameterProvider;
     }
+
     @Override
-    public SafeStorage getSafeStorage(Storage s, String name) {
-        String x = "shathel.safe." + name + ".password";
-        return new SafeStorageImpl(s.getPersistedDirectory("safe." + name),
-                parameters.getParameter(x)
+    public SafeStorage getSafeStorage(File s, String name) {
+        String x = "shathel.env." + name + ".safePassword";
+        return new SafeStorageImpl(s,
+                parameterProvider.getParameter(x)
                         .map(pass -> pass.toCharArray())
                         .orElseThrow(() -> new RuntimeException("No password provided for " + x)));
     }

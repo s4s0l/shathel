@@ -1,56 +1,83 @@
 package org.s4s0l.shathel.commons.filestorage;
 
-import org.s4s0l.shathel.commons.core.Parameters;
+import org.s4s0l.shathel.commons.core.ParameterProvider;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 
 import java.io.File;
-import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
  */
 public class FileStorage implements Storage {
-    private final StorageParameters storageParameters;
 
-    public FileStorage(File root, Parameters parameters) {
+    private final File root;
+
+    public FileStorage(File root) {
         root.mkdirs();
-        storageParameters = new StorageParameters(parameters, root);
+        this.root = root;
     }
 
-
-    @Override
-    public File getTemporaryDirectory(String name) {
-        File temporaryDirectory = storageParameters.getTemporaryDirectory(name);
-        temporaryDirectory.mkdirs();
-        return temporaryDirectory;
+    private File get(ParameterProvider parameterProvider, String type, File defaultDir) {
+        return parameterProvider.getParameter(type + "Dir")
+                .map(v -> new File(v))
+                .map(f -> f.isAbsolute() ? f : new File(root, f.getPath()))
+                .orElse(defaultDir);
     }
 
-    @Override
-    public File getWorkDirectory(String name) {
-        File temporaryDirectory = storageParameters.getWorkDirectory(name);
-        temporaryDirectory.mkdirs();
-        return temporaryDirectory;
+    private File get(ParameterProvider parameterProvider, String env, String type) {
+        return get(parameterProvider,  type, new File(root,
+                env + "/" + type));
     }
 
     @Override
-    public File getPersistedDirectory(String name) {
-        File persistedDirectory = storageParameters.getPersistedDirectory(name);
-        persistedDirectory.mkdirs();
-        return persistedDirectory;
+    public File getDependencyCacheDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider,  "dependencies", new File(root, ".dependency-cache")));
+    }
+
+    @Override
+    public File getDataDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider, env, "data"));
+    }
+
+    @Override
+    public File getSafeDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider, env, "safe"));
+    }
+
+    @Override
+    public File getSettingsDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider, env, "settings"));
+    }
+
+    @Override
+    public File getEnrichedDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider, env, "enriched"));
+    }
+
+    @Override
+    public File getTemptDirectory(ParameterProvider parameterProvider, String env) {
+        return ensureExists(get(parameterProvider, env, "temp"));
+    }
+
+    private File ensureExists(File f) {
+        f.mkdirs();
+        return f;
     }
 
     @Override
     public void verify() {
-        assertIt(storageParameters.getRootFile().exists(), "Root storage directory does not exist.");
-        assertIt(getConfiguration().exists(), "Configuration file does not exist.");
-        assertIt(getConfiguration().isFile(), "Config file is not a file.");
-        assertIt(storageParameters.getRootFile().isDirectory(), "Root storage dir is not directory.");
-        assertIt(isAncestor(getConfiguration(), storageParameters.getRootFile()), "Root dir should contain config file!");
+        File configuration = getConfiguration();
+
+        assertIt(root.exists(), "Root storage directory does not exist.");
+        assertIt(configuration.exists(), "Configuration file does not exist.");
+        assertIt(configuration.isFile(), "Config file is not a file.");
+        assertIt(root.isDirectory(), "Root storage dir is not directory.");
+        assertIt(isAncestor(configuration, root), "Root dir should contain config file!");
     }
 
     private void assertIt(boolean condition, String errorMessage) {
         if (!condition) {
-            throw new RuntimeException("Storage verification failed! Reason:" + errorMessage + " ( " + storageParameters.getRootFile().getAbsolutePath() + " vs " + getConfiguration().getAbsolutePath() + " ) ");
+            throw new RuntimeException("Storage verification failed! Reason:" + errorMessage + " ( " + root.getAbsolutePath() + " vs " + getConfiguration().getAbsolutePath() + " ) ");
         }
     }
 
@@ -60,16 +87,7 @@ public class FileStorage implements Storage {
 
     @Override
     public File getConfiguration() {
-        return storageParameters.get(Optional.empty(), "shathel-solution.yml", Optional.empty());
+        return new File(root, "shathel-solution.yml");
     }
 
-    @Override
-    public boolean isModified() {
-        return true;
-    }
-
-    @Override
-    public void save() {
-
-    }
 }

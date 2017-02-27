@@ -1,18 +1,17 @@
 package org.s4s0l.shathel.commons.swarm;
 
-import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade;
+import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Matcin Wielgus
  */
-public interface SwarmClusterWrapper extends EnvironmentApiFacade {
+public interface SwarmClusterWrapper extends ExecutableApiFacade {
 
 
     void start(String node);
@@ -73,10 +72,12 @@ public interface SwarmClusterWrapper extends EnvironmentApiFacade {
         return getNodeNames().size() >= managersCount + workersCount;
     }
 
-
+    default void labelNode(String managerNodeName, String nodeName, Map<String, String> labels){
+        getDocker(managerNodeName).swarmNodeSetLabels(nodeName, labels);
+    }
 
     default void labelNode(String nodeName, Map<String, String> labels){
-        getDocker(nodeName).swarmNodeSetLabels(nodeName, labels);
+        getDockerForManagementNode().swarmNodeSetLabels(nodeName, labels);
     }
 
 

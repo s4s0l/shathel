@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.deployer
 
+import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.utils.ExtensionInterface
 import org.s4s0l.shathel.commons.{DefaultExtensionContext, Shathel}
 import org.springframework.shell.core.CommandMarker
@@ -14,14 +15,15 @@ import scala.util.Try
 class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMarker with ParametersKeyProvider {
 
 
-  def shathel(map: java.util.Map[String, String], extra: DeployerParameters.Builder = new DeployerParameters.Builder())(work: (DeployerParameters.ShathelCommandContext) => String): String = {
-    val build = extra.build()
-    val buildParameters = parametersCommands.buildParameters(map, build)
-    val extensionContext = DefaultExtensionContext.create(buildParameters, List[ExtensionInterface](new MvnDependencyDownloader(buildParameters)).asJava)
-    val shathel = new Shathel(buildParameters, extensionContext)
-    val context = new DeployerParameters.ShathelCommandContext(shathel, () => buildParameters)
+  def shathel(parametersMap: java.util.Map[String, String], commandOverrides: DeployerParameters.Builder = new DeployerParameters.Builder())(work: (DeployerParameters.ShathelCommandContext) => String): String = {
+    val build = commandOverrides.build()
+    val buildParameters = parametersCommands.buildParameters(parametersMap)
+    val allParameters = MapParameters.builder().parameters(build.asJava).build().over(buildParameters)
+    val extensionContext = DefaultExtensionContext.create(allParameters, List[ExtensionInterface](new MvnDependencyDownloader(allParameters)).asJava)
+    val shathel = new Shathel(allParameters, extensionContext)
+    val context = new DeployerParameters.ShathelCommandContext(shathel, () => allParameters)
     val ret = work(context)
-    parametersCommands.setParameters(map, build)
+    parametersCommands.setParameters(parametersMap)
     return ret;
   }
 

@@ -1,7 +1,6 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
 import org.apache.commons.io.FileUtils;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.*;

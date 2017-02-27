@@ -7,12 +7,8 @@ import org.s4s0l.shathel.commons.core.model.DefaultSolutiuonFileProvider;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.filestorage.FileStorage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
-import org.s4s0l.shathel.commons.utils.TemplateUtils;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Matcin Wielgus
@@ -67,7 +63,7 @@ public class Shathel {
         if (new File(f, ".git").exists()) {
             throw new RuntimeException("git storage unsupported?");
         }
-        return new FileStorage(f, params);
+        return new FileStorage(f);
     }
 
 

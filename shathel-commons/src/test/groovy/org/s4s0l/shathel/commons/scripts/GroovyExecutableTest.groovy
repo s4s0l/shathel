@@ -5,11 +5,11 @@ import spock.lang.Specification
 /**
  * @author Matcin Wielgus
  */
-class GroovyExecutorTest extends Specification {
+class GroovyExecutableTest extends Specification {
 
     def "Script should getGrapes"() {
         given:
-        GroovyExecutor ge = new GroovyExecutor()
+        GroovyExecutable ge = new GroovyExecutable()
 
         when:
         Map<String, String> res = ge.execute(getClass().getResource("/scala.groovy").text, ["input":{ x -> x }])

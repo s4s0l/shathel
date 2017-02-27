@@ -1,6 +1,6 @@
 package org.s4s0l.shathel.commons.core;
 
-import org.s4s0l.shathel.commons.core.provision.StackCommand;
+import org.s4s0l.shathel.commons.core.environment.StackCommand;
 
 import java.util.ArrayList;
 import java.util.Collections;

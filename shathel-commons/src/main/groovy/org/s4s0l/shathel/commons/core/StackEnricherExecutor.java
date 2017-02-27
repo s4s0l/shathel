@@ -3,34 +3,37 @@ package org.s4s0l.shathel.commons.core;
 import com.google.common.collect.Streams;
 import org.apache.commons.collections.map.HashedMap;
 import org.s4s0l.shathel.commons.core.environment.Environment;
+import org.s4s0l.shathel.commons.core.environment.StackCommand;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
-import org.s4s0l.shathel.commons.core.provision.StackCommand;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackEnricherDefinition;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
-import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.Executable;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * @author Matcin Wielgus
  */
-public class StackOperationsFactory {
+public class StackEnricherExecutor {
     private final StackTreeDescription descriptionTree;
     private final List<StackDescription> sidekicks;
     private final StackIntrospectionProvider introspectionProvider;
     private final Environment environment;
 
-    public StackOperationsFactory(StackTreeDescription descriptionTree,
-                                  List<StackDescription> sidekicks, Environment environment) {
+    public StackEnricherExecutor(StackTreeDescription descriptionTree,
+                                 List<StackDescription> sidekicks, Environment environment) {
         this.descriptionTree = descriptionTree;
         this.sidekicks = sidekicks;
         this.environment = environment;
@@ -59,7 +62,7 @@ public class StackOperationsFactory {
 
     private StackCommand createStackCommand(StackDescription stack, StackCommand.Type commandType) {
         ComposeFileModel composeModel = stack.getStackResources().getComposeFileModel();
-        List<Executor> provisionersExtra = commandType.willRun ? Streams.concat(
+        List<Executable> provisionersExtra = commandType.willRun ? Streams.concat(
                 getEnricherDefinitions(stack).stream()
                         .map(x -> ScriptExecutorProvider.findExecutor(getExtensionContext(), x)),
                 GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext()).stream()
@@ -75,9 +78,9 @@ public class StackOperationsFactory {
         return environment.getEnvironmentContext().getExtensionContext();
     }
 
-    private List<Executor> execute(Optional<Executor> executor,
-                                   ComposeFileModel composeModel,
-                                   StackDescription stack) {
+    private List<Executable> execute(Optional<Executable> executor,
+                                     ComposeFileModel composeModel,
+                                     StackDescription stack) {
         Map<String, Object> ctxt = new HashedMap();
         ctxt.put("context", environment.getEnvironmentContext());
         ctxt.put("env", environment.getEnvironmentApiFacade());
@@ -86,7 +89,7 @@ public class StackOperationsFactory {
 
         return executor
                 .map(x -> x.execute(ctxt))
-                .map(o -> (List<Executor>) o)
+                .map(o -> (List<Executable>) o)
                 .orElse(Collections.emptyList());
     }
 

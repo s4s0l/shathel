@@ -21,16 +21,15 @@ class DeployerTest extends FeatureSpec {
 
   def destroyCommand = {
     "environment destroy --params " +
-      "shathel.env=dev,shathel.mvn.localRepo=$ROOT/../build/localrepo,shathel.storage.file=$ROOT/build/TempSolution"
+      "shathel.env=dev,shathel.mvn.localRepo=$ROOT/../build/localrepo,shathel.deployer.dir=$ROOT/build/TempSolution"
         .replace("$ROOT", new File(".").getAbsolutePath)
   }
 
-  def prepareScript(command: String, scriptTemplate: String) = {
+  def prepareScript(scriptTemplate: String) = {
     new File(s"build/${getClass.getSimpleName}").mkdirs()
     val script = scala.io.Source.fromURL(getClass.getResource(s"/${scriptTemplate}"))
       .mkString
       .replace("$ROOT", new File("./..").getAbsolutePath)
-      .replace("$COMMAND", command)
     val out = new File(s"build/${getClass.getSimpleName}/${scriptTemplate}");
     new PrintWriter(out) {
       write(script);
@@ -41,14 +40,14 @@ class DeployerTest extends FeatureSpec {
 
   feature("Starting stopping stacks") {
     scenario("in composed environment") {
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("start", "script-compose")}".toString) !))
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("stop", "script-compose")}") !))
+      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-compose")}".toString) !))
+      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-compose-stop")}") !))
     }
 
     scenario("in dind environment") {
-      def cmd1 = s"${getPath()} --cmdfile ${prepareScript("start", "script-dind")}";
+      def cmd1 = s"${getPath()} --cmdfile ${prepareScript("script-dind")}";
       assert(0 == ((cmd1) !))
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("stop", "script-dind")}".toString) !))
+      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-dind-stop")}".toString) !))
 
       def cmd3 = s"${getPath()} ${destroyCommand}"
 

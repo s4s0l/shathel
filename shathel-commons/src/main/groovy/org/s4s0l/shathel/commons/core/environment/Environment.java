@@ -1,11 +1,7 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
-import org.s4s0l.shathel.commons.core.security.SafeStorage;
-import org.s4s0l.shathel.commons.core.storage.Storage;
-import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.Executable;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -13,7 +9,7 @@ import java.util.List;
  */
 public interface Environment {
 
-    File getExecutionDirectory();
+
 
     /**
      * Checks if amount of existing nodes fulfills environments
@@ -64,14 +60,12 @@ public interface Environment {
 
     StackIntrospectionProvider getIntrospectionProvider();
 
-    EnvironmentProvisionExecutor getProvisionExecutor();
-
     EnvironmentContainerRunner getContainerRunner();
 
     EnvironmentContext getEnvironmentContext();
 
-    EnvironmentApiFacade getEnvironmentApiFacade();
+    ExecutableApiFacade getEnvironmentApiFacade();
 
-    List<Executor> getEnvironmentEnrichers();
+    List<Executable> getEnvironmentEnrichers();
 
 }

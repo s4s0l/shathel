@@ -1,16 +1,10 @@
 package org.s4s0l.shathel.commons.swarm;
 
-import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionResolver;
-import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.localcompose.LocalStackIntrospectionProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Matcin Wielgus

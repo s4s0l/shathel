@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.commons.utils;
 
-import com.google.common.collect.ImmutableMap;
 import groovy.text.SimpleTemplateEngine;
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 

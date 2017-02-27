@@ -19,14 +19,13 @@ class ParametersCommandsTest extends FeatureSpec {
       val cmds = new ParametersCommands
       val list = cmds.list(true)
       assert(list.contains("shathel.env="))
-      assert(!list.contains("shathel.storage.work"))
       System.setProperty("shathel.env", "itg")
       val list2 = cmds.list(true)
       assert(list2.contains("shathel.env=itg"))
-      assert(list2.contains("shathel.storage.work.itg.dir="))
+      assert(list2.contains("shathel.env.itg.enrichedDir="))
       val list3 = cmds.list(false)
       assert(list3.contains("shathel.env=itg"))
-      assert(!list3.contains("shathel.storage.work.itg.dir="))
+      assert(!list3.contains("shathel.env.itg.enrichedDir="))
     }
 
     scenario("add") {

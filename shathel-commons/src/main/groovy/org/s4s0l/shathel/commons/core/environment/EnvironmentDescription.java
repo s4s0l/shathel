@@ -1,6 +1,6 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.core.Parameters;
+import org.s4s0l.shathel.commons.core.ParameterProvider;
 
 import java.util.Map;
 import java.util.Optional;
@@ -8,13 +8,13 @@ import java.util.Optional;
 /**
  * @author Matcin Wielgus
  */
-public class EnvironmentDescription {
-    private final Parameters overrides;
+public class EnvironmentDescription implements ParameterProvider {
+    private final ParameterProvider overrides;
     private final String name;
     private final String type;
     private final Map<String, String> parameters;
 
-    public EnvironmentDescription(Parameters overrides, String name, String type, Map<String, String> parameters) {
+    public EnvironmentDescription(ParameterProvider overrides, String name, String type, Map<String, String> parameters) {
         this.overrides = overrides;
         this.name = name;
         this.type = type;
@@ -30,17 +30,23 @@ public class EnvironmentDescription {
         return Optional.ofNullable(s);
     }
 
-    public Optional<Boolean> getParameterAsBoolean(String name) {
-        return getParameter(name)
-                .map(Boolean::parseBoolean);
+    public int getNodesCount() {
+        return getManagersCount() + getWorkersCount();
+    }
+
+    public int getManagersCount() {
+        return getParameterAsInt("managers")
+                .orElse(1);
+    }
+
+    public int getWorkersCount() {
+        return getParameterAsInt("workers")
+                .orElse(0);
     }
 
     public String getType() {
         return type;
     }
 
-    public Optional<Integer> getParameterAsInt(String name) {
-        return getParameter(name)
-                .map(Integer::parseInt);
-    }
+
 }

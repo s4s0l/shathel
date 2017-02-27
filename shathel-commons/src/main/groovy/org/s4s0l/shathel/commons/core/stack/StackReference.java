@@ -73,8 +73,8 @@ public class StackReference {
     /**
      * Is same stack, comparest group and name only
      *
-     * @param o
-     * @return
+     * @param o other stack reference
+     * @return true uf group and name matches
      */
     public boolean isSameStack(StackReference o) {
         return StringUtils.equals(getGroup(), o.getGroup()) &&

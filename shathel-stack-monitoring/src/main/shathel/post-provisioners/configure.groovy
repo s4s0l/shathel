@@ -11,13 +11,13 @@ import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.FileBody
 //@Grab('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
 //@Grab('org.apache.httpcomponents:httpmime:4.2.1')
-import org.s4s0l.shathel.commons.core.environment.EnvironmentApiFacade
+import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.core.provision.StackCommand
+import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.scripts.HttpApis
 
 EnvironmentContext environmentContext = context;
-EnvironmentApiFacade api = env;
+ExecutableApiFacade api = env;
 StackCommand stackCommand = command;
 HttpApis httpApi = http
 

@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.core.provision.StackCommand
+import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
@@ -22,7 +22,7 @@ class VBoxEnvironmentTest
     }
 
     boolean cleanOnEnd() {
-        def file = new File(getRootDir(), "tmp/itg/settings")
+        def file = new File(getRootDir(), "itg/settings")
         if (file.exists()) {
             def wrapper = new DockerMachineWrapper(file)
             new File(file, "machines").listFiles().each {
@@ -48,8 +48,8 @@ class VBoxEnvironmentTest
         if (!environment.isStarted()) {
             environment.start()
         }
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"), false)
-        def command = stack.createStartCommand(false);
+        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
+        def command = stack.createStartCommand();
 
         then:
         command.commands.size() == 2
@@ -58,7 +58,7 @@ class VBoxEnvironmentTest
         stack.run(command)
 
         then:
-        stack.createStartCommand(false).commands.size()==1
+        stack.createStartCommand().commands.size()==1
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -70,7 +70,7 @@ class VBoxEnvironmentTest
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand(false).commands.size() == 2
+        stack.createStartCommand().commands.size() == 2
 
         cleanOnEnd()
     }
@@ -86,10 +86,10 @@ class VBoxEnvironmentTest
 
     Parameters prepare(File root, String sourceDir) {
         File src = new File("src/test/$sourceDir")
-        def deps = new File(root, "tmp/dependencies")
+        def deps = new File(root, ".dependency-cache")
         deps.mkdirs()
         Parameters parameters = MapParameters.builder()
-                .parameter("shathel.safe.itg.password", "MySecretPassword")
+                .parameter("shathel.env.itg.safePassword", "MySecretPassword")
                 .parameter("shathel.env.itg.net", "20.20.21")
                 .build()
         src.listFiles()

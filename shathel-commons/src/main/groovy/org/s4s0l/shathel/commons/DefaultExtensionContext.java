@@ -18,20 +18,20 @@ import java.util.List;
  * @author Matcin Wielgus
  */
 public class DefaultExtensionContext {
-    public static ExtensionContext create(Parameters parameters) {
-        return getExtensionContext(parameters, Collections.emptyList());
+    public static ExtensionContext create(Parameters parameterProvider) {
+        return getExtensionContext(parameterProvider, Collections.emptyList());
     }
 
-    public static ExtensionContext create(Parameters parameters, List<ExtensionInterface> extraExtensions) {
-        return getExtensionContext(parameters, extraExtensions);
+    public static ExtensionContext create(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
+        return getExtensionContext(parameterProvider, extraExtensions);
     }
 
-    private static ExtensionContext getExtensionContext(Parameters parameters, List<ExtensionInterface> extraExtensions) {
+    private static ExtensionContext getExtensionContext(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
         ExtensionContext.ExtensionContextBuilder extension = ExtensionContext.builder()
                 .extension(new LocaEnvironmentProvider())
-                .extension(new VBoxMachineEnvironmentProvider(parameters))
-                .extension(new DindEnvironmentProvider(parameters))
-                .extension(new DefaultSafeStorageProvider(parameters))
+                .extension(new VBoxMachineEnvironmentProvider(parameterProvider))
+                .extension(new DindEnvironmentProvider())
+                .extension(new DefaultSafeStorageProvider(parameterProvider))
                 .extension(new NoopDependencyProvider())
                 .extension(new DefaultGlobalEnricherProvider())
                 .extension(new GroovyExecutorProvider());

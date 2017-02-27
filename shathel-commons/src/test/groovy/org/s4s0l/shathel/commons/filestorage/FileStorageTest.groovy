@@ -16,20 +16,20 @@ class FileStorageTest extends Specification {
 
     def "FileStorageTest with overrides"() {
         given:
-        FileStorage fs = create("${rootDir}/1", [
-                'shathel.storage.data.x.dir'          : 'data_x',
-                'shathel.storage.tmp.x.dir'           : f('tmp_x').absolutePath,
-                'shathel.storage.shathel-solution.yml': 'my-file.yml'
-        ])
+        FileStorage fs = create("${rootDir}/1" )
+        def params = MapParameters.builder().parameters([
+                'dataDir'          : 'data_x',
+                'tempDir'           : f('tmp_x').absolutePath
+        ]).build()
 
         when:
-        def dataDir = fs.getPersistedDirectory("x")
+        def dataDir = fs.getDataDirectory(params, "xxx")
 
         then:
         dataDir.absolutePath == f("1/data_x").absolutePath
 
         when:
-        def tmpDir = fs.getTemporaryDirectory("x")
+        def tmpDir = fs.getTemptDirectory(params, "xxx")
 
         then:
         tmpDir.absolutePath == f("tmp_x").absolutePath
@@ -38,14 +38,14 @@ class FileStorageTest extends Specification {
         def configuration = fs.getConfiguration()
 
         then:
-        configuration.absolutePath == f("1/my-file.yml").absolutePath
+        configuration.absolutePath == f("1/shathel-solution.yml").absolutePath
     }
 
 
     def "FileStorageTest with defaults"() {
         given:
-        FileStorage fs = create("${rootDir}/1", [:])
-
+        FileStorage fs = create("${rootDir}/1")
+        def params = MapParameters.builder().parameters([:]).build()
 
         when:
         fs.verify()
@@ -62,25 +62,20 @@ class FileStorageTest extends Specification {
         f("1/shathel-solution.yml").exists()
 
         when:
-        def directory = fs.getPersistedDirectory("x")
+        def directory = fs.getDataDirectory(params, "dummy")
 
         then:
         directory.exists()
-        f("1/data/x").exists()
+        f("1/dummy/data").exists()
 
         when:
-        def tmpDir = fs.getTemporaryDirectory("x")
+        def tmpDir = fs.getTemptDirectory(params, "dummy")
 
         then:
         tmpDir.exists()
-        f("1/tmp/x").exists()
+        f("1/dummy/temp").exists()
 
-        when:
-        f("1/tmp/x/aaaa").text = "something"
-        fs.getTemporaryDirectory("x")
 
-        then:
-        f("1/tmp/x/aaaa").exists()
 
     }
 
@@ -88,9 +83,9 @@ class FileStorageTest extends Specification {
         return new File("${rootDir}/$name");
     }
 
-    private FileStorage create(String where, LinkedHashMap params) {
+    private FileStorage create(String where) {
         FileUtils.deleteDirectory(new File(where))
-        new FileStorage(new File(where), MapParameters.builder().parameters(params).build())
+        new FileStorage(new File(where))
     }
 
 

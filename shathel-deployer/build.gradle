@@ -45,6 +45,7 @@ dependencies {
 
 springBoot {
     executable = true
+    embeddedLaunchScript = file('src/main/resources/launch.script.sh')
 }
 
 apply from: '../gradle/github.gradle'

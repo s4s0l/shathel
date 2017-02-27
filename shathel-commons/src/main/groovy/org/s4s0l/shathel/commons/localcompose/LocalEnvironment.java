@@ -1,15 +1,11 @@
 package org.s4s0l.shathel.commons.localcompose;
 
 import org.s4s0l.shathel.commons.core.environment.*;
-import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
-import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
-import org.s4s0l.shathel.commons.scripts.Executor;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
+import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +25,7 @@ public class LocalEnvironment implements Environment {
     }
 
 
-    @Override
-    public File getExecutionDirectory() {
-        return context.getExecutionDirectory();
-    }
+
 
     @Override
     public boolean isInitialized() {
@@ -87,10 +80,7 @@ public class LocalEnvironment implements Environment {
         return new LocalStackIntrospectionProvider();
     }
 
-    @Override
-    public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return new DefaultProvisionerExecutor(this);
-    }
+
 
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
@@ -103,15 +93,15 @@ public class LocalEnvironment implements Environment {
     }
 
     @Override
-    public List<Executor> getEnvironmentEnrichers() {
+    public List<Executable> getEnvironmentEnrichers() {
         return Arrays.asList(new LocalMountingEnricher());
     }
 
     private static final Logger LOGGER = getLogger(LocalEnvironment.class);
 
     @Override
-    public EnvironmentApiFacade getEnvironmentApiFacade() {
-        return new EnvironmentApiFacade() {
+    public ExecutableApiFacade getEnvironmentApiFacade() {
+        return new ExecutableApiFacade() {
             @Override
             public List<String> getNodeNames() {
                 return Collections.singletonList("localhost");
@@ -152,15 +142,7 @@ public class LocalEnvironment implements Environment {
                 return Collections.emptyMap();
             }
 
-            @Override
-            public int getExpectedNodeCount() {
-                return 1;
-            }
 
-            @Override
-            public int getExpectedManagerNodeCount() {
-                return 1;
-            }
         };
     }
 

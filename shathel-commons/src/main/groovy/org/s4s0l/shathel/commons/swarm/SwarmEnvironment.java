@@ -3,10 +3,8 @@ package org.s4s0l.shathel.commons.swarm;
 import groovy.lang.Tuple;
 import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
 import org.s4s0l.shathel.commons.core.environment.*;
-import org.s4s0l.shathel.commons.core.provision.DefaultProvisionerExecutor;
-import org.s4s0l.shathel.commons.core.provision.EnvironmentProvisionExecutor;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
-import org.s4s0l.shathel.commons.scripts.Executor;
+import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -41,16 +39,13 @@ public class SwarmEnvironment implements Environment {
     private final NodeProvisioner nodeProvisioner;
 
 
-    @Override
-    public File getExecutionDirectory() {
-        return environmentContext.getExecutionDirectory();
-    }
+
 
 
     @Override
     public boolean isInitialized() {
-        int managersCount = SwarmEnvironmentDescription.getManagersCount(environmentContext);
-        int workersCount = SwarmEnvironmentDescription.getWorkersCount(environmentContext);
+        int managersCount = environmentContext.getEnvironmentDescription().getManagersCount();
+        int workersCount = environmentContext.getEnvironmentDescription().getWorkersCount();
         return swarmClusterWrapper.isInitialized(managersCount, workersCount);
     }
 
@@ -169,11 +164,6 @@ public class SwarmEnvironment implements Environment {
     }
 
     @Override
-    public EnvironmentProvisionExecutor getProvisionExecutor() {
-        return new DefaultProvisionerExecutor(this);
-    }
-
-    @Override
     public EnvironmentContainerRunner getContainerRunner() {
         return new SwarmContainerRunner(swarmClusterWrapper.getDockerForManagementNode());
     }
@@ -184,12 +174,12 @@ public class SwarmEnvironment implements Environment {
     }
 
     @Override
-    public EnvironmentApiFacade getEnvironmentApiFacade() {
+    public ExecutableApiFacade getEnvironmentApiFacade() {
         return swarmClusterWrapper;
     }
 
     @Override
-    public List<Executor> getEnvironmentEnrichers() {
+    public List<Executable> getEnvironmentEnrichers() {
         String repository = swarmClusterWrapper.getIp(environmentContext.getContextName() + "-manager-1") + ":4000";
         return Arrays.asList(
                 new SwarmMountingPermissionsEnricher(swarmClusterWrapper),

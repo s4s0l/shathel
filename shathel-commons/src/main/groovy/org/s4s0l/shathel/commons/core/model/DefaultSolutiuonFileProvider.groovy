@@ -1,7 +1,6 @@
 package org.s4s0l.shathel.commons.core.model
 
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.utils.TemplateUtils
 import org.yaml.snakeyaml.Yaml
 
 /**

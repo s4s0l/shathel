@@ -29,7 +29,7 @@ class DockerCommands(parametersCommands: ParametersCommands, environmentCommands
       .storageInit(initIfAbsent)
     )(context => {
       val (storage, _, _) = environmentCommands.getEnvironment(context)
-      val file1 = new File(storage.getTemporaryDirectory(context.environment()), "settings")
+      val file1 = storage.getSettingsDirectory(context, context.environment())
       return new DockerMachineWrapper(file1).getExec.executeForOutput(command)
     })
   }
@@ -54,7 +54,7 @@ class DockerCommands(parametersCommands: ParametersCommands, environmentCommands
       .storageInit(initIfAbsent)
     )(context => {
       val (storage, solution, environment) = environmentCommands.getEnvironment(context)
-      val file1 = new File(storage.getTemporaryDirectory(context.environment()), "settings")
+      val file1 = storage.getSettingsDirectory(context, context.environment())
       environment.getEnvironmentApiFacade.getDockerForManagementNode.getExec.executeForOutput(command)
 
     })

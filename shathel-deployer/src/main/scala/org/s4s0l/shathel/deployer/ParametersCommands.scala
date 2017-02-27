@@ -2,7 +2,7 @@ package org.s4s0l.shathel.deployer
 
 import java.util
 
-import org.s4s0l.shathel.commons.core.{MapParameters, Parameters}
+import org.s4s0l.shathel.commons.core.{MapParameters, ParameterProvider, Parameters}
 import org.s4s0l.shathel.deployer.shell.customization.MapConverterKeysProvider
 import org.springframework.shell.core.CommandMarker
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
@@ -40,17 +40,16 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
     return null;
   }
 
-  def buildParameters(paramMap: java.util.Map[String, String], extra: Map[String, String] = Map()): Parameters = {
+  def buildParameters(paramMap: java.util.Map[String, String]): Parameters = {
     val map = new util.HashMap[String, String]();
     if (paramMap != null) {
       map.putAll(paramMap)
     }
-    map.putAll(extra.asJava)
     MapParameters.builder().parameters(map).build().over(parameters)
   }
 
-  def setParameters(paramMap: java.util.Map[String, String], extra: Map[String, String] = Map()): Parameters = {
-    parameters = buildParameters(paramMap, extra);
+  def setParameters(paramMap: java.util.Map[String, String]): Parameters = {
+    parameters = buildParameters(paramMap);
     return globalParameters;
   }
 

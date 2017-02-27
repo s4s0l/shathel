@@ -2,7 +2,6 @@ package org.s4s0l.shathel.commons.swarm
 
 import org.s4s0l.shathel.commons.docker.OpenSslWrapper
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings
-import org.s4s0l.shathel.commons.machine.vbox.PortainerCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -47,7 +46,7 @@ class SwarmClusterCreator {
         startRegistries("${CLUSTER_NAME}-manager-1", MANAGER_IP)
 
         initSwarm("${CLUSTER_NAME}-manager-1", MANAGER_IP)
-        swarmClusterWrapper.labelNode("${CLUSTER_NAME}-manager-1", [
+        swarmClusterWrapper.labelNode("${CLUSTER_NAME}-manager-1", "${CLUSTER_NAME}-manager-1", [
                 "shathel.node.main":"true",
                 "shathel.node.name":"manager-1"
         ])

@@ -10,6 +10,7 @@ shathel-solution:
       workers: 1
       net: 33.33.33
     itg:
+      forceful: false
       pull: true
       type: docker-machine-vbox
       build-allowed: true

@@ -20,18 +20,20 @@ object DeployerParameters {
     "shathel.mvn.settings",
     "shathel.mvn.securitySetting",
     "shathel.mvn.localRepo",
-    "shathel.storage.file",
-    "shathel.storage.init",
-    "shathel.stack.forceful",
+    "shathel.deployer.dir",
+    "shathel.deployer.init",
     "shathel.solution.name",
     //    "shathel.safe.{env}.password",
     "shathel.env.{env}.net",
     "shathel.env.{env}.managers",
+    "shathel.env.{env}.forceful",
     "shathel.env.{env}.workers",
-    "shathel.storage.tmp.dependencies.dir",
-    "shathel.storage.tmp.{env}.dir",
-    "shathel.storage.work.{env}.dir",
-    "shathel.storage.data.safe.{env}.dir"
+    "shathel.env.{env}.dependenciesDir",
+    "shathel.env.{env}.dataDir",
+    "shathel.env.{env}.safeDir",
+    "shathel.env.{env}.settingsDir",
+    "shathel.env.{env}.enrichedDir",
+    "shathel.env.{env}.tempDir"
   )
 
 
@@ -50,22 +52,21 @@ object DeployerParameters {
   }
 
   val defaults: Map[String, String] = Map(
-    "shathel.storage.file" -> ".",
-    "shathel.storage.init" -> "true",
-    "shathel.stack.forceful" -> "false"
+    "shathel.deployer.dir" -> ".",
+    "shathel.deployer.init" -> "true"
   )
 
   class Builder(values: Map[String, String] = Map()) {
 
     def apply(param: (String, Option[String])) = new Builder(values + (param._1 -> param._2.getOrElse(values.getOrElse(param._1, null))));
 
-    def storageFile(f: File): Builder = this ("shathel.storage.file" -> Option(f).map(_.getAbsolutePath))
+    def storageFile(f: File): Builder = this ("shathel.deployer.dir" -> Option(f).map(_.getAbsolutePath))
 
-    def storageInit(f: java.lang.Boolean): Builder = this ("shathel.storage.init" -> Option(f).map(_.toString))
+    def storageInit(f: java.lang.Boolean): Builder = this ("shathel.deployer.init" -> Option(f).map(_.toString))
 
     def environment(f: String): Builder = this ("shathel.env" -> Option(f).map(_.toString))
 
-    def forceful(f:java.lang.Boolean): Builder = this ("shathel.stack.forceful" -> Option(f).map(_.toString))
+    def forceful(f: java.lang.Boolean): Builder = this (s"shathel.env.${values.get("shathel.env")}.forceful" -> Option(f).map(_.toString))
 
     def build(): Map[String, String] = values.filter(e => e._2 != null)
   }
@@ -73,14 +74,11 @@ object DeployerParameters {
   class Provider(provider: () => Parameters) extends Parameters {
 
 
-    def storageFile(): File = new File(mandatoryParam("shathel.storage.file"))
+    def storageFile(): File = new File(mandatoryParam("shathel.deployer.dir"))
 
-    def storageInit(): Boolean = mandatoryBoolean("shathel.storage.init")
+    def storageInit(): Boolean = mandatoryBoolean("shathel.deployer.init")
 
     def environment(): String = mandatoryParam("shathel.env")
-
-    def forceful(): Boolean = mandatoryBoolean("shathel.stack.forceful")
-
 
     override def getParameter(name: String): Optional[String] = provider().getParameter(name);
 
@@ -112,7 +110,7 @@ object DeployerParameters {
       this getWithDefault (name)
 
     def optionalBoolean(name: String): Option[Boolean] =
-      getWithDefault (name).map((s) => Try(s.toBoolean).getOrElse(invalid(name)))
+      getWithDefault(name).map((s) => Try(s.toBoolean).getOrElse(invalid(name)))
 
     override def getAllParameters: util.Set[String] = provider().getAllParameters;
   }
