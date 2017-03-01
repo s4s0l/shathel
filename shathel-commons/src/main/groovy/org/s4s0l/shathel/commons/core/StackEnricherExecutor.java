@@ -15,11 +15,9 @@ import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,7 +87,20 @@ public class StackEnricherExecutor {
 
         return executor
                 .map(x -> x.execute(ctxt))
-                .map(o -> (List<Executable>) o)
+                .map(x -> {
+                    if (x instanceof Collection) {
+                        return new ArrayList<Executable>((Collection<? extends Executable>) x);
+                    }
+                    if (x instanceof Executable) {
+                        return Collections.singletonList((Executable) x);
+                    }
+                    return Collections.EMPTY_LIST;
+                })
+                .map(o -> {
+                    Collector<Executable, ?, List<Executable>> collector = Collectors.toList();
+                    Stream<Executable> stream = o.stream().filter(x -> (x instanceof Executable));
+                    return stream.collect(collector);
+                })
                 .orElse(Collections.emptyList());
     }
 

@@ -105,15 +105,15 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
             if (cont.contains("${name}=")) {
                 getWrapper().sudo(node, "sed -i.bak s/${name}=.*/$param/g /etc/sysctl.conf")
             } else {
-                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
                         "\"echo '$param' >> /etc/sysctl.conf\"")
             }
             cont = getWrapper().sudo(node, "cat /var/lib/boot2docker/profile")
             if (cont.contains("sysctl -w ${name}=")) {
-                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                getWrapper().exec.executeForOutput(null,new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
                         "\"sed -i.bak s/sysctl\\ -w\\ ${name}=.*/sysctl\\ -w\\ $param/g /var/lib/boot2docker/profile\"")
             } else {
-                getWrapper().exec.executeForOutput(new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                getWrapper().exec.executeForOutput(null,new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
                         "\"echo 'sysctl -w $param' >> /var/lib/boot2docker/profile\"")
             }
 

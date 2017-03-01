@@ -38,14 +38,19 @@ class ExecWrapper {
     }
 
     String executeForOutput(File dir = new File("."), Map<String, String> env = [:], String args) {
-        executeForOutput(dir, env, args.split(' '))
+        executeForOutput(null,dir, env, args.split(' '))
     }
 
-    String executeForOutput(File dir = new File("."), Map<String, String> env = [:], String... args) {
+    String executeForOutput(byte [] input = null, File dir = new File("."), Map<String, String> env = [:], String... args) {
         StringBuilder sb = new StringBuilder()
         List<?> flatten = fix(args)
         LOGGER.debug("Running ${flatten.join(",")}")
         Process process = createProcess(flatten, dir, env)
+        if(input!=null){
+            process.outputStream.write(input)
+            process.outputStream.flush()
+            process.outputStream.close()
+        }
         process.inputStream.eachLine {
             LOGGER.debug("output:  [$it]")
             sb.append(it).append("\n")

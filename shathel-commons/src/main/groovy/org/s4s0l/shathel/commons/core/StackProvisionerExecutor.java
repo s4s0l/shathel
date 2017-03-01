@@ -9,10 +9,13 @@ import org.s4s0l.shathel.commons.scripts.Executable;
 import org.s4s0l.shathel.commons.scripts.HttpApis;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.utils.IoUtils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Matcin Wielgus
@@ -83,13 +86,14 @@ public class StackProvisionerExecutor {
             execute(dstStackDir, executable, stackCommand);
         }
     }
-
+private static final Logger LOGGER = getLogger(StackProvisionerExecutor.class);
     private void execute(File dstStackDir, Executable executable, StackCommand stackCommand) {
         Map<String, Object> ctxt = new HashedMap();
         ctxt.put("context", environmentContext);
         ctxt.put("env", executableApiFacade);
         ctxt.put("command", stackCommand);
         ctxt.put("dir", dstStackDir);
+        ctxt.put("log", LOGGER);
         ctxt.put("http", new HttpApis());
         executable.execute(ctxt);
     }

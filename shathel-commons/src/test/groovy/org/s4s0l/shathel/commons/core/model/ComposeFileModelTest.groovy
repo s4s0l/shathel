@@ -102,4 +102,36 @@ class ComposeFileModelTest extends Specification {
 
 
     }
+
+
+    def "Find labeled services "() {
+        given:
+        ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
+        services:
+              aaaa:
+                  build: ./logstash
+                  deploy:
+                        labels:
+                            com.df.notify: "true"
+                            com.df.usersSecret: "monitoring"
+                            com.df.distribute: "true"
+                            com.df.servicePath: "/prometheus"
+                            com.df.port: "9090"
+              bbbb:
+                build: 
+                    context: ./kibana/xxx
+        """))
+
+        when:
+        def services = x.findServicesWithLabels("com.df.notify", "true")
+
+        then:
+        services.size() == 1
+        services[0]['build'] == './logstash'
+
+
+    }
+
+
+
 }

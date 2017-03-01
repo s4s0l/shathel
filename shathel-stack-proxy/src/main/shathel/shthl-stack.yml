@@ -1,14 +1,32 @@
 version: 1
 shathel-stack:
   deployName: proxy
+  pre-provisioners:
+    createSecret:
+      type: groovy
+      inline: |
+        def docker = env.dockerForManagementNode
+        if(!docker.secretExists('dfp_users_monitoring')){
+            InputStream pasFile = context.environmentDescription
+                                              .getParameter('proxy_password')
+                                              .map {new FileInputStream(new File(it))}
+                                              .orElseGet {
+                                                log.warn("USING DEFAULT PASSWORD!!! DON'T DO IT IN PRODUCTION!!!")
+                                                new FileInputStream(new File(dir, "data/default-proxy-users"))
+                                              }
+            docker.secretCreate('dfp_users_monitoring', pasFile.bytes)
+        }
   enrichers:
     addNetwork:
         target: ALL
         inline: |
-          def x = compose.yml.services.findAll {
-              it.value.deploy?.labels?.find { label -> label.key == "com.df.notify" && label.value=="true"} != null
+          def services = compose.findServicesWithLabels("com.df.notify","true")
+          if (!services.isEmpty()){
+              compose.addExternalNetwork("proxy_network")
+              services.each {
+                  compose.addNetworkToService(it, "proxy_network")
+                  if (it.deploy.labels['com.df.usersSecret'] == 'monitoring') {
+                          it.deploy.labels['com.df.usersPassEncrypted'] = 'true'
+                  }
+              }
           }
-          if(!x.isEmpty()){
-            compose.addExternalNetwork("proxy_network")
-          }
-

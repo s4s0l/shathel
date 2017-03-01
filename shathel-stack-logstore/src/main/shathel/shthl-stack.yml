@@ -9,4 +9,4 @@ shathel-stack:
       addNetwork:
         target: DEPS
         inline: >
-          compose.addExternalNetwork("logstore_network")
+          compose.addExternalNetworkAndAttachAllServices("logstore_network")

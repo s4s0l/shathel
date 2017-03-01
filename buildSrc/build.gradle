@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.s4s0l.gradle:bootcker-gradle-plugin:0.2.4'
+    compile 'org.s4s0l.gradle:bootcker-gradle-plugin:0.2.5'
     compile "org.yaml:snakeyaml:1.16"
     compile 'commons-io:commons-io:2.3'
     testCompile gradleTestKit()

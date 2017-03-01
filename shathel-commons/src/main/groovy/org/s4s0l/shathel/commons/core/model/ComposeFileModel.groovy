@@ -127,17 +127,37 @@ class ComposeFileModel {
     }
 
     /**
+     *
+     * @param key label name
+     * @param value label value
+     * @return list of maps each representing one service
+     */
+    List<Map> findServicesWithLabels(String key, String value){
+        yml.services?.findAll {
+            it.value.deploy?.labels?.find { label -> label.key == key && label.value==value} != null
+        }.collect {it.value}
+    }
+
+    /**
      * adds external network to all services
      * @param networkName
      */
-    void addExternalNetwork(String networkName) {
+    void addExternalNetworkAndAttachAllServices(String networkName) {
         parsedYml.services?.each {
-            if (it.value.networks == null) {
-                it.value.networks = [networkName]
-            } else {
-                it.value.networks << networkName
-            }
+            addNetworkToService(it.value, networkName)
         }
+        addExternalNetwork(networkName)
+    }
+
+    private void addNetworkToService(Map service, String networkName) {
+        if (service.networks == null) {
+            service.networks = [networkName]
+        } else {
+            service.networks << networkName
+        }
+    }
+
+    void addExternalNetwork(String networkName) {
         if (parsedYml.networks == null) {
             parsedYml.networks = [:]
         }

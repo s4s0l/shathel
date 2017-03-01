@@ -285,4 +285,12 @@ class DockerWrapper {
     void swarmNodeSetLabels(String nodeName, Map<String, String> labels) {
         exec.executeForOutput("node update ${labels.collect { "--label-add ${it.key}=${it.value}" }.join(" ")} $nodeName")
     }
+
+    boolean secretExists(String name) {
+        return exec.executeForExitValue("secret inspect $name") == 0
+    }
+
+    void secretCreate(String name, byte[] secret) {
+        exec.executeForOutput(secret, new File("."), [:], "secret","create","$name", "-")
+    }
 }
