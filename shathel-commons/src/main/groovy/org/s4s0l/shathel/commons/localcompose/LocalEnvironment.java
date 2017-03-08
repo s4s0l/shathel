@@ -7,9 +7,7 @@ import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -101,49 +99,7 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public ExecutableApiFacade getEnvironmentApiFacade() {
-        return new ExecutableApiFacade() {
-            @Override
-            public List<String> getNodeNames() {
-                return Collections.singletonList("localhost");
-            }
-
-            @Override
-            public String getIp(String nodeName) {
-                return "localhost";
-            }
-
-            @Override
-            public String getIpForManagementNode() {
-                return "localhost";
-            }
-
-            @Override
-            public DockerWrapper getDockerForManagementNode() {
-                return new DockerWrapper();
-            }
-
-            @Override
-            public DockerWrapper getDocker(String nodeName) {
-                if ("localhost".equals(nodeName)) {
-                    return getDockerForManagementNode();
-                } else {
-                    throw new RuntimeException("Unknown node name " + nodeName);
-                }
-            }
-
-
-            @Override
-            public void setKernelParam(String param) {
-                LOGGER.warn("!Set parameter like: sudo sysctl -w " + param);
-            }
-
-            @Override
-            public Map<String, String> getDockerEnvs(String nodeName) {
-                return Collections.emptyMap();
-            }
-
-
-        };
+        return new LocalExecutableApiFacade(new DockerWrapper());
     }
 
 }

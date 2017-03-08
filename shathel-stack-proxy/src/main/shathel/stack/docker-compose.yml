@@ -13,9 +13,12 @@ services:
       - MODE=swarm
       - CONNECTION_MODE=http-keep-alive
     deploy:
+      update_config:
+        delay: 300s
       replicas: 2
     secrets:
-      - dfp_users_monitoring
+      - source: shathel_dfp_users_monitoring
+        target: dfp_users_monitoring
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
@@ -31,8 +34,8 @@ services:
       placement:
         constraints: [node.role == manager]
 secrets:
-  dfp_users_monitoring:
-    external: true
+  shathel_dfp_users_monitoring:
+    file: ./data/default-proxy-users
 networks:
   network:
     ipam:

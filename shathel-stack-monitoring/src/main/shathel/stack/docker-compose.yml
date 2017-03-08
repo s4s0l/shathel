@@ -74,6 +74,7 @@ services:
               cpus: '0.5'
               memory: 300M
         labels:
+
           com.df.notify: 'true'
           com.df.usersSecret: "monitoring"
           com.df.distribute: 'true'

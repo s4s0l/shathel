@@ -1,9 +1,11 @@
 package org.s4s0l.shathel.commons.swarm;
 
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
+import org.s4s0l.shathel.commons.secrets.SecretManager;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,22 +32,30 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
 
     Node getNode(String nodeName);
 
+    EnvironmentContext getEnvironmentContext();
 
     String getNonRootUser();
 
-
     @Override
-    default String getIpForManagementNode() {
+    default String getNameForManagementNode() {
         return getManager()
-                .map(x -> getIp(x.getName()))
+                .map(x -> x.getName())
                 .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
     }
 
     @Override
+    default String getIpForManagementNode() {
+        return getIp(getNameForManagementNode());
+    }
+
+    @Override
     default DockerWrapper getDockerForManagementNode() {
-        return getManager()
-                .map(x -> getDocker(x.getName()))
-                .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
+        return getDocker(getNameForManagementNode());
+    }
+
+    @Override
+    default SecretManager getSecretManager() {
+        return new SecretManager(getEnvironmentContext().getEnvironmentDescription(), getClientForManagementNode());
     }
 
     default Optional<DockerInfoWrapper> getManager() {
@@ -72,11 +82,11 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
         return getNodeNames().size() >= managersCount + workersCount;
     }
 
-    default void labelNode(String managerNodeName, String nodeName, Map<String, String> labels){
+    default void labelNode(String managerNodeName, String nodeName, Map<String, String> labels) {
         getDocker(managerNodeName).swarmNodeSetLabels(nodeName, labels);
     }
 
-    default void labelNode(String nodeName, Map<String, String> labels){
+    default void labelNode(String nodeName, Map<String, String> labels) {
         getDockerForManagementNode().swarmNodeSetLabels(nodeName, labels);
     }
 

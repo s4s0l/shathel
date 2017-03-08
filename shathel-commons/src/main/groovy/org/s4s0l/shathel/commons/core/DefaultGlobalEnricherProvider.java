@@ -56,7 +56,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         @Override
         protected void execute(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
                                StackDescription stack, ComposeFileModel model) {
-
+//            todo to powinno ustawiac zmienne tak aby normalny subs dzialal
             int size = environmentContext.getEnvironmentDescription().getNodesCount();
             int quorum = (int) Math.floor(size / 2) + 1;
             model.replaceInAllStrings("${SHATHEL_ENV_SIZE}", "" + size);

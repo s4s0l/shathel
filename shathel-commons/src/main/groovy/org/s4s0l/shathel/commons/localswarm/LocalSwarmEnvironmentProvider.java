@@ -1,24 +1,25 @@
-package org.s4s0l.shathel.commons.localcompose;
+package org.s4s0l.shathel.commons.localswarm;
 
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider;
+import org.s4s0l.shathel.commons.localcompose.LocalEnvironment;
 
 /**
  * @author Matcin Wielgus
  */
-public class LocaEnvironmentProvider implements EnvironmentProvider {
+public class LocalSwarmEnvironmentProvider implements EnvironmentProvider {
 
 
     @Override
     public String getType() {
-        return "docker-compose";
+        return "local-swarm";
     }
 
     @Override
     public Environment getEnvironment(EnvironmentContext environmentContext) {
 
-        return new LocalEnvironment(environmentContext);
+        return new LocalSwarmEnvironment(environmentContext);
     }
 
 

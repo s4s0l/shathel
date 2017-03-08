@@ -1,21 +1,6 @@
 version: 1
 shathel-stack:
   deployName: proxy
-  pre-provisioners:
-    createSecret:
-      type: groovy
-      inline: |
-        def docker = env.dockerForManagementNode
-        if(!docker.secretExists('dfp_users_monitoring')){
-            InputStream pasFile = context.environmentDescription
-                                              .getParameter('proxy_password')
-                                              .map {new FileInputStream(new File(it))}
-                                              .orElseGet {
-                                                log.warn("USING DEFAULT PASSWORD!!! DON'T DO IT IN PRODUCTION!!!")
-                                                new FileInputStream(new File(dir, "data/default-proxy-users"))
-                                              }
-            docker.secretCreate('dfp_users_monitoring', pasFile.bytes)
-        }
   enrichers:
     addNetwork:
         target: ALL

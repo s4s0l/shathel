@@ -19,7 +19,10 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         this.environmentContext = environmentContext
         this.clusterFlavour = clusterFlavour
     }
-
+    @Override
+    EnvironmentContext getEnvironmentContext() {
+        return environmentContext;
+    }
     DockerMachineWrapper getWrapper() {
         return new DockerMachineWrapper(environmentContext.getSettingsDirectory());
     }

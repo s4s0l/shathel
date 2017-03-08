@@ -31,6 +31,11 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
+    public EnvironmentContext getEnvironmentContext() {
+        return context;
+    }
+
+    @Override
     public List<String> getNodeNames() {
         List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=" + getNetworkName());
         return maps.stream().map(x -> x.get("Names")).sorted().collect(Collectors.toList());

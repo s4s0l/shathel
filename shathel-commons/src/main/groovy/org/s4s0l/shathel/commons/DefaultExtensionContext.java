@@ -5,7 +5,8 @@ import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.dependencies.NoopDependencyProvider;
 import org.s4s0l.shathel.commons.core.security.DefaultSafeStorageProvider;
 import org.s4s0l.shathel.commons.dind.DindEnvironmentProvider;
-import org.s4s0l.shathel.commons.localcompose.LocaEnvironmentProvider;
+import org.s4s0l.shathel.commons.localcompose.LocalEnvironmentProvider;
+import org.s4s0l.shathel.commons.localswarm.LocalSwarmEnvironmentProvider;
 import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineEnvironmentProvider;
 import org.s4s0l.shathel.commons.scripts.GroovyExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
@@ -28,7 +29,8 @@ public class DefaultExtensionContext {
 
     private static ExtensionContext getExtensionContext(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
         ExtensionContext.ExtensionContextBuilder extension = ExtensionContext.builder()
-                .extension(new LocaEnvironmentProvider())
+                .extension(new LocalEnvironmentProvider())
+                .extension(new LocalSwarmEnvironmentProvider())
                 .extension(new VBoxMachineEnvironmentProvider(parameterProvider))
                 .extension(new DindEnvironmentProvider())
                 .extension(new DefaultSafeStorageProvider(parameterProvider))

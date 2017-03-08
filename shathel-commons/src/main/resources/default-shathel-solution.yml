@@ -2,6 +2,9 @@ version: 1
 shathel-solution:
   name: ${SOLLUTION_NAME}
   environments:
+    local:
+      type: local-swarm
+      build-allowed: true
     dev:
       pull: false
       type: dind

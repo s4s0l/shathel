@@ -161,8 +161,25 @@ class DockerWrapper {
         return "" != exec.executeForOutput("service ls -q -f name=$containerName")
     }
 
+    /**
+     * returns container names for service
+     * @param containerName
+     * @return
+     */
+    List<String> serviceContainers(String serviceName) {
+        exec.executeForOutput("service ps $serviceName --no-trunc").readLines().collect {
+            it.split("\\s+")
+        }
+        .findAll { it[0] != "ID" && it[4] == "Running" }
+                .collect { it[1] + "." + it[0] }
+    }
+
     void serviceCreate(String params) {
         exec.executeForOutput("service create $params")
+    }
+
+    void serviceRemove(String params) {
+        exec.executeForOutput("service rm $params")
     }
 
     /**
@@ -175,6 +192,22 @@ class DockerWrapper {
         return new JsonSlurper().parseText(output);
     }
 
+
+    float getServiceRunningRatio(String serviceName) {
+        def output = exec.executeForOutput("service ls")
+        def ratios = output.readLines().collect { it.split("\\s+") }.findAll {
+            it[1] == serviceName
+        }.collect { it[3] }
+                .collect {
+            def x = it =~ /([0-9]+)/
+            Integer.parseInt(x[0][1]) / Integer.parseInt(x[1][1])
+        }
+        if (ratios.isEmpty()) {
+            return 0f;
+        } else {
+            return ratios.head()
+        }
+    }
 
     void stackDeploy(File composeFile, String deploymentName) {
         LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
@@ -217,6 +250,10 @@ class DockerWrapper {
 
     void swarmInit(String advertiseIp) {
         exec.executeForOutput("swarm init --listen-addr ${advertiseIp} --advertise-addr ${advertiseIp}")
+    }
+
+    void swarmInit() {
+        exec.executeForOutput("swarm init")
     }
 
     String swarmTokenForManager() {
@@ -291,6 +328,11 @@ class DockerWrapper {
     }
 
     void secretCreate(String name, byte[] secret) {
-        exec.executeForOutput(secret, new File("."), [:], "secret","create","$name", "-")
+        exec.executeForOutput(secret, new File("."), [:], "secret", "create", "$name", "-")
+    }
+
+    void secretRemove(String name) {
+        if (secretExists(name))
+            exec.executeForOutput("secret rm $name")
     }
 }

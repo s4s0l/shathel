@@ -15,7 +15,7 @@ class ComposeFileModel {
         parsedYml = replaceInAllObject(parsedYml, what, with)
     }
 
-    Map getYml(){
+    Map getYml() {
         return parsedYml
     }
 
@@ -100,13 +100,11 @@ class ComposeFileModel {
         }
     }
 
-    void mapImages(Function<String,  String> mapper) {
+    void mapImages(Function<String, String> mapper) {
         parsedYml.services.each {
             it.value.image = mapper.apply(it.value.image)
         }
     }
-
-
 
 
     void addLabelToServices(String key, String value) {
@@ -127,15 +125,70 @@ class ComposeFileModel {
     }
 
     /**
+     * map contains name, file, external, if returned map changes name
+     * this change is reflected in all services in file
+     * @param mapper a mapping function
+     */
+    void mapSecrets(Function<Map<String, String>, Map<String, String>> mapper) {
+        yml.secrets = yml.secrets?.collectEntries { its ->
+            def mapped = mapper.apply([name    : its.key,
+                                       file    : its.value.file,
+                                       external: its.value.external])
+            if (mapped.name != its.key) {
+
+                updateSecretInServices(its.key, mapped.name)
+                def params = [:]
+                if (mapped.file != null) {
+                    params.file = mapped.file
+                }
+                if (mapped.external != null) {
+                    params.external = mapped.external
+                }
+                return [(mapped.name): params]
+            } else {
+                its
+            }
+        }
+
+        if (yml.secrets == null) {
+            yml.remove('secrets')
+        }
+    }
+
+
+    private updateSecretInServices(String oldSecret, String newSecret) {
+        yml.services.each { srv ->
+            if(srv.value == null || srv.value.secrets == null){
+                return
+            }
+            srv.value.secrets = srv.value.secrets?.collect { secret ->
+                if (secret instanceof String) {
+                    if (secret == oldSecret) {
+                        return [source: newSecret, target: oldSecret]
+                    }
+                }
+                if (secret instanceof Map) {
+                    if (secret.source == oldSecret) {
+                        secret.source = newSecret
+                    }
+                }
+                return secret
+            }
+            if (srv.value.secrets == null) {
+                srv.value.remove('secrets')
+            }
+        }
+    }
+    /**
      *
      * @param key label name
      * @param value label value
      * @return list of maps each representing one service
      */
-    List<Map> findServicesWithLabels(String key, String value){
+    List<Map> findServicesWithLabels(String key, String value) {
         yml.services?.findAll {
-            it.value.deploy?.labels?.find { label -> label.key == key && label.value==value} != null
-        }.collect {it.value}
+            it.value.deploy?.labels?.find { label -> label.key == key && label.value == value } != null
+        }.collect { it.value }
     }
 
     /**

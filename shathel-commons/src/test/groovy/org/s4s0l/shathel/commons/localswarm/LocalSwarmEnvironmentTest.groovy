@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.localcompose
+package org.s4s0l.shathel.commons.localswarm
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
@@ -6,8 +6,10 @@ import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
-import org.s4s0l.shathel.commons.docker.DockerComposeWrapper
+import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 import testutils.BaseIntegrationTest
@@ -15,23 +17,35 @@ import testutils.BaseIntegrationTest
 /**
  * @author Matcin Wielgus
  */
-class LocalEnvironmentTest extends BaseIntegrationTest {
+class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
 
     @Override
     def setupEnvironment() {
-        environmentName = "composed"
-        network = "224.224.224"
+        environmentName = "local"
+        network = "222.222.222"
     }
 
+
     def cleanupEnvironment() {
-        new DockerComposeWrapper().with {
-            removeAllForComposeProject("sidekick")
-            removeAllForComposeProject("dummy")
-            removeAllForComposeProject("00shathel")
+        new DockerWrapper().with {
+            if (swarmActive()) {
+
+                stackUnDeploy(new File("."), "sidekick")
+                stackUnDeploy(new File("."), "dummy")
+                //docker stack undeploy is async sometimes it cant stop the network therefore
+                (0..10).forEach {
+                    try {
+                        stackUnDeploy(new File("."), "00shathel")
+                    } catch (Exception e) {
+                        Thread.sleep(5000)
+                    }
+                }
+                stackUnDeploy(new File("."), "00shathel")
+            }
         }
     }
 
-    def "Run stack in local docker integration test"() {
+    def "Run stack in local swarm integration test"() {
         given:
         File root = getRootDir()
         def parameters = prepare()
@@ -46,44 +60,37 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
 
         when:
         def solution = sht.getSolution(storage)
-        def environment = solution.getEnvironment("composed")
+        def environment = solution.getEnvironment("local")
+        if(!environment.isInitialized()){
+            environment.initialize()
+        }
 
         then:
-        environment != null;
+        environment.isInitialized()
+
         //        SIDEKICK INSTALLATION
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
-
-        then:
-        stack != null
-        new File(dependenciesDir, "sidekick-1.0-shathel").isDirectory()
-
-        when:
-        def command = stack.createStartCommand();
-
-        then:
-        command != null
-        command.commands.size() == 1
-
-        when:
+        def command = stack.createStartCommand()
         stack.run(command)
 
+
         then:
+
+        new File(dependenciesDir, "sidekick-1.0-shathel").isDirectory()
+        command.commands.size() == 1
         environment.getIntrospectionProvider().allStacks.size() == 1
         //        SIDEKICK INSTALLATION
 
         when:
         stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
+        command = stack.createStartCommand();
 
         then:
         stack != null
         new File(dependenciesDir, "dummy-2.0-shathel").isDirectory()
         new File(dependenciesDir, "shathel-core-stack-1.2.3-shathel").isDirectory()
 
-        when:
-        command = stack.createStartCommand();
-
-        then:
         command != null
         command.commands.size() == 2
         command.commands[0].description.name == 'shathel-core-stack'
@@ -99,11 +106,11 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         stack.run(command)
 
         then:
-        def preparedCompose2 = new Yaml().load(new File(root, "composed/enriched/dummy-2.0-shathel/stack/docker-compose.yml").text)
+        def preparedCompose2 = new Yaml().load(new File(root, "local/enriched/dummy-2.0-shathel/stack/docker-compose.yml").text)
         preparedCompose2.networks['00shathel_network'].external == true
         preparedCompose2.services.dummy.networks == ['00shathel_network']
-        new File(root, "composed/enriched/shathel-core-stack-1.2.3-shathel/post-provision").text == "Done"
-        new File(root, "composed/enriched/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
+        new File(root, "local/enriched/shathel-core-stack-1.2.3-shathel/post-provision").text == "Done"
+        new File(root, "local/enriched/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
         command = stack.createStartCommand()
@@ -126,7 +133,9 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         then:
         stack.createStartCommand().commands.size() == 2
 
+
         onEnd()
+
     }
 
 

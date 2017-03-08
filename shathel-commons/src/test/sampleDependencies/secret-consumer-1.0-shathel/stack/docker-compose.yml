@@ -1,0 +1,12 @@
+version: "3.1"
+services:
+  service:
+    image: tutum/hello-world
+    secrets:
+      - source: shathel_some_pass
+        target: consumer_password
+
+
+secrets:
+  shathel_some_pass:
+    external: true

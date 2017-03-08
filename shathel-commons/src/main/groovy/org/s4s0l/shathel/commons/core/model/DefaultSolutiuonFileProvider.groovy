@@ -36,7 +36,11 @@ class DefaultSolutiuonFileProvider {
         }
 
         envs.keySet().each { String env ->
-            allParamNames.findAll { it.startsWith("shathel.env.$env.") }.each {
+            allParamNames.findAll {
+                it.startsWith("shathel.env.$env.") &&
+                        !it.toLowerCase().contains("password") &&
+                        !it.toLowerCase().endsWith("_secret_value")
+            }.each {
                 envs[env][it - "shathel.env.$env."] = parameters.getParameter(it).orElseThrow {
                     new RuntimeException("WTF?!")
                 }

@@ -6,9 +6,8 @@ services:
       - 8500:8500
     environment:
       - "CONSUL_BIND_INTERFACE=eth0"
-      - "CONSUL_BIND_INTERFACEXXXXX=eth0"
       - "CONSUL_LOCAL_CONFIG={\"skip_leave_on_interrupt\": true}"
-    command: agent   -server -ui -client=0.0.0.0 -bootstrap-expect=${SHATHEL_ENV_QUORUM} -retry-join=tasks.consul
+    command: agent   -server -ui -client=0.0.0.0 -bootstrap-expect=${SHATHEL_ENV_QUORUM:-1} -retry-join=tasks.consul
     deploy:
       mode: global
       update_config:

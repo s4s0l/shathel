@@ -17,6 +17,9 @@ class DefaultSolutiuonFileProviderTest extends Specification {
                 'shathel.env.extraenv.net' : '0.0.0',
                 'shathel.env.xxxx.net'     : '10.10.10',
                 'shathel.env.dev.net'      : '0.0.0',
+                'shathel.env.dev.safePassword' : 'aaaa',
+                'shathel.env.dev.shathel_some_secret_path' : 'aaaa',
+                'shathel.env.dev.shathel_some_secret_value' : 'aaaa'
 
         ])
 
@@ -31,6 +34,9 @@ class DefaultSolutiuonFileProviderTest extends Specification {
         yaml['shathel-solution']['environments']['extraenv'].net == "0.0.0"
         yaml['shathel-solution']['environments']['xxxx'] == null
         yaml['shathel-solution']['environments']['dev'].net == "0.0.0"
+        yaml['shathel-solution']['environments']['dev'].safePassword == null
+        yaml['shathel-solution']['environments']['dev'].shathel_some_secret_path == 'aaaa'
+        yaml['shathel-solution']['environments']['dev'].shathel_some_secret_value == null
 
 
     }

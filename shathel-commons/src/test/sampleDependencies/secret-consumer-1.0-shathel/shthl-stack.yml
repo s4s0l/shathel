@@ -1,0 +1,6 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:secret-consumer:1.0
+  dependencies:
+    org.s4s0l.shathel:secret-provider:1.0:
+

@@ -9,19 +9,21 @@ import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
 import spock.lang.Specification
+import testutils.BaseIntegrationTest
 
 /**
  * @author Matcin Wielgus
  */
 class VBoxEnvironmentTest
-        extends Specification {
+        extends BaseIntegrationTest {
 
-    def setupSpec() {
-        cleanOnEnd()
-        FileUtils.deleteDirectory(new File(getRootDir()));
+    @Override
+    def setupEnvironment() {
+        environmentName = "itg"
+        network = "214.214.214"
     }
 
-    boolean cleanOnEnd() {
+    def cleanupEnvironment() {
         def file = new File(getRootDir(), "itg/settings")
         if (file.exists()) {
             def wrapper = new DockerMachineWrapper(file)
@@ -35,10 +37,10 @@ class VBoxEnvironmentTest
 
     def "Run stack in vbox integration test"() {
         given:
-        File root = new File(getRootDir())
-        def parameters = prepare(root, "sampleDependencies")
+        File root = getRootDir()
+        def parameters = prepare()
         Shathel sht = new Shathel(parameters)
-        def solution = sht.getSolution(sht.initStorage(root,false))
+        def solution = sht.getSolution(sht.initStorage(root, false))
         def environment = solution.getEnvironment("itg")
 
         when:
@@ -58,7 +60,7 @@ class VBoxEnvironmentTest
         stack.run(command)
 
         then:
-        stack.createStartCommand().commands.size()==1
+        stack.createStartCommand().commands.size() == 1
 
         when:
         def stopCommand = stack.createStopCommand(true)
@@ -72,35 +74,9 @@ class VBoxEnvironmentTest
         then:
         stack.createStartCommand().commands.size() == 2
 
-        cleanOnEnd()
+        onEnd()
     }
 
-    private String getRootDir() {
-        "build/Test${getClass().getSimpleName()}"
-    }
-
-    private String getClusterName() {
-        return getClass().getSimpleName()
-    }
-
-
-    Parameters prepare(File root, String sourceDir) {
-        File src = new File("src/test/$sourceDir")
-        def deps = new File(root, ".dependency-cache")
-        deps.mkdirs()
-        Parameters parameters = MapParameters.builder()
-                .parameter("shathel.env.itg.safePassword", "MySecretPassword")
-                .parameter("shathel.env.itg.net", "20.20.21")
-                .build()
-        src.listFiles()
-                .findAll { it.isDirectory() }
-                .findAll { !new File(deps, "${it.getName()}.zip").exists() }
-                .each {
-            IoUtils.zipIt(it,
-                    new File(deps, "${it.getName()}.zip"))
-        }
-        return parameters;
-    }
 
 }
 

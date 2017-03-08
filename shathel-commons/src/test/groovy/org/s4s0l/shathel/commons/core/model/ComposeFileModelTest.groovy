@@ -68,6 +68,7 @@ class ComposeFileModelTest extends Specification {
         x.parsedYml.services.logstash.volumes == ['logstash:./logstash/config:/etc/logstash/conf.d']
         x.parsedYml.services.kibana.volumes == ['kibana:./kibana/config/:/etc/kibana/']
     }
+
     def "Map builds"() {
         given:
         ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
@@ -132,6 +133,84 @@ class ComposeFileModelTest extends Specification {
 
     }
 
+
+    def "Map secrets"() {
+        given:
+        ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
+        services:
+              serviceNoSecrets:
+              serviceEmptySecrets:
+                secrets:
+              service1:
+                  secrets:
+                      - my_first_secret
+                      - my_second_secret
+                      - dummy
+              service2:
+                  secrets:
+                    -   source: my_first_secret
+                        target: targetSecret
+                        uid: '103'
+                        gid: '103'
+                        mode: 0440
+                    -   source: dummy
+                        target: other
+                        uid: '103'
+                        gid: '103'
+                        mode: 0440
+                    -   my_second_secret    
+        secrets:
+            my_first_secret:
+                file: ./secret_data
+            my_second_secret:
+                external: true
+            dummy:
+                file: ./dummy_secret_data       
+        """))
+
+        when:
+        x.mapSecrets { it ->
+            if (it.name == "my_second_secret") {
+                return [name: "my_second_secret_2", external: true]
+            }
+            if (it.name == "my_first_secret") {
+                return [name: "external_my_first_secret2", external: true]
+            }
+            it
+        }
+
+        then:
+        x.yml.secrets.size() == 3
+        x.yml.secrets['dummy'] == [file: './dummy_secret_data']
+        x.yml.secrets['my_second_secret_2'] == [external: true]
+        x.yml.secrets['external_my_first_secret2'] == [external: true]
+
+        x.yml.services.service1.secrets == [
+                [source: 'external_my_first_secret2',
+                 target: 'my_first_secret'],
+                [source: 'my_second_secret_2',
+                 target: 'my_second_secret'],
+                'dummy'
+
+        ]
+
+        x.yml.services.service2.secrets == [
+                [source: 'external_my_first_secret2',
+                 target: 'targetSecret',
+                 uid   : '103',
+                 gid   : '103',
+                 mode  : 0440],
+                [source: 'dummy',
+                 target: 'other',
+                 uid   : '103',
+                 gid   : '103',
+                 mode  : 0440],
+                [source: 'my_second_secret_2',
+                 target: 'my_second_secret']
+
+        ]
+
+    }
 
 
 }

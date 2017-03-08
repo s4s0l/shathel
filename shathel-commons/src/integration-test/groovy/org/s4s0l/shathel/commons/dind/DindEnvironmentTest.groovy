@@ -7,19 +7,19 @@ import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
 import spock.lang.Specification
+import testutils.BaseIntegrationTest
 
 /**
  * @author Matcin Wielgus
  */
-class DindEnvironmentTest extends Specification {
-
-    def setupSpec() {
-        cleanupSpecX();
-        FileUtils.deleteDirectory(new File(getRootDir()));
-
+class DindEnvironmentTest extends BaseIntegrationTest {
+    @Override
+    def setupEnvironment() {
+        environmentName = "dind"
+        network = "223.223.223"
     }
 
-    def cleanupSpecX() {
+    def cleanupEnvironment() {
         new DockerWrapper().with {
             containerRemoveIfPresent("DindTest-dev-manager-1")
             containerRemoveIfPresent("DindTest-dev-manager-2")
@@ -32,15 +32,15 @@ class DindEnvironmentTest extends Specification {
 
     def "Run stack in local docker integration test"() {
         given:
-        File root = new File(getRootDir())
-        def parameters = prepare(root, "sampleDependencies")
+        File root = getRootDir()
+        def parameters = prepare()
         Shathel sht = new Shathel(parameters)
 
         when:
         def storage = sht.initStorage(root, true)
 
         then:
-        new File(root, "shathel-solution.yml").text.contains("name: DindTest")
+        new File(root, "shathel-solution.yml").text.contains("name: ${getClass().getSimpleName()}")
 
 
         when:
@@ -116,30 +116,9 @@ class DindEnvironmentTest extends Specification {
 //        then:
 //        stack.createStartCommand().commands.size() == 2
 
-        cleanupSpecX()
+        onEnd()
 
     }
 
-    private GString getRootDir() {
-        "build/Test${getClass().getSimpleName()}"
-    }
 
-
-    Parameters prepare(File root, String sourceDir) {
-        File src = new File("src/test/$sourceDir")
-        def deps = new File(root, "deps")
-        deps.mkdirs()
-        Parameters parameters = MapParameters.builder()
-                .parameter("shathel.env.dev.dependenciesDir", deps.absolutePath)
-                .parameter("shathel.solution.name", "DindTest")
-                .parameter("shathel.env.dev.net", "22.22.22")
-                .build()
-        src.listFiles()
-                .findAll { it.isDirectory() }
-                .each {
-            IoUtils.zipIt(it,
-                    new File(deps, "${it.getName()}.zip"))
-        }
-        return parameters;
-    }
 }
