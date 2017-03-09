@@ -51,8 +51,11 @@ class SwarmClusterCreatorTest extends Specification {
         Mockito.when(storage.getTemptDirectory(Mockito.any(), Mockito.anyString())).thenReturn(tempDir())
 
         EnvironmentDescription desc = new EnvironmentDescription(MapParameters.builder().build(), "xxx", "vbox", [:])
+        def context = new EnvironmentContext(new ExtensionContext(), desc, null, null, storage);
+        def wrapper = new MachineSwarmClusterWrapper(context)
         SwarmClusterCreator c = new SwarmClusterCreator(
-                new MachineSwarmClusterWrapper(new EnvironmentContext(new ExtensionContext(), desc, null, null, storage), new VBoxMachineSwarmClusterFlavour()),
+                wrapper,
+                new VBoxMachineNodeCreator(wrapper.getWrapper(), context),
                 new File(getRootDir()),
                 "$clusterName", 2, 1, "20.20.20")
         when:

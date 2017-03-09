@@ -21,11 +21,11 @@ class DindEnvironmentTest extends BaseIntegrationTest {
 
     def cleanupEnvironment() {
         new DockerWrapper().with {
-            containerRemoveIfPresent("DindTest-dev-manager-1")
-            containerRemoveIfPresent("DindTest-dev-manager-2")
-            containerRemoveIfPresent("DindTest-dev-worker-1")
-            if (networkExistsByFilter("name=shathel-dindtest-dev"))
-                networkRemove("shathel-dindtest-dev")
+            containerRemoveIfPresent("DindEnvironmentTest-dev-manager-1")
+            containerRemoveIfPresent("DindEnvironmentTest-dev-manager-2")
+            containerRemoveIfPresent("DindEnvironmentTest-dev-worker-1")
+            if (networkExistsByFilter("name=shathel-dindenvironmenttest-dev"))
+                networkRemove("shathel-dindenvironmenttest-dev")
         }
         true
     }
@@ -58,9 +58,9 @@ class DindEnvironmentTest extends BaseIntegrationTest {
             environment.start()
         }
         then:
-        new DockerWrapper().containerRunning("DindTest-dev-manager-1")
-        new DockerWrapper().containerRunning("DindTest-dev-manager-2")
-        new DockerWrapper().containerRunning("DindTest-dev-worker-1")
+        new DockerWrapper().containerRunning("DindEnvironmentTest-dev-manager-1")
+        new DockerWrapper().containerRunning("DindEnvironmentTest-dev-manager-2")
+        new DockerWrapper().containerRunning("DindEnvironmentTest-dev-worker-1")
 //        new DockerWrapper(new ExecWrapper("docker --host " + new DockerWrapper().containerGetIpInNetwork("DindTest-dev-manager-1", "shathel-dindtest-dev"))).swarmActive()
 //        new DockerWrapper(new ExecWrapper("docker --host " + new DockerWrapper().containerGetIpInNetwork("DindTest-dev-manager-2", "shathel-dindtest-dev"))).swarmActive()
 //        new DockerWrapper(new ExecWrapper("docker --host " + new DockerWrapper().containerGetIpInNetwork("DindTest-dev-worker-1", "shathel-dindtest-dev"))).swarmActive()

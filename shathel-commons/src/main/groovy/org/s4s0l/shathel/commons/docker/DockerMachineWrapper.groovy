@@ -13,8 +13,8 @@ class DockerMachineWrapper {
 
     final ExecWrapper exec;
 
-    DockerMachineWrapper(File staorageDir) {
-        exec = new ExecWrapper(LOGGER, "docker-machine -s ${staorageDir.absolutePath}")
+    DockerMachineWrapper(File storageDir) {
+        exec = new ExecWrapper(LOGGER, "docker-machine -s ${storageDir.absolutePath}")
     }
 
     DockerMachineWrapper() {
@@ -133,7 +133,6 @@ class DockerMachineWrapper {
      * @return
      */
     Map<String, Map<String, String>> getMachines() {
-        //TODO parsowac jsona nie output!!
         def output = exec.executeForOutput("ls", "--format",  """{ "name":"{{.Name}}","driver":"{{.DriverName}}", "state":"{{.State}}" }""")
         def json = DockerWrapper.fixPsOutToJson(output)
         json.collectEntries {

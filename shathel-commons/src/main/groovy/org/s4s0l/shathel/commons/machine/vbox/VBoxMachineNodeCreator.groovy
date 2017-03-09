@@ -1,19 +1,26 @@
 package org.s4s0l.shathel.commons.machine.vbox
 
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
-import org.s4s0l.shathel.commons.machine.MachineSwarmClusterFlavour
-import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
+import org.s4s0l.shathel.commons.swarm.SwarmNodeCreator
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * @author Matcin Wielgus
  */
-class VBoxMachineSwarmClusterFlavour implements MachineSwarmClusterFlavour {
-    private static
-    final Logger LOGGER = LoggerFactory.getLogger(VBoxMachineSwarmClusterFlavour.class);
+class VBoxMachineNodeCreator implements SwarmNodeCreator{
 
-    @Override
+    private static final Logger LOGGER = LoggerFactory.getLogger(VBoxMachineNodeCreator.class);
+    private final DockerMachineWrapper wrapper;
+    private final EnvironmentContext environmentContext;
+
+    VBoxMachineNodeCreator(DockerMachineWrapper wrapper, EnvironmentContext environmentContext) {
+        this.wrapper = wrapper
+        this.environmentContext = environmentContext
+    }
+
+
     String getMachineOpts(NetworkSettings ns) {
         "-d virtualbox --virtualbox-hostonly-cidr=${ns.getCidr(254)} --virtualbox-disk-size=20000 " +
                 "--virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v1.13.1/boot2docker.iso"
@@ -25,12 +32,12 @@ class VBoxMachineSwarmClusterFlavour implements MachineSwarmClusterFlavour {
  * @param ipNum
  * @return
  */
-    SwarmClusterWrapper.CreationResult staticIp(DockerMachineWrapper wrapper, File tmpDir, String machineName, NetworkSettings ns, int ipNum) {
+    SwarmNodeCreator.CreationResult staticIp( File tmpDir, String machineName, NetworkSettings ns, int ipNum) {
         boolean modified = false;
         wrapper.sudo(machineName, "touch /var/lib/boot2docker/bootsync.sh")
         String sudo = wrapper.sudo(machineName, "cat /var/lib/boot2docker/bootsync.sh")
         if (sudo.contains("#SHATHELIP_START")) {
-            return new SwarmClusterWrapper.CreationResult((sudo =~ /#IP=([0-9\.]+)#/)[0][1], false);
+            return new SwarmNodeCreator.CreationResult((sudo =~ /#IP=([0-9\.]+)#/)[0][1], false);
         }
         def address = ns.getAddress(ipNum)
         LOGGER.info "Fixing ip address for ${machineName} to be ${address}"
@@ -54,6 +61,20 @@ class VBoxMachineSwarmClusterFlavour implements MachineSwarmClusterFlavour {
             file.delete()
         }
 
-        return new SwarmClusterWrapper.CreationResult(address, modified)
+        return new SwarmNodeCreator.CreationResult(address, modified)
+    }
+
+
+
+    @Override
+    SwarmNodeCreator.CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost) {
+        boolean modified = false
+        if (wrapper.getMachinesByName(machineName).isEmpty()) {
+            String MACHINE_OPTS = getMachineOpts(ns)
+            wrapper.create("${MACHINE_OPTS} --engine-registry-mirror ${registryMirrorHost} $machineName")
+            modified = true
+        }
+        def ip = staticIp( environmentContext.getTempDirectory(), machineName, ns, expectedIp)
+        return new SwarmNodeCreator.CreationResult(ip.ip, modified || ip.modified)
     }
 }

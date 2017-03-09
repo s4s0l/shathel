@@ -69,14 +69,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
     }
 
 
-    /**
-     * @param machineName        name of machine
-     * @param ns                 network setting s to use for ip generation
-     * @param expectedIp         number to pass to ns to get ip address
-     * @param registryMirrorHost url to registry mirror to set in engine daemon
-     * @return ip of machine created
-     */
-    CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost);
+
 
     default boolean isInitialized(int managersCount, int workersCount) {
         return getNodeNames().size() >= managersCount + workersCount;
@@ -91,23 +84,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
     }
 
 
-    class CreationResult {
-        private final String ip;
-        private final boolean modified;
 
-        public CreationResult(String ip, boolean modified) {
-            this.ip = ip;
-            this.modified = modified;
-        }
-
-        public String getIp() {
-            return ip;
-        }
-
-        public boolean isModified() {
-            return modified;
-        }
-    }
 
     class Node {
         private final String name;

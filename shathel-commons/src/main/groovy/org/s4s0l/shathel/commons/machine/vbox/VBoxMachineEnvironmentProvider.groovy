@@ -29,9 +29,11 @@ class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
         def machineSettingsImporterExporter = new VBoxMachineSettingsImporterExporter(environmentContext.getTempDirectory())
 
         MachineSwarmClusterWrapper clusterWrapper = new MachineSwarmClusterWrapper(
-                environmentContext, new VBoxMachineSwarmClusterFlavour())
+                environmentContext)
+
+        VBoxMachineNodeCreator nodeCreator = new VBoxMachineNodeCreator(clusterWrapper.getWrapper(), environmentContext)
 
         return new SwarmEnvironment(environmentContext, machineSettingsImporterExporter,
-                clusterWrapper, new SwarmNodeProvisioner( clusterWrapper))
+                clusterWrapper, new SwarmNodeProvisioner( clusterWrapper,nodeCreator))
     }
 }

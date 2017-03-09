@@ -13,16 +13,17 @@ import org.slf4j.LoggerFactory
  */
 class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     private final EnvironmentContext environmentContext;
-    private final MachineSwarmClusterFlavour clusterFlavour;
 
-    MachineSwarmClusterWrapper(EnvironmentContext environmentContext, MachineSwarmClusterFlavour clusterFlavour) {
+
+    MachineSwarmClusterWrapper(EnvironmentContext environmentContext) {
         this.environmentContext = environmentContext
-        this.clusterFlavour = clusterFlavour
     }
+
     @Override
     EnvironmentContext getEnvironmentContext() {
         return environmentContext;
     }
+
     DockerMachineWrapper getWrapper() {
         return new DockerMachineWrapper(environmentContext.getSettingsDirectory());
     }
@@ -84,7 +85,7 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
                     machines.name,
                     machines.state == "Running",
                     getDocker(nodeName).isReachable())
-        }catch(Exception e){
+        } catch (Exception e) {
             //todo log?
             LOGGER.trace("Not neccecary an error", e);
             return new SwarmClusterWrapper.Node(
@@ -113,10 +114,10 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
             }
             cont = getWrapper().sudo(node, "cat /var/lib/boot2docker/profile")
             if (cont.contains("sysctl -w ${name}=")) {
-                getWrapper().exec.executeForOutput(null,new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
                         "\"sed -i.bak s/sysctl\\ -w\\ ${name}=.*/sysctl\\ -w\\ $param/g /var/lib/boot2docker/profile\"")
             } else {
-                getWrapper().exec.executeForOutput(null,new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
                         "\"echo 'sysctl -w $param' >> /var/lib/boot2docker/profile\"")
             }
 
@@ -134,18 +135,6 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         LOGGER.info(msg)
     }
 
-    @Override
-    SwarmClusterWrapper.CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost) {
-        log "Create node named $machineName"
-        boolean modified = false
-        if (getWrapper().getMachinesByName(machineName).isEmpty()) {
-            String MACHINE_OPTS = clusterFlavour.getMachineOpts(ns)
-            getWrapper().create("${MACHINE_OPTS} --engine-registry-mirror ${registryMirrorHost} $machineName")
-            modified = true
-        }
-        def ip = clusterFlavour.staticIp(getWrapper(), environmentContext.getTempDirectory(), machineName, ns, expectedIp)
-        return new SwarmClusterWrapper.CreationResult(ip.ip, modified || ip.modified)
-    }
 
     @Override
     Map<String, String> getDockerEnvs(String node) {

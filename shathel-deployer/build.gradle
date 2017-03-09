@@ -29,6 +29,7 @@ dependencies {
     compile "org.apache.maven:maven-aether-provider:${mavenVersion}"
     compile "org.apache.maven.wagon:wagon-ssh:${wagonVersion}"
     compile project(":shathel-commons")
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'org.beryx:text-io:1.7.0'
     compile 'jline:jline:2.14.3'
     compile('org.springframework.shell:spring-shell:1.2.0.M1') {

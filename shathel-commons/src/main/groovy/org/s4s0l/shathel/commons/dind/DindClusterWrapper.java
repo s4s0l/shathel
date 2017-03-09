@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
+import org.s4s0l.shathel.commons.swarm.SwarmNodeCreator;
 import org.s4s0l.shathel.commons.utils.ExecWrapper;
 import org.slf4j.Logger;
 
@@ -17,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Matcin Wielgus
  */
-public class DindClusterWrapper implements SwarmClusterWrapper {
+public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator {
     private static final Logger LOGGER = getLogger(DindClusterWrapper.class);
 
     private final EnvironmentContext context;
@@ -131,7 +132,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
     }
 
     @Override
-    public CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost) {
+    public SwarmNodeCreator.CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost) {
         boolean modified = false;
         if (!getLocalWrapper().networkExistsByFilter("name=" + getNetworkName())) {
             getLocalWrapper().networkCreate(getNetworkName(), ns.getCidr(0));
@@ -149,7 +150,7 @@ public class DindClusterWrapper implements SwarmClusterWrapper {
             modified = true;
         }
         getLocalWrapper().containerStart(machineName);
-        return new CreationResult(getIp(machineName), modified);
+        return new SwarmNodeCreator.CreationResult(getIp(machineName), modified);
     }
 
     @Override

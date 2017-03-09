@@ -13,7 +13,6 @@ import org.s4s0l.shathel.commons.swarm.SwarmNodeProvisioner;
 public class DindEnvironmentProvider implements EnvironmentProvider {
 
 
-
     @Override
     public String getType() {
         return "dind";
@@ -24,6 +23,6 @@ public class DindEnvironmentProvider implements EnvironmentProvider {
         DefaultSettingsImporterExporter machineSettingsImporterExporter = new DefaultSettingsImporterExporter();
         DindClusterWrapper clusterWrapper = new DindClusterWrapper(environmentContext);
         return new SwarmEnvironment(environmentContext, machineSettingsImporterExporter,
-                clusterWrapper, new SwarmNodeProvisioner( clusterWrapper));
+                clusterWrapper, new SwarmNodeProvisioner(clusterWrapper, clusterWrapper));
     }
 }

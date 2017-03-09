@@ -10,19 +10,21 @@ import org.slf4j.LoggerFactory
  */
 class SwarmClusterCreator {
 
-    private final String CLUSTER_NAME
+    private final String clusterName
     private final int numberOfManagers
     private final int numberOfWorkers
-    private final NetworkSettings ns
+    private final NetworkSettings networkSettings
     private final String tmpDir
     private final SwarmClusterWrapper swarmClusterWrapper;
+    private final SwarmNodeCreator swarmNodeCreator;
 
-    SwarmClusterCreator(SwarmClusterWrapper swarmClusterWrapper, File workDir, String clusterName, int numberOfManagers, int numberOfWorkers, String net) {
-        this.CLUSTER_NAME = clusterName
+    SwarmClusterCreator(SwarmClusterWrapper swarmClusterWrapper, SwarmNodeCreator swarmNodeCreator,File workDir, String clusterName, int numberOfManagers, int numberOfWorkers, String net) {
+        this.clusterName = clusterName
         this.swarmClusterWrapper = swarmClusterWrapper
         this.numberOfManagers = numberOfManagers
         this.numberOfWorkers = numberOfWorkers
-        ns = new NetworkSettings(net)
+        this.swarmNodeCreator = swarmNodeCreator
+        networkSettings = new NetworkSettings(net)
         tmpDir = workDir.with {
             mkdirs()
             absolutePath
@@ -38,49 +40,49 @@ class SwarmClusterCreator {
         modified = false;
         int currentIp = 99
 
-        SwarmClusterWrapper.CreationResult cr = swarmClusterWrapper.createNodeIfNotExists("${CLUSTER_NAME}-manager-1", ns, currentIp--, "https://${CLUSTER_NAME}-manager-1:4001")
+        SwarmNodeCreator.CreationResult cr = swarmNodeCreator.createNodeIfNotExists("${clusterName}-manager-1", networkSettings, currentIp--, "https://${clusterName}-manager-1:4001")
         String MANAGER_IP = cr.ip
         modified = modified || cr.modified
 
 
-        startRegistries("${CLUSTER_NAME}-manager-1", MANAGER_IP)
+        startRegistries("${clusterName}-manager-1", MANAGER_IP)
 
-        initSwarm("${CLUSTER_NAME}-manager-1", MANAGER_IP)
-        swarmClusterWrapper.labelNode("${CLUSTER_NAME}-manager-1", "${CLUSTER_NAME}-manager-1", [
-                "shathel.node.main":"true",
-                "shathel.node.name":"manager-1"
+        initSwarm("${clusterName}-manager-1", MANAGER_IP)
+        swarmClusterWrapper.labelNode("${clusterName}-manager-1", "${clusterName}-manager-1", [
+                "shathel.node.main": "true",
+                "shathel.node.name": "manager-1"
         ])
 
         log "Saving tokens"
-        String manager_token = swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").swarmTokenForManager()
-        String worker_token = swarmClusterWrapper.getDocker("${CLUSTER_NAME}-manager-1").swarmTokenForWorker()
+        String manager_token = swarmClusterWrapper.getDocker("${clusterName}-manager-1").swarmTokenForManager()
+        String worker_token = swarmClusterWrapper.getDocker("${clusterName}-manager-1").swarmTokenForWorker()
 
 
         (numberOfManagers < 2 ? [] : 2..numberOfManagers).each { n ->
-            String nodeName = "${CLUSTER_NAME}-manager-${n}"
-            cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
+            String nodeName = "${clusterName}-manager-${n}"
+            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, "https://${MANAGER_IP}:4001")
 
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)
             joinSwarm(nodeName, ip, manager_token, MANAGER_IP)
             swarmClusterWrapper.labelNode(nodeName, [
-                    "shathel.node.main":"false",
-                    "shathel.node.name":"manager-${n}"
+                    "shathel.node.main": "false",
+                    "shathel.node.name": "manager-${n}"
             ])
         }
 
         (numberOfWorkers < 1 ? [] : 1..numberOfWorkers).each { n ->
-            String nodeName = "${CLUSTER_NAME}-worker-${n}"
-            cr = swarmClusterWrapper.createNodeIfNotExists(nodeName, ns, currentIp--, "https://${MANAGER_IP}:4001")
+            String nodeName = "${clusterName}-worker-${n}"
+            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, "https://${MANAGER_IP}:4001")
 
             def ip = cr.ip
             modified = modified || cr.modified
             distributeKeys(nodeName, MANAGER_IP)
             joinSwarm(nodeName, ip, worker_token, MANAGER_IP)
             swarmClusterWrapper.labelNode(nodeName, [
-                    "shathel.node.main":"false",
-                    "shathel.node.name":"worker-${n}"
+                    "shathel.node.main": "false",
+                    "shathel.node.name": "worker-${n}"
             ])
 
         }
@@ -198,7 +200,7 @@ class SwarmClusterCreator {
     private String generateKeyPair(String MANAGER_IP, File keyFile, File crtFile) {
         markModified()
         new OpenSslWrapper().generateKeyPair(MANAGER_IP, [MANAGER_IP],
-                ["${CLUSTER_NAME}-manager-1", "dregistry.${CLUSTER_NAME}"],
+                ["${clusterName}-manager-1", "dregistry.${clusterName}"],
                 "${keyFile.absolutePath}",
                 "${crtFile.absolutePath}")
     }
