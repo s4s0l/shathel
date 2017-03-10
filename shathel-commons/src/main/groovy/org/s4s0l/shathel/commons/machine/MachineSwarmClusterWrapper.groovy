@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.machine
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.docker.DockerMachineCachingWrapper
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings
@@ -13,10 +14,11 @@ import org.slf4j.LoggerFactory
  */
 class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     private final EnvironmentContext environmentContext;
-
+    private final DockerMachineWrapper dockerMachineWrapper;
 
     MachineSwarmClusterWrapper(EnvironmentContext environmentContext) {
         this.environmentContext = environmentContext
+        this.dockerMachineWrapper = new DockerMachineCachingWrapper(environmentContext.getSettingsDirectory())
     }
 
     @Override
@@ -24,21 +26,27 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         return environmentContext;
     }
 
+    @Override
+    Map<String, SwarmClusterWrapper.Node> getAllNodes() {
+        getWrapper().getMachines().collectEntries {
+            [
+                    (it.key):
+                            new SwarmClusterWrapper.Node(
+                                    it.value.name,
+                                    it.value.isRunning(),
+                                    it.value.docker,
+                                    it.value.swarmInfo,
+                                    it.value.ip,
+                                    it.value.envs
+                            )
+            ]
+        }
+    }
+
     DockerMachineWrapper getWrapper() {
-        return new DockerMachineWrapper(environmentContext.getSettingsDirectory());
+        return dockerMachineWrapper
     }
 
-    @Override
-    List<String> getNodeNames() {
-        def collect = getWrapper().getMachines().collect { it.key }
-        Collections.sort(collect)
-        return collect;
-    }
-
-    @Override
-    String getIp(String nodeName) {
-        return getWrapper().getIp(nodeName);
-    }
 
     @Override
     void start(String node) {
@@ -77,24 +85,6 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         return "/mnt/sda1/shathel-data";
     }
 
-    @Override
-    SwarmClusterWrapper.Node getNode(String nodeName) {
-        try {
-            def machines = getWrapper().getMachines()[nodeName]
-            return new SwarmClusterWrapper.Node(
-                    machines.name,
-                    machines.state == "Running",
-                    getDocker(nodeName).isReachable())
-        } catch (Exception e) {
-            //todo log?
-            LOGGER.trace("Not neccecary an error", e);
-            return new SwarmClusterWrapper.Node(
-                    nodeName,
-                    false,
-                    false);
-        }
-
-    }
 
     String getNonRootUser() {
         return "docker"
@@ -124,10 +114,7 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         }
     }
 
-    @Override
-    DockerWrapper getDocker(String node) {
-        return getWrapper().getDockerWrapperOn(node)
-    }
+
     private static
     final Logger LOGGER = LoggerFactory.getLogger(MachineSwarmClusterWrapper.class);
 
@@ -135,10 +122,5 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         LOGGER.info(msg)
     }
 
-
-    @Override
-    Map<String, String> getDockerEnvs(String node) {
-        return getWrapper().getMachineEnvs(node)
-    }
 
 }

@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.docker
 
+import org.apache.commons.lang.StringUtils
 import org.s4s0l.shathel.commons.utils.ExecWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,7 +34,7 @@ class DockerMachineWrapper {
                 "scp $from $to");
     }
 
-    Map<String, String> getMachineEnvs(String machineName) {
+    Map<String, String> getMachineEnvironments(String machineName) {
         def output = exec.executeForOutput("env ${machineName}")
         [
                 DOCKER_CERT_PATH   : (output =~ /[^\s]+ DOCKER_CERT_PATH="(.+)"/),
@@ -78,21 +79,6 @@ class DockerMachineWrapper {
                 "create $string");
     }
 
-    String getIp(String node) {
-        exec.executeForOutput(new File("."),
-                "ip $node")
-    }
-
-    /**
-     * gets all machine names for given name filter pattern
-     * @param machineNamePattern
-     * @return
-     */
-    List<String> getMachinesByName(String machineNamePattern) {
-        exec.executeForOutput("ls -q --filter name=${machineNamePattern}")
-                .split("\n")
-                .findAll { it != "" }
-    }
     /**
      * Forcibly removes machine
      * @param machineName
@@ -129,19 +115,40 @@ class DockerMachineWrapper {
 
     /**
      * returns docker-machine ls statuses
-     * name -> name|driver|state
+     * name -> name|driver|state|url|envs|ip
      * @return
      */
-    Map<String, Map<String, String>> getMachines() {
-        def output = exec.executeForOutput("ls", "--format",  """{ "name":"{{.Name}}","driver":"{{.DriverName}}", "state":"{{.State}}" }""")
+    Map<String, DockerMachineNode> getMachines() {
+        def output = exec.executeForOutput("ls", "--format",
+                """{ "name":"{{.Name}}","driver":"{{.DriverName}}", "state":"{{.State}}", "url":"{{.URL}}","version":"{{.DockerVersion}}" }""")
         def json = DockerWrapper.fixPsOutToJson(output)
+        def resolveIpFromUrl = {
+            String url ->
+                if (StringUtils.isEmpty(url)) {
+                    return ""
+                }
+                def a = url =~ /(\d+\.){3}\d+/
+                if (a.find()) {
+                    return a[0][0]
+                }
+                return ""
+        }
         json.collectEntries {
-            [(it.name):
-                     [
-                             name  : it.name,
-                             driver: it.driver,
-                             state : it.state
-                     ]]
+            def running = "Running" == it.state
+            def envs = running ? getMachineEnvironments(it.name) : [:]
+            def dockerWrapper = running ? new DockerWrapper(new ExecWrapper(LOGGER, 'docker', envs)) : null
+            def info = running ? new DockerInfoWrapper(dockerWrapper.daemonInfo(), it.name) : null
+            [(it.name): new DockerMachineNode(
+                     it.name,
+                    it.driver,
+                    it.state,
+                    it.url,
+                    it.version,
+                    envs,
+                    resolveIpFromUrl(it.url),
+                    info,
+                    dockerWrapper
+            )]
         }
     }
 

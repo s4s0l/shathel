@@ -53,6 +53,7 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         //        SIDEKICK INSTALLATION
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
+        stack.getStackContext()
 
         then:
         stack != null
@@ -74,7 +75,7 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
 
         when:
         stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-
+        stack.getStackContext()
         then:
         stack != null
         new File(dependenciesDir, "dummy-2.0-shathel").isDirectory()

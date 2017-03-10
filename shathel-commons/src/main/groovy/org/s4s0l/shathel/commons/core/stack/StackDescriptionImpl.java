@@ -95,4 +95,13 @@ public class StackDescriptionImpl implements StackDescription {
                                 d.getGroup().equals(reference.getGroup()))
                 .findAny().isPresent();
     }
+
+    @Override
+    public String toString() {
+        return "StackDescriptionImpl{" +
+                "group='" + getGroup() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", version='" + getVersion() + '\'' +
+                '}';
+    }
 }

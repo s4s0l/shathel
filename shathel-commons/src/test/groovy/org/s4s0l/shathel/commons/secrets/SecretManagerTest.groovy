@@ -34,7 +34,7 @@ class SecretManagerTest
         }
     }
 
-    def "Run stack in local swarm integration test"() {
+    def "Secret updates should restart dependant services"() {
         given:
         Shathel sht = new Shathel(prepare())
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))

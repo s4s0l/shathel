@@ -19,7 +19,7 @@ import spock.lang.Specification
 class SwarmClusterCreatorTest extends Specification {
     def setupSpec() {
         new DockerMachineWrapper(settingsDir()).with {
-            getMachinesByName("$clusterName-.*").each { remove(it) }
+            getMachines().each { remove(it.key) }
         }
         FileUtils.deleteDirectory(new File(getRootDir()))
     }
@@ -61,7 +61,9 @@ class SwarmClusterCreatorTest extends Specification {
         when:
         c.createMachines()
         then:
-        new DockerMachineWrapper(new File(getRootDir(), "settings")).getMachinesByName("$clusterName-.*").sort() ==
+        new DockerMachineWrapper(new File(getRootDir(), "settings")).getMachines().collect {
+            it.key
+        }.sort() ==
                 ["$clusterName-manager-1", "$clusterName-manager-2",
                  "$clusterName-worker-1"]
 

@@ -22,7 +22,7 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
     }
 
     @Override
-    public Optional<StackIntrospection> getIntrospection(StackReference reference) {
+    public Optional<StackIntrospection> getStackIntrospection(StackReference reference) {
         List<Map<String, String>> oneByFilter = getByFilter("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
         if (oneByFilter.isEmpty()) {
             return Optional.empty();
@@ -34,11 +34,20 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
     private StackIntrospection getStackIntrospection(List<Map<String, String>> oneByFilter) {
         StackIntrospectionResolver resolver = new StackIntrospectionResolver(oneByFilter);
         String o = resolver.getGav();
-        return new StackIntrospection(new StackReference(o), resolver.getShathelLabels());
+        List<StackIntrospection.Service> services = getServicesFromOneStackLabels(resolver);
+
+        return new StackIntrospection(new StackReference(o), services, resolver.getShathelLabels());
+    }
+
+    protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
+        return resolver.getLabelValues("com.docker.compose.service")
+                    .entrySet().stream()
+                    .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
+                    .collect(Collectors.toList());
     }
 
     @Override
-    public List<StackIntrospection> getAllStacks() {
+    public StackIntrospections getAllStacks() {
         List<Map<String, String>> oneByFilter = getByFilter("label=org.shathel.stack.marker=true");
         Map<String, List<Map<String, String>>> collect = oneByFilter.stream().collect(
                 Collectors.groupingBy(x -> x.get("org.shathel.stack.ga"),
@@ -48,7 +57,7 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
         List<StackIntrospection> ret=  collect.entrySet().stream()
                 .map(x -> getStackIntrospection(x.getValue()))
                 .collect(Collectors.toList());
-        return ret;
+        return new StackIntrospections(ret);
 
     }
 }

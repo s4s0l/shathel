@@ -39,7 +39,7 @@ class VBoxMachineSettingsImporterExporterTest extends Specification {
 
 
         new DockerMachineWrapper(srcDir).create("-d virtualbox machineMovingTest")
-        MachineSettingsImporterExporter ie = new VBoxMachineSettingsImporterExporter(new File("${getRootDir()}/tmp"))
+        MachineSettingsImporterExporter ie = new VBoxMachineSettingsImporterExporter(new File("${getRootDir()}/tmp"),new DockerMachineWrapper(srcDir))
         File saved = new File("${getRootDir()}/saved.zip")
         saved.createNewFile()
 

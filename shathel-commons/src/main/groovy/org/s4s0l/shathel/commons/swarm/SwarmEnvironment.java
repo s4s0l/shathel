@@ -122,8 +122,8 @@ public class SwarmEnvironment implements Environment {
         List<DockerInfoWrapper> machines = swarmClusterWrapper.getNodeNames()
                 .stream()
                 .map(swarmClusterWrapper::getNode)
-                .filter(x -> x.isStarted() || x.isReachable())
-                .map(x -> new DockerInfoWrapper(swarmClusterWrapper.getDocker(x.getName()).daemonInfo(), x.getName()))
+                .filter(x -> x.isStarted())
+                .map(x -> x.getSwarmInfo())
                 .collect(Collectors.toList());
 
         //can we ssh to theese dockers
@@ -184,7 +184,7 @@ public class SwarmEnvironment implements Environment {
         return Arrays.asList(
                 new SwarmMountingPermissionsEnricher(swarmClusterWrapper),
                 new SwarmMountingEnricher(swarmClusterWrapper),
-                new SwarmBuildingEnricher( repository),
+                new SwarmBuildingEnricher(repository),
                 new SwarmPullingEnricher(swarmClusterWrapper),
                 new SecretsEnricher()
         );

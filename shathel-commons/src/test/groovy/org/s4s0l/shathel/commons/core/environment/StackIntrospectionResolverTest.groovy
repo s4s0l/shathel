@@ -28,5 +28,23 @@ class StackIntrospectionResolverTest extends Specification {
         rlabels == labels
     }
 
+    def "Should collect distinct label names"() {
+        given:
+        def labels = ["org.shathel.stack.a"  : 1,
+                      "org.shathel.stack.ga" : "GA",
+                      "org.shathel.stack.gav": "GAV",
+                        "com.docker.compose.service" : "service1",
+                      "org.shathel.stack.b"  : 1]
+        StackIntrospectionResolver resolver = new StackIntrospectionResolver([
+                labels, [:] <<labels, ([:] << labels) << ["com.docker.compose.service" : "service2"]
+        ])
+
+        when:
+        def ga = resolver.getLabelValues("com.docker.compose.service")
+
+        then:
+        ga == ["service1":2, "service2":1]
+    }
+
 
 }

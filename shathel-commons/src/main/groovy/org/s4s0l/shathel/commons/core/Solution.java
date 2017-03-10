@@ -63,17 +63,14 @@ public class Solution {
     public Stack openStack(Environment e, StackReference reference) {
         e.verify();
         DependencyManager dependencyManager = getDependencyManager(e);
-        StackTreeDescription stackDescriptionTree = dependencyManager.downloadDependencies(reference);
-        List<StackDescription> sidekicks = dependencyManager.getSidekicks(stackDescriptionTree);
-        return new Stack(stackDescriptionTree, sidekicks, e);
+        return new Stack(reference, dependencyManager, e);
     }
 
     private DependencyManager getDependencyManager(Environment e) {
         Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");
-        StackIntrospectionProvider stackIntrospectionProvider = e.getIntrospectionProvider();
         return new DependencyManager(
                 e.getEnvironmentContext().getDependencyCacheDirectory(),
-                extensionContext.lookupOne(DependencyDownloader.class).get(), stackIntrospectionProvider, forceful.orElse(false));
+                extensionContext.lookupOne(DependencyDownloader.class).get(), forceful.orElse(false));
     }
 
 

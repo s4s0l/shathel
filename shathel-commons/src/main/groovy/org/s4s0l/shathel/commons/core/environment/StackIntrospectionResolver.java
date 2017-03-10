@@ -14,6 +14,10 @@ public class StackIntrospectionResolver {
         this.map = map;
     }
 
+    public List<Map<String, String>> getMap() {
+        return map;
+    }
+
     public String getGa() {
         List<String> collect = map.stream()
                 .map(x -> x.get("org.shathel.stack.ga"))
@@ -33,6 +37,15 @@ public class StackIntrospectionResolver {
         }
         return collect.get(0);
     }
+
+    public Map<String,Long> getLabelValues(String labelName){
+        return map.stream()
+                .map(x -> x.get(labelName))
+                .collect(Collectors.groupingBy(p -> p,
+                        Collectors.counting()));
+    }
+
+
 
     public  Map<String, String> getShathelLabels() {
         List<Map<String, String>> collect = map.stream().map(x ->

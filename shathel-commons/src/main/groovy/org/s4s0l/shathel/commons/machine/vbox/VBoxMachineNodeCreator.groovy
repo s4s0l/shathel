@@ -69,7 +69,7 @@ class VBoxMachineNodeCreator implements SwarmNodeCreator{
     @Override
     SwarmNodeCreator.CreationResult createNodeIfNotExists(String machineName, NetworkSettings ns, int expectedIp, String registryMirrorHost) {
         boolean modified = false
-        if (wrapper.getMachinesByName(machineName).isEmpty()) {
+        if (wrapper.getMachines()[machineName] == null) {
             String MACHINE_OPTS = getMachineOpts(ns)
             wrapper.create("${MACHINE_OPTS} --engine-registry-mirror ${registryMirrorHost} $machineName")
             modified = true

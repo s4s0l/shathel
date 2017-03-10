@@ -23,46 +23,45 @@ public class DependencyManager {
 
     private final File dependenciesDir;
     private final DependencyDownloader downloader;
-    private final StackIntrospectionProvider introspectionProvider;
+
 
     private final boolean forcefull;
 
-    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, StackIntrospectionProvider introspectionProvider, boolean forcefull) {
+    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, boolean forcefull) {
         this.dependenciesDir = dependenciesDir;
         this.downloader = downloader;
-        this.introspectionProvider = introspectionProvider;
         this.forcefull = forcefull;
 
     }
 
-    private VersionOverrider getOverrider() {
+    private VersionOverrider getOverrider(StackIntrospectionProvider.StackIntrospections stackIntrospections) {
         return desc ->
-                introspectionProvider.getIntrospection(desc)
+                stackIntrospections.getIntrospection(desc)
                         .filter(x -> new VersionComparator().compare(x.getReference().getVersion(), desc.getVersion()) > 0)
                         .map(x -> x.getReference().getVersion())
                         .orElse(desc.getVersion());
     }
 
-    public StackTreeDescription downloadDependencies(StackReference root) {
+    public StackTreeDescription downloadDependencies(StackReference root, StackIntrospectionProvider.StackIntrospections stackIntrospections) {
         StackDescription desc = getStackDescription(dependenciesDir, root, desc1 -> desc1.getVersion());
         StackTreeDescription.Builder builder = StackTreeDescription.builder(desc);
-        addDependencies(desc, builder);
+        addDependencies(desc, builder, stackIntrospections);
         return builder.build();
     }
 
-    public List<StackDescription> getSidekicks(StackTreeDescription tree) {
-        return introspectionProvider.getAllStacks().stream().map(x -> x.getReference())
+    public List<StackDescription> getSidekicks(StackTreeDescription tree, StackIntrospectionProvider.StackIntrospections stackIntrospections) {
+        return stackIntrospections.getStacks().stream().map(x -> x.getReference())
                 .filter(x -> !tree.contains(x))
                 .map(x -> getStackDescription(dependenciesDir, x, desc1 -> desc1.getVersion()))
                 .collect(Collectors.toList());
     }
 
-    private void addDependencies(StackDescription parent, StackTreeDescription.Builder builder) {
+    private void addDependencies(StackDescription parent, StackTreeDescription.Builder builder, StackIntrospectionProvider.StackIntrospections stackIntrospections) {
         List<StackReference> dependencies = parent.getDependencies();
         for (StackReference dependency : dependencies) {
-            StackDescription depDesc = getStackDescription(dependenciesDir, dependency, getOverrider());
+            StackDescription depDesc = getStackDescription(dependenciesDir, dependency, getOverrider(stackIntrospections));
             builder.addNode(parent.getReference(), depDesc);
-            addDependencies(depDesc, builder);
+            addDependencies(depDesc, builder, stackIntrospections);
         }
     }
 

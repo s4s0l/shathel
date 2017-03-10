@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.dind;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper;
@@ -8,9 +9,11 @@ import org.s4s0l.shathel.commons.swarm.SwarmNodeCreator;
 import org.s4s0l.shathel.commons.utils.ExecWrapper;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -18,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Matcin Wielgus
  */
-public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator {
+public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator {
     private static final Logger LOGGER = getLogger(DindClusterWrapper.class);
 
     private final EnvironmentContext context;
@@ -36,11 +39,6 @@ public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator 
         return context;
     }
 
-    @Override
-    public List<String> getNodeNames() {
-        List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=" + getNetworkName());
-        return maps.stream().map(x -> x.get("Names")).sorted().collect(Collectors.toList());
-    }
 
     @Override
     public String getDataDirectory() {
@@ -73,7 +71,6 @@ public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator 
     }
 
 
-
     @Override
     public void destroy() {
         getNodeNames().forEach(it ->
@@ -92,23 +89,36 @@ public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator 
     }
 
     @Override
-    public Node getNode(String nodeName) {
-        return getLocalWrapper().containerBasicInfoByFilter("name=" + nodeName)
+    public Map<String, Node> getAllNodes() {
+        List<Map<String, String>> maps = getLocalWrapper().containerBasicInfoByFilter("label=org.shathel.env.dind=" + getNetworkName());
+        List<String> nodeNames = maps.stream().map(x -> x.get("Names")).sorted().collect(Collectors.toList());
+        return nodeNames.stream().map(nodeName -> extractNodeDetails(nodeName))
+                .collect(Collectors.toMap(Node::getName, Function.identity()));
+    }
+
+    private Node extractNodeDetails(String nodeName) {
+        Node names = getLocalWrapper().containerBasicInfoByFilter("name=" + nodeName)
                 .stream()
                 .filter(x -> nodeName.equals(x.get("Names")))
                 .findFirst()
-                .map(x -> new Node(
-                        nodeName,
-                        x.getOrDefault("Status", "").startsWith("Up"),
-                        isReachable(nodeName)))
+                .map(x -> extractNodeDetaails(nodeName, x))
                 .orElseThrow(() -> new RuntimeException("Node " + nodeName + " not found"));
+        return names;
     }
 
-    @Override
-    public DockerWrapper getDocker(String node) {
-        String ip = getIp(node);
-        return new DockerWrapper(new ExecWrapper(LOGGER, "docker --host " + ip));
+    private Node extractNodeDetaails(String nodeName, Map<String, String> x) {
+        boolean started = x.getOrDefault("Status", "").startsWith("Up");
+        String ip = started ? getLocalWrapper().containerGetIpInNetwork(nodeName, getNetworkName()) : "";
+        DockerWrapper wrapper = started ? new DockerWrapper(new ExecWrapper(LOGGER, "docker --host " + ip)) : null;
+        return new Node(
+                nodeName,
+                started,
+                wrapper,
+                started ? new DockerInfoWrapper(wrapper.daemonInfo(), nodeName) : null,
+                ip,
+                started ? getDockerEnvironments(ip) : Collections.EMPTY_MAP);
     }
+
 
     @Override
     public void setKernelParam(String param) {
@@ -118,12 +128,6 @@ public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator 
     @Override
     public String getNonRootUser() {
         return "root";
-    }
-
-
-    @Override
-    public String getIp(String node) {
-        return getLocalWrapper().containerGetIpInNetwork(node, getNetworkName());
     }
 
 
@@ -153,11 +157,11 @@ public class DindClusterWrapper implements SwarmClusterWrapper,SwarmNodeCreator 
         return new SwarmNodeCreator.CreationResult(getIp(machineName), modified);
     }
 
-    @Override
-    public Map<String, String> getDockerEnvs(String node) {
+
+    private static Map<String, String> getDockerEnvironments(String ip) {
         HashMap<String, String> ret = new HashMap<>();
         ret.put("DOCKER_CERT_PATH", "");
-        ret.put("DOCKER_HOST", "tcp://" + getIp(node) + ":2375");
+        ret.put("DOCKER_HOST", "tcp://" + ip + ":2375");
         ret.put("DOCKER_TLS_VERIFY", "");
         ret.put("DOCKER_MACHINE_NAME", "");
         ret.put("DOCKER_API_VERSION", "");

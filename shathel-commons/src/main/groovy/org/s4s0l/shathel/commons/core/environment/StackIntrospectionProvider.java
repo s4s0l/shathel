@@ -10,8 +10,28 @@ import java.util.Optional;
  */
 public interface StackIntrospectionProvider {
 
-    Optional<StackIntrospection> getIntrospection(StackReference reference);
+    Optional<StackIntrospection> getStackIntrospection(StackReference reference);
 
-    List<StackIntrospection> getAllStacks();
+    StackIntrospections getAllStacks();
 
+
+    class StackIntrospections {
+        private final List<StackIntrospection> stacks;
+
+        public StackIntrospections(List<StackIntrospection> stacks) {
+            this.stacks = stacks;
+        }
+
+        public List<StackIntrospection> getStacks() {
+            return stacks;
+        }
+
+        public Optional<StackIntrospection> getIntrospection(StackReference reference) {
+            return stacks.stream().filter(x -> x.getReference().isSameStack(reference)).findFirst();
+        }
+
+        public int size() {
+            return stacks.size();
+        }
+    }
 }

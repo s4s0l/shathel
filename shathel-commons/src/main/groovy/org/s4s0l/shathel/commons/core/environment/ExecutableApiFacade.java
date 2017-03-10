@@ -11,19 +11,12 @@ import java.util.Map;
  * @author Matcin Wielgus
  */
 public interface ExecutableApiFacade {
+
     List<String> getNodeNames();
 
     String getIp(String nodeName);
 
-    String getIpForManagementNode();
-
-    DockerWrapper getDockerForManagementNode();
-
-    String getNameForManagementNode();
-
     DockerWrapper getDocker(String nodeName);
-
-    void setKernelParam(String param);
 
     /**
      * returns DOCKER_* environment variables used to talk with
@@ -33,6 +26,16 @@ public interface ExecutableApiFacade {
      * @return see above
      */
     Map<String, String> getDockerEnvs(String nodeName);
+
+    DockerWrapper getDockerForManagementNode();
+
+    String getIpForManagementNode();
+
+    String getNameForManagementNode();
+
+    void setKernelParam(String param);
+
+
 
     SecretManager getSecretManager();
 

@@ -8,9 +8,11 @@ import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter
  * @author Matcin Wielgus
  */
 class VBoxMachineSettingsImporterExporter extends MachineSettingsImporterExporter {
+    private final DockerMachineWrapper machineWrapper;
 
-    VBoxMachineSettingsImporterExporter(File tmpDirToUse) {
+    VBoxMachineSettingsImporterExporter(File tmpDirToUse,DockerMachineWrapper machineWrapper) {
         super(tmpDirToUse)
+        this.machineWrapper = machineWrapper;
     }
     private VBoxManageWrapper vbox = new VBoxManageWrapper()
 
@@ -22,20 +24,20 @@ class VBoxMachineSettingsImporterExporter extends MachineSettingsImporterExporte
     @Override
     protected void beforeLoad(File restoredMachineDir) {
         if (vbox.isVmPresent(restoredMachineDir.name)) {
-            new DockerMachineWrapper(restoredMachineDir.getParentFile().getParentFile()).stop(restoredMachineDir.name)
+            machineWrapper.stop(restoredMachineDir.name)
             vbox.removeVm(restoredMachineDir.name, false)
         }
     }
 
     @Override
     protected void beforeSave(File vmFolder) {
-        new DockerMachineWrapper(vmFolder.getParentFile().getParentFile()).stop(vmFolder.name)
+        machineWrapper.stop(vmFolder.name)
         vbox.removeVm(vmFolder.name, false)
     }
 
     @Override
     protected void afterSave(File vmFolder) {
         vbox.registervm(new File(vmFolder, "${vmFolder.name}/${vmFolder.name}.vbox"))
-        new DockerMachineWrapper(vmFolder.getParentFile().getParentFile()).start(vmFolder.name)
+        machineWrapper.start(vmFolder.name)
     }
 }

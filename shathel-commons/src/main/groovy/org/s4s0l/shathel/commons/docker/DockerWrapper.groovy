@@ -117,7 +117,7 @@ class DockerWrapper {
             return []
         }
         dockerIds.collect {
-            String inspect = exec.executeForOutput("inspect ${dockerIds[0]}")
+            String inspect = exec.executeForOutput("inspect ${it}")
             def val = new JsonSlurper().parseText(inspect);
             def ret = [:]
             ret << val[0].Config.Labels
@@ -143,17 +143,31 @@ class DockerWrapper {
 
     }
 
+    /**
+     * gets labels of services
+     * Adds extra labels "shathel.service.ratio" "shathel.service.mode" "shathel.service.name"
+     * "shathel.service.replicas", "shathel.service.count", "shathel.service.expectedCount"
+     * @param filter
+     * @return
+     */
     List<Map<String, String>> servicesOfContainersMatching(String filter) {
-        String[] dockerIds = exec.executeForOutput("service ls -f $filter -q").split("\\s")
-        if (dockerIds.size() == 0 || "" == dockerIds[0]) {
-            return []
-        }
-        dockerIds.collect {
-            String inspect = exec.executeForOutput("service inspect ${it}")
+        def output = exec.executeForOutput("service ls -f $filter")
+        def parsed = parseServiceLsOutput(output);
+
+        parsed.collect {
+            String inspect = exec.executeForOutput("service inspect ${it.key}")
             def val = new JsonSlurper().parseText(inspect);
             def ret = [:]
             ret << val[0].Spec.Labels
-            ret << [name: val[0].Spec.Name]
+            ret << [
+                    "shathel.service.name": val[0].Spec.Name,
+                    "shathel.service.ratio" : it.value.ratio,
+                    "shathel.service.mode" : it.value.mode,
+                    "shathel.service.replicas" : it.value.replicas,
+                    "shathel.service.count" : it.value.count,
+                    "shathel.service.expectedCount" : it.value.expectedCount,
+            ]
+
         }
     }
 
@@ -187,25 +201,38 @@ class DockerWrapper {
      * @return
      */
     Map daemonInfo() {
-        exec.executeForOutput("version")
         def output = exec.executeForOutput("info", "-f", "{{ json . }}")
         return new JsonSlurper().parseText(output);
     }
 
 
+    Map<String,String> parseServiceLsOutput(String output) {
+        output.readLines()
+                .collect { it.split("\\s+") }
+                .findAll {it[0]!="ID"}
+                .collectEntries {
+            def x = it[3] =~ /([0-9]+)/
+            def count = Integer.parseInt(x[0][1]);
+            def expectedCount = Integer.parseInt(x[1][1])
+            def ratio =  count / expectedCount
+            [(it[1]): [
+                    name : it[1],
+                    mode : it[2],
+                    replicas: it[3],
+                    ratio: "$ratio".toString(),
+                    expectedCount: "$expectedCount".toString(),
+                    count: "$count".toString(),
+            ]]
+        }
+    }
+
     float getServiceRunningRatio(String serviceName) {
         def output = exec.executeForOutput("service ls")
-        def ratios = output.readLines().collect { it.split("\\s+") }.findAll {
-            it[1] == serviceName
-        }.collect { it[3] }
-                .collect {
-            def x = it =~ /([0-9]+)/
-            Integer.parseInt(x[0][1]) / Integer.parseInt(x[1][1])
-        }
-        if (ratios.isEmpty()) {
-            return 0f;
-        } else {
-            return ratios.head()
+        def parsed = parseServiceLsOutput(output)
+        if(parsed[serviceName] == null){
+            return 0f
+        }else{
+            Float.parseFloat(parsed[serviceName].ratio)
         }
     }
 
