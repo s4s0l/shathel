@@ -15,7 +15,7 @@ import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 import scala.collection.JavaConverters._
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class StackCommands(parametersCommands: ParametersCommands, environmentCommands: EnvironmentCommands)
   extends ShathelCommands(parametersCommands) {
@@ -31,11 +31,14 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
              @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
                specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
              inspectLong: Boolean,
+             @CliOption(key = Array("with-optional"), mandatory = false, help = "If true will start with optional dependencies",
+               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+             withOptional: Boolean,
              @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
              map: java.util.Map[String, String]
            ): String = {
     runCommand(name, inspect, inspectLong, map)((s, c) => {
-      s.createStartCommand()
+      s.createStartCommand(withOptional)
     })
   }
 
@@ -52,10 +55,13 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
             @CliOption(key = Array("with-dependencies"), mandatory = false, help = "If true will stop all dependencies also",
               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
             withDependencies: Boolean,
+            @CliOption(key = Array("with-optional"), mandatory = false, help = "If true will stop optional dependencies",
+              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+            withOptional: Boolean,
             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
             map: java.util.Map[String, String]
           ): String = {
-    runCommand(name, inspect, inspectLong, map)((s, c) => s.createStopCommand(withDependencies))
+    runCommand(name, inspect, inspectLong, map)((s, c) => s.createStopCommand(withDependencies, withOptional))
   }
 
 

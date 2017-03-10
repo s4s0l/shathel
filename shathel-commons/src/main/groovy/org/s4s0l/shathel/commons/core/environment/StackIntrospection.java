@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackIntrospection {
     private final StackReference reference;

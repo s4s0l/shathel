@@ -4,7 +4,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class VersionComparatorTest extends Specification {
 

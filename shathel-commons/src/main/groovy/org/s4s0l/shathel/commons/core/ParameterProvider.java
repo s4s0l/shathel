@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.core;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface ParameterProvider {
     Optional<String> getParameter(String name);

@@ -6,7 +6,7 @@ import org.s4s0l.shathel.commons.core.Parameters
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class FileStorageTest extends Specification {
 

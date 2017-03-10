@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface SafeStorage {
     void readFile(String key, File copyTo);

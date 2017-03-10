@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator {
     private static final Logger LOGGER = getLogger(DindClusterWrapper.class);

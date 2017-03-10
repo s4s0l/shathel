@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import java.io.File;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface NodeProvisioner {
 

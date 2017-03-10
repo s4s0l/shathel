@@ -5,7 +5,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.junit.JUnitRunner
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
 class DeployerParameters$Test extends FeatureSpec with GivenWhenThen {

@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.commons.core.model
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class GavUtils {
 

@@ -21,11 +21,11 @@ def log(String x) {
 
 
 EnvironmentContext environmentContext = context;
-ExecutableApiFacade api = env;
+ExecutableApiFacade apii = api;
 StackCommand stackCommand = command;
 HttpApis httpApi = http
 
-String ip = api.getIpForManagementNode();
+String ip = apii.getIpForManagementNode();
 int portainerPort = 9001
 String adminPassword = "qwerty"
 def address = "http://${ip}:${portainerPort}"
@@ -82,12 +82,12 @@ portainer.encoder.'multipart/form-data' = {
         e
 }
 
-api.getNodeNames()
+apii.getNodeNames()
         .findAll {!nodesDefined.contains(it)}
         .each {
 
     def machineName = it
-    def envs = api.getDockerEnvs(machineName)
+    def envs = apii.getDockerEnvs(machineName)
     def certPath = envs['DOCKER_CERT_PATH']
     def machineIp = envs['DOCKER_HOST']
     if (machineIp == null) {

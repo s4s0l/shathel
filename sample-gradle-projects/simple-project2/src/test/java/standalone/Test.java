@@ -8,7 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class Test {
 

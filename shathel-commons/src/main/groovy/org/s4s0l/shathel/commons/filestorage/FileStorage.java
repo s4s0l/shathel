@@ -6,7 +6,7 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import java.io.File;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class FileStorage implements Storage {
 

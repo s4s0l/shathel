@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 @Builder
 public class MapParameters implements Parameters {

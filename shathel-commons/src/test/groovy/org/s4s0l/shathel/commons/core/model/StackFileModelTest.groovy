@@ -5,7 +5,7 @@ import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class StackFileModelTest extends Specification {
 

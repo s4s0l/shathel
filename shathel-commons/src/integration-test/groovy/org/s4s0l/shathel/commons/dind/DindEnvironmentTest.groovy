@@ -10,7 +10,7 @@ import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DindEnvironmentTest extends BaseIntegrationTest {
     @Override

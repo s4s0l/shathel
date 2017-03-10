@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class GraphUtils {
     public static <X> Stream<X> depthFirstReverse(Graph<X> graph, X node) {

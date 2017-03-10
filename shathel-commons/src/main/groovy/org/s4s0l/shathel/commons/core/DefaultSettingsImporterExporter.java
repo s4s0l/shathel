@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class DefaultSettingsImporterExporter implements SettingsImporterExporter {
     @Override

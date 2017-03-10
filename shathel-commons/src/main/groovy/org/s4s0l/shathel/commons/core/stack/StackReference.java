@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.s4s0l.shathel.commons.core.model.GavUtils;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackReference {
     private final String group;

@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class MapConverter extends Converter[java.util.Map[String, String]] {
 

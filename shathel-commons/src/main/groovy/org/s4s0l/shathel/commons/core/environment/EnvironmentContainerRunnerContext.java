@@ -3,12 +3,13 @@ package org.s4s0l.shathel.commons.core.environment;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 
 import java.io.File;
+import java.util.Map;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface EnvironmentContainerRunnerContext extends AutoCloseable{
-    void startContainers(StackDescription description, File composeFile);
+    void startContainers(String deployName, Map<String,String> environment, File composeFile);
 
-    void stopContainers(StackDescription description, File composeFile);
+    void stopContainers(String deployName, Map<String,String> environment, File composeFile);
 }

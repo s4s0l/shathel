@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface Parameters extends ParameterProvider {
 

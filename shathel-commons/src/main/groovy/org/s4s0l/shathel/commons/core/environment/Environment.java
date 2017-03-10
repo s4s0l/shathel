@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.scripts.Executable;
 import java.util.List;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface Environment {
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SolutionDescription {
     private final ParameterProvider overrides;

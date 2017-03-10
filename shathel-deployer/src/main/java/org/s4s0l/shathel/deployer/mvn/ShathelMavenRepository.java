@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.deployer.mvn;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 
 import lombok.Builder;

@@ -5,7 +5,7 @@ import org.springframework.shell.plugin.support.DefaultPromptProvider
 import scala.Option
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class PromptProvider(params: ParametersCommands) extends DefaultPromptProvider {
 

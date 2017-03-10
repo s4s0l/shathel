@@ -6,7 +6,7 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ComposeFileModel {
     Object parsedYml;

@@ -10,7 +10,7 @@ import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 import scala.collection.JavaConverters._
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
 class MapConverterTest extends FeatureSpec with GivenWhenThen {

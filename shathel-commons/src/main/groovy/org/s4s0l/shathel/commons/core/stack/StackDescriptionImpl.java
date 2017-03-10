@@ -3,10 +3,11 @@ package org.s4s0l.shathel.commons.core.stack;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackDescriptionImpl implements StackDescription {
 
@@ -49,17 +50,22 @@ public class StackDescriptionImpl implements StackDescription {
     }
 
     @Override
-    public List<StackReference> getDependencies() {
+    public List<StackDependency> getDependencies() {
         return fileModel.getDependencies().stream()
-                .map(map -> new StackReference(map.get("group"), map.get("name"), map.get("version")))
+                .map(map -> new StackDependency(
+                        new StackReference((String) map.get("group"),
+                                (String) map.get("name"), (String) map.get("version")),
+                        (Boolean) map.get("optional"),
+                        (Map<String, String>) map.get("envs")))
                 .collect(Collectors.toList());
 
     }
 
+
     @Override
     public List<StackProvisionerDefinition> getPreProvisioners() {
         return fileModel.getPreProvisioners().stream()
-                .map(map -> new StackProvisionerDefinition(this,"pre-provisioners",
+                .map(map -> new StackProvisionerDefinition(this, "pre-provisioners",
                         map.get("name"),
                         map.get("inline"),
                         map.get("type"))
@@ -69,7 +75,7 @@ public class StackDescriptionImpl implements StackDescription {
     @Override
     public List<StackProvisionerDefinition> getPostProvisioners() {
         return fileModel.getPostProvisioners().stream()
-                .map(map -> new StackProvisionerDefinition(this,"post-provisioners",
+                .map(map -> new StackProvisionerDefinition(this, "post-provisioners",
                         map.get("name"),
                         map.get("inline"),
                         map.get("type"))
@@ -88,11 +94,11 @@ public class StackDescriptionImpl implements StackDescription {
     }
 
     @Override
-    public boolean isDependantOn(StackReference reference) {
+    public boolean isDependantOn(StackReference reference, boolean includeOptional) {
         return getDependencies().stream()
+                .filter(d -> includeOptional || !d.isOptional())
                 .filter(d ->
-                        d.getName().equals(reference.getName()) &&
-                                d.getGroup().equals(reference.getGroup()))
+                        d.getStackReference().isSameStack(reference))
                 .findAny().isPresent();
     }
 

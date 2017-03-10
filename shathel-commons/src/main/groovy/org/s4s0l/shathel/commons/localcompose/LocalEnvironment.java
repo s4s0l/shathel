@@ -12,7 +12,7 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class LocalEnvironment implements Environment {
 

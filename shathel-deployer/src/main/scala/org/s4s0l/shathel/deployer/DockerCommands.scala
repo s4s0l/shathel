@@ -6,7 +6,7 @@ import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class DockerCommands(parametersCommands: ParametersCommands, environmentCommands: EnvironmentCommands)
   extends ShathelCommands(parametersCommands) {

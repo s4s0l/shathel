@@ -18,7 +18,7 @@ import java.security.spec.KeySpec
 import java.util.logging.Level
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class CryptoSpec extends Specification {
     private static final Logger logger = LoggerFactory.getLogger(CryptoSpec.class);

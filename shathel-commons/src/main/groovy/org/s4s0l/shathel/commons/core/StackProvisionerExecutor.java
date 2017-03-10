@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackProvisionerExecutor {
 
@@ -50,10 +50,10 @@ public class StackProvisionerExecutor {
                     ComposeFileModel.dump(stackCommand.getComposeModel(), composeFile);
                     if (stackCommand.getType() != StackCommand.Type.STOP) {
                         executePreProvisioners(dstStackDir, stackCommand);
-                        ecrc.startContainers(stackCommand.getDescription(), composeFile);
+                        ecrc.startContainers(stackCommand.getDescription().getDeployName(), stackCommand.getEnvironment(), composeFile);
                         executePostProvisioners(dstStackDir, stackCommand);
                     } else {
-                        ecrc.stopContainers(stackCommand.getDescription(), composeFile);
+                        ecrc.stopContainers(stackCommand.getDescription().getDeployName(), stackCommand.getEnvironment(), composeFile);
                     }
                 }
             }
@@ -66,9 +66,9 @@ public class StackProvisionerExecutor {
 
     public void executePreProvisioners(File dstStackDir, StackCommand stackCommand) {
         List<StackProvisionerDefinition> preProvisioners = stackCommand.getDescription().getPreProvisioners();
-        executeProvisioners(dstStackDir,stackCommand, preProvisioners);
+        executeProvisioners(dstStackDir, stackCommand, preProvisioners);
         for (Executable executable : stackCommand.getEnricherPreProvisioners()) {
-            execute(dstStackDir, executable,stackCommand);
+            execute(dstStackDir, executable, stackCommand);
         }
     }
 
@@ -78,7 +78,7 @@ public class StackProvisionerExecutor {
 
     }
 
-    private void executeProvisioners(File dstStackDir,StackCommand stackCommand, List<StackProvisionerDefinition> postProvisioners) {
+    private void executeProvisioners(File dstStackDir, StackCommand stackCommand, List<StackProvisionerDefinition> postProvisioners) {
         for (StackProvisionerDefinition postProvisioner : postProvisioners) {
             Executable executable = ScriptExecutorProvider
                     .findExecutor(environmentContext.getExtensionContext(), postProvisioner)
@@ -86,11 +86,13 @@ public class StackProvisionerExecutor {
             execute(dstStackDir, executable, stackCommand);
         }
     }
-private static final Logger LOGGER = getLogger(StackProvisionerExecutor.class);
+
+    private static final Logger LOGGER = getLogger(StackProvisionerExecutor.class);
+
     private void execute(File dstStackDir, Executable executable, StackCommand stackCommand) {
         Map<String, Object> ctxt = new HashedMap();
         ctxt.put("context", environmentContext);
-        ctxt.put("env", executableApiFacade);
+        ctxt.put("api", executableApiFacade);
         ctxt.put("command", stackCommand);
         ctxt.put("dir", dstStackDir);
         ctxt.put("log", LOGGER);

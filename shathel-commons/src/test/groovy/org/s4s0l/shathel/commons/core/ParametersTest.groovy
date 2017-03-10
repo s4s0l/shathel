@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.core
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ParametersTest extends Specification {
 

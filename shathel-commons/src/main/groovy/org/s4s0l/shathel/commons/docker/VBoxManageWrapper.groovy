@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import java.util.regex.Matcher
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class VBoxManageWrapper {
     private static

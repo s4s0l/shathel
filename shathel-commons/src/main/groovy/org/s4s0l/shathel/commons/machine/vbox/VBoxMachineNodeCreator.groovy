@@ -7,7 +7,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class VBoxMachineNodeCreator implements SwarmNodeCreator{
 

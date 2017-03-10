@@ -10,7 +10,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 abstract class BaseIntegrationTest extends Specification {
     @Shared
@@ -25,6 +25,10 @@ abstract class BaseIntegrationTest extends Specification {
         cleanupEnvironment()
         FileUtils.deleteDirectory(getRootDir())
 
+    }
+
+    def cleanupSpec(){
+        cleanupEnvironment()
     }
 
     def onEnd() {

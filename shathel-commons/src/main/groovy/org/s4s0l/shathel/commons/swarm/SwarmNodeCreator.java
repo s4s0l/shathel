@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.swarm;
 import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface SwarmNodeCreator {
     /**

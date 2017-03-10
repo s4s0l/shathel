@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 @Component
 public class HistoryFile implements HistoryFileNameProvider {

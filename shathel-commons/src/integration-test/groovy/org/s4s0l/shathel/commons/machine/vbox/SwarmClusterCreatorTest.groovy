@@ -14,7 +14,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class SwarmClusterCreatorTest extends Specification {
     def setupSpec() {

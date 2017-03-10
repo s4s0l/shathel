@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.swarm;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
@@ -16,13 +17,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SwarmMountingEnricher extends EnricherExecutable {
     private final SwarmClusterWrapper swarmClusterWrapper;
@@ -33,8 +35,9 @@ public class SwarmMountingEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
-                                                           StackDescription stack, ComposeFileModel model) {
+    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+        ComposeFileModel model = params.getModel();
+        StackDescription stack = params.getStack();
         List<Executable> execs = new ArrayList<>();
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("./")) {

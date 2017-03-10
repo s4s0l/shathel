@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface GlobalEnricherProvider extends ExtensionInterface {
     List<Executable> getGlobalEnrichers();

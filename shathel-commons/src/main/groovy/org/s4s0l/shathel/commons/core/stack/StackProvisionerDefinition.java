@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.commons.core.stack;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackProvisionerDefinition extends ScriptDefinition   {
 

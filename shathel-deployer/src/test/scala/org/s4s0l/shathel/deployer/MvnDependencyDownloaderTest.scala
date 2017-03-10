@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
 class MvnDependencyDownloaderTest extends FeatureSpec with GivenWhenThen {

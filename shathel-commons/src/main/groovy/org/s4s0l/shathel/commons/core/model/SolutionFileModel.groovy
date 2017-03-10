@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap
 import org.yaml.snakeyaml.Yaml
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class SolutionFileModel {
     final Object parsedYml;

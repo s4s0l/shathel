@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface StackIntrospectionProvider {
 

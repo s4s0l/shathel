@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class EnvironmentDescription implements ParameterProvider {
     private final ParameterProvider overrides;

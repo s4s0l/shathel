@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.machine.vbox
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class NetworkSettingsTest extends Specification {
 

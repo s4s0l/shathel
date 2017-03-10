@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 import sys.process._
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
 class DeployerTest extends FeatureSpec {

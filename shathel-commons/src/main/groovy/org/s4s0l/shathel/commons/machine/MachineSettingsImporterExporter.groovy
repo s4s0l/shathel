@@ -8,7 +8,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class MachineSettingsImporterExporter implements SettingsImporterExporter{
 

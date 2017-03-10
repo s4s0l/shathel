@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface SettingsImporterExporter {
     void saveSettings(File dockerMachineSettingsFolder, OutputStream outputStream);

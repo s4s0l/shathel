@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 /**
  * taken from http://stackoverflow.com/questions/198431/how-do-you-compare-two-version-strings-in-java/41530729#41530729
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class VersionComparator implements Comparator<String>{
     /**

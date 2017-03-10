@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface SwarmClusterWrapper extends ExecutableApiFacade {
 

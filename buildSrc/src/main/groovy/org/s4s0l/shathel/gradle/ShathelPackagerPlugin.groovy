@@ -12,7 +12,7 @@ import org.s4s0l.gradle.bootcker.ComposeFilesContainer
 import org.yaml.snakeyaml.Yaml
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ShathelPackagerPlugin implements Plugin<Project> {
 

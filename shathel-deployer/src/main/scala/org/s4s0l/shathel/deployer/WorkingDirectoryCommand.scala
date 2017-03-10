@@ -6,7 +6,7 @@ import org.springframework.shell.core.CommandMarker
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class WorkingDirectoryCommand extends CommandMarker {
 

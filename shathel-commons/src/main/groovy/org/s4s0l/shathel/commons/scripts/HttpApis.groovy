@@ -7,7 +7,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class HttpApis {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpApis.class)

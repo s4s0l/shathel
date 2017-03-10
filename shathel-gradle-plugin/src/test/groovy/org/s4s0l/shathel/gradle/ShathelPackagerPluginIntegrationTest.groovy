@@ -3,7 +3,7 @@ package org.s4s0l.shathel.gradle
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ShathelPackagerPluginIntegrationTest extends org.s4s0l.bootcker.gradle.utils.GradlePluginFunctionalSpecification {
 

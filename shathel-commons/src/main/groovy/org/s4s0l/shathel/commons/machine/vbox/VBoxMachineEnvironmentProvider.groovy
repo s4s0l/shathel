@@ -9,7 +9,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmEnvironment
 import org.s4s0l.shathel.commons.swarm.SwarmNodeProvisioner
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
     private final Parameters params;

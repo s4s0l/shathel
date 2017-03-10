@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SwarmBuildingEnricher extends EnricherExecutable {
     private final String repository;
@@ -24,8 +25,10 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
-                                                           StackDescription stack, ComposeFileModel model) {
+    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams paramz) {
+        ExecutableApiFacade apiFacade = paramz.getApiFacade();
+        ComposeFileModel model = paramz.getModel();
+        StackDescription stack = paramz.getStack();
         DockerWrapper dockerForManagementNode = apiFacade.getDockerForManagementNode();
         List<Executable> execs = new ArrayList<>();
         model.mapBuilds((service, params) -> {

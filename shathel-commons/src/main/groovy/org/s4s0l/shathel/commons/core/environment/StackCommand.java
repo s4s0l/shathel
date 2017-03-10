@@ -5,9 +5,10 @@ import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.scripts.Executable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackCommand {
     public enum Type {
@@ -27,13 +28,19 @@ public class StackCommand {
     private final ComposeFileModel mutableModel;
     private final StackDescription description;
     private final List<Executable> provisioners;
+    private final Map<String, String> environment;
 
 
-    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<Executable> provisioners) {
+    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<Executable> provisioners, Map<String, String> environment) {
         this.type = type;
         this.mutableModel = mutableModel;
         this.description = description;
         this.provisioners = provisioners;
+        this.environment = environment;
+    }
+
+    public Map<String, String> getEnvironment() {
+        return environment;
     }
 
     public Type getType() {

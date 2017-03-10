@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class ScriptDefinition implements TypedScript {
     private final StackDescription origin;

@@ -7,11 +7,12 @@ import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class LocalEnvironmentContainerRunner implements  EnvironmentContainerRunner {
     private static final Logger LOGGER = getLogger(LocalEnvironmentContainerRunner.class);
@@ -26,18 +27,19 @@ public class LocalEnvironmentContainerRunner implements  EnvironmentContainerRun
     private class Context implements EnvironmentContainerRunnerContext {
 
         @Override
-        public void startContainers(StackDescription description, File composeFile) {
+        public void startContainers(String deployName, Map<String,String> environment, File composeFile) {
             DockerComposeWrapper dockerCompose = new DockerComposeWrapper();
-            if(!dockerCompose.up(composeFile.getParentFile(), description.getDeployName())){
-                throw new RuntimeException("Unable to start stack " + description.getGav());
+            if(!dockerCompose.up(composeFile.getParentFile(), deployName, environment)){
+                throw new RuntimeException("Unable to start stack " + deployName);
             }
         }
 
         @Override
-        public void stopContainers(StackDescription description, File composeFile) {
+        public void stopContainers(String deployName, Map<String,String> environment, File composeFile)
+        {
             DockerComposeWrapper dockerCompose = new DockerComposeWrapper();
-            if(!dockerCompose.down(composeFile.getParentFile(), description.getDeployName())){
-                throw new RuntimeException("Unable to stop stack " + description.getGav());
+            if(!dockerCompose.down(composeFile.getParentFile(), deployName, environment)){
+                throw new RuntimeException("Unable to stop stack " + deployName);
             }
         }
 

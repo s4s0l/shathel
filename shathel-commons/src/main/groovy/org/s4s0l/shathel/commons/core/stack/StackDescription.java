@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.core.stack;
 import java.util.List;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface StackDescription {
     String getName();
@@ -20,7 +20,8 @@ public interface StackDescription {
 
     StackResources getStackResources();
 
-    List<StackReference> getDependencies();
+    List<StackDependency> getDependencies();
+
 
     List<StackProvisionerDefinition> getPreProvisioners();
 
@@ -28,8 +29,7 @@ public interface StackDescription {
 
     List<StackEnricherDefinition> getEnricherDefinitions();
 
-    boolean isDependantOn(StackReference reference);
-
+    boolean isDependantOn(StackReference reference, boolean includeOptional);
 
     String getGav();
 }

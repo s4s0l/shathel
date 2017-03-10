@@ -11,7 +11,7 @@ import scala.collection.JavaConverters._
 
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class ParametersCommands extends CommandMarker with ParametersKeyProvider {
   private var parameters: Parameters = Parameters.fromMapWithSysPropAndEnv(Map[String, String]().asJava)

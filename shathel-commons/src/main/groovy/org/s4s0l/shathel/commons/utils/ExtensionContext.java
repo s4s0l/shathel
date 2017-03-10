@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 @Builder
 public class ExtensionContext {

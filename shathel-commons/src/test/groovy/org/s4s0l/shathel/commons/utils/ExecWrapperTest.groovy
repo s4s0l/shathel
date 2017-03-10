@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ExecWrapperTest extends Specification {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecWrapperTest.class);

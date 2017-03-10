@@ -10,7 +10,7 @@ import org.s4s0l.shathel.commons.core.Parameters
 import scala.util.Try
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 object DeployerParameters {
   val VALID_PARAMS = List(

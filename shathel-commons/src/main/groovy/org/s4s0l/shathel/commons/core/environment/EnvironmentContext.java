@@ -8,7 +8,7 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import java.io.File;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class EnvironmentContext {
     private final ExtensionContext extensionContext;

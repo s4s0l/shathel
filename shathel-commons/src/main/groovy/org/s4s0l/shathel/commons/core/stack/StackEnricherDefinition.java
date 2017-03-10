@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.commons.core.stack;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackEnricherDefinition extends ScriptDefinition {
 
@@ -12,9 +12,9 @@ public class StackEnricherDefinition extends ScriptDefinition {
         if (target == Target.ALL) {
             return true;
         } else if (target == Target.ALLOTHERS) {
-            return !getOrigin().isDependantOn(forStack.getReference());
+            return !getOrigin().isDependantOn(forStack.getReference(), true);
         } else {
-            return forStack.isDependantOn(getOrigin().getReference());
+            return forStack.isDependantOn(getOrigin().getReference(), true);
         }
     }
 

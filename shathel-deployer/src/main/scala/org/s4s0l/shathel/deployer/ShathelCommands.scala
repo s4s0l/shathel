@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMarker with ParametersKeyProvider {
 

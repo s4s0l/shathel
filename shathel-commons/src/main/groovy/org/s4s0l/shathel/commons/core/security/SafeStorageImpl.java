@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * TODO split it to CipherProvider and IO facade
  *
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SafeStorageImpl implements SafeStorage {
     private static final Logger LOGGER = getLogger(SafeStorageImpl.class);

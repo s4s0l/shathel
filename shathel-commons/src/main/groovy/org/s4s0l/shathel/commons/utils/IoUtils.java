@@ -13,7 +13,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * tweaked https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/
  *
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class IoUtils {
 

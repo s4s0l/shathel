@@ -6,7 +6,7 @@ import spock.lang.Specification
 import java.util.stream.Collectors
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ExtensionContextTest extends Specification {
 

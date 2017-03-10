@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class LocalEnvironmentProvider implements EnvironmentProvider {
 

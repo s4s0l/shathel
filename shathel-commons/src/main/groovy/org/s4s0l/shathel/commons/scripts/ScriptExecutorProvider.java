@@ -6,7 +6,7 @@ import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface ScriptExecutorProvider extends ExtensionInterface {
 

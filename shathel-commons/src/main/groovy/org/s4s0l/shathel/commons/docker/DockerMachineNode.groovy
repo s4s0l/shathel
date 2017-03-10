@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.commons.docker
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerMachineNode {
     final String name

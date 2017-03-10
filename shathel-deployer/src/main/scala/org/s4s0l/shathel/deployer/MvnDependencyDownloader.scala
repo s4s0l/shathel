@@ -17,7 +17,7 @@ import org.s4s0l.shathel.deployer.mvn.ShathelMavenRepository.ShathelMavenSetting
 import scala.collection.JavaConverters._
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class MvnDependencyDownloader(parameters: Parameters) extends DependencyDownloader {
 

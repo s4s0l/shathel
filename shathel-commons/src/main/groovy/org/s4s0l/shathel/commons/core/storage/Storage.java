@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.core.ParameterProvider;
 import java.io.File;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public interface Storage {
 

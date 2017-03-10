@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.core.model
 import org.yaml.snakeyaml.Yaml
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class StackFileModel implements Cloneable {
 
@@ -18,8 +18,8 @@ class StackFileModel implements Cloneable {
     }
 
     StackFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;         \
-                 if (this.parsedYml.version != 1) {
+        this.parsedYml = parsedYml;            \
+                    if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
     }
@@ -58,7 +58,7 @@ class StackFileModel implements Cloneable {
         (parsedYml['shathel-stack']['deployName']) ?: getName();
     }
 
-    Collection<Map<String, String>> getDependencies() {
+    Collection<Map<String, Object>> getDependencies() {
         def deps = parsedYml['shathel-stack'].dependencies
         deps.collect {
             kv ->
@@ -67,15 +67,18 @@ class StackFileModel implements Cloneable {
                         name      : GavUtils.getName(kv.key),
                         version   : GavUtils.getVersion(kv.key),
                         minVersion: kv.value?.min,
-                        maxVersion: kv.value?.max
+                        maxVersion: kv.value?.max,
+                        optional  : kv.value?.optional ?: false,
+                        envs      : kv.value?.envs ?: [:],
                 ]
 
         }
     }
 
+
     Collection<Map<String, String>> getEnrichers() {
         def deps = parsedYml['shathel-stack'].enrichers
-        if(deps == null)
+        if (deps == null)
             return Collections.emptyList()
         deps.collect {
             kv ->

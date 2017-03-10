@@ -5,7 +5,7 @@ import java.io.File
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class SnippetsCommand(parametersCommands: ParametersCommands, storageCommands: EnvironmentCommands)
   extends ShathelCommands(parametersCommands) {

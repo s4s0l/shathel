@@ -12,13 +12,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class LocalStackIntrospectionProvider implements StackIntrospectionProvider {
 
     protected List<Map<String, String>> getByFilter(String filter) {
-        return new DockerWrapper()
-                .containersLabelsByFilter(filter);
+        return new DockerWrapper().containersLabelsByFilter(filter)
+                .stream()
+                .filter(x -> x.get("com.docker.compose.service") != null)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -41,9 +43,9 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
 
     protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
         return resolver.getLabelValues("com.docker.compose.service")
-                    .entrySet().stream()
-                    .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
-                    .collect(Collectors.toList());
+                .entrySet().stream()
+                .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -54,7 +56,7 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
                         Collectors.mapping(x -> x, Collectors.toList())
                 )
         );
-        List<StackIntrospection> ret=  collect.entrySet().stream()
+        List<StackIntrospection> ret = collect.entrySet().stream()
                 .map(x -> getStackIntrospection(x.getValue()))
                 .collect(Collectors.toList());
         return new StackIntrospections(ret);

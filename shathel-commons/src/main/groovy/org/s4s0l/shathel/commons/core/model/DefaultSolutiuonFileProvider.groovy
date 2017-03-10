@@ -4,7 +4,7 @@ import org.s4s0l.shathel.commons.core.Parameters
 import org.yaml.snakeyaml.Yaml
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DefaultSolutiuonFileProvider {
 

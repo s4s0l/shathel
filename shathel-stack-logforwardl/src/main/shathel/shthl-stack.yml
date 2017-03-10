@@ -10,7 +10,7 @@ shathel-stack:
             it.value.logging = [
                        driver: 'gelf',
                        options: [
-                          'gelf-address':"udp://${env.getIpForManagementNode()}:12201".toString(),
+                          'gelf-address':"udp://${api.getIpForManagementNode()}:12201".toString(),
                           tag:stack.name
                        ]
 

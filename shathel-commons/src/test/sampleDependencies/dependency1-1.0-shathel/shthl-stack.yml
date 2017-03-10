@@ -1,0 +1,16 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:dependency1:1.0
+  dependencies:
+    org.s4s0l.shathel:dependency2:1.0:
+      optional: false
+      envs:
+        DEPENDENCY2: present
+    org.s4s0l.shathel:dependency3:1.0:
+      optional: true
+      envs:
+        DEPENDENCY3: present
+    org.s4s0l.shathel:dependency4:1.0:
+      optional: true
+      envs:
+        DEPENDENCY4: present

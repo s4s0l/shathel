@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.scripts
 import org.slf4j.LoggerFactory
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class GroovyExecutable implements Executable {
     private final TypedScript script;

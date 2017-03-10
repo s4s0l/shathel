@@ -6,7 +6,7 @@ import org.yaml.snakeyaml.Yaml
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class ComposeFileModelTest extends Specification {
     def "ReplaceInAllStrings"() {

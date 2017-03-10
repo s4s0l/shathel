@@ -12,7 +12,7 @@ import java.io.Reader;
 import java.util.logging.Logger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 
 public class OsOperationsImpl implements OsOperations {

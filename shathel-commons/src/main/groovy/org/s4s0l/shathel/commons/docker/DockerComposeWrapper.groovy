@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerComposeWrapper {
     private static
@@ -13,14 +13,14 @@ class DockerComposeWrapper {
 
     final ExecWrapper exec = new ExecWrapper(LOGGER, 'docker-compose')
 
-    boolean up(File project, String projectName) {
+    boolean up(File project,  String projectName,Map<String,String> env = [:]) {
         LOGGER.info("compose: starting project $projectName from ${project.absolutePath}")
-        exec.executeForExitValue(project, [:], true, "-p $projectName up -d") == 0
+        exec.executeForExitValue(project, env, true, "-p $projectName up -d") == 0
     }
 
-    boolean down(File project, String projectName) {
+    boolean down(File project, String projectName,Map<String,String> env = [:]) {
         LOGGER.info("compose: stopping project $projectName from ${project.absolutePath}")
-        exec.executeForExitValue(project, [:], true, "-p $projectName down --remove-orphans") == 0
+        exec.executeForExitValue(project, env, true, "-p $projectName down --remove-orphans") == 0
     }
 
 

@@ -5,7 +5,7 @@ import org.springframework.shell.support.util.VersionUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 @Component
 public class CustomBanner implements BannerProvider {

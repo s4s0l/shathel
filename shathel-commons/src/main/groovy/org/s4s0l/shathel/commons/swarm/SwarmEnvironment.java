@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SwarmEnvironment implements Environment {
     private static final Logger LOGGER = getLogger(SwarmEnvironment.class);

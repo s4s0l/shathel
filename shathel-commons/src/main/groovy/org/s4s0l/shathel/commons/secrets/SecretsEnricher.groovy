@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.secrets
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel
@@ -8,15 +9,15 @@ import org.s4s0l.shathel.commons.core.stack.StackDescription
 import org.s4s0l.shathel.commons.scripts.Executable
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class SecretsEnricher extends EnricherExecutable {
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnvironmentContext environmentContext,
-                                                           ExecutableApiFacade apiFacade,
-                                                           StackDescription stack,
-                                                           ComposeFileModel model) {
+    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+        def apiFacade = params.getApiFacade();
+        def model = params.model
+        def stack = params.stack
         def manager = apiFacade.getSecretManager()
         List<Executable> executables = []
         model.mapSecrets {

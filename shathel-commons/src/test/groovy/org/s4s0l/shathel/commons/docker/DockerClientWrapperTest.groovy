@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.docker
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerClientWrapperTest extends Specification {
 

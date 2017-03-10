@@ -13,7 +13,7 @@ import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class LocalEnvironmentTest extends BaseIntegrationTest {
 
@@ -53,14 +53,14 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         //        SIDEKICK INSTALLATION
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
-        stack.getStackContext()
+        stack.getStackContext(false)
 
         then:
         stack != null
         new File(dependenciesDir, "sidekick-1.0-shathel").isDirectory()
 
         when:
-        def command = stack.createStartCommand();
+        def command = stack.createStartCommand(false);
 
         then:
         command != null
@@ -75,14 +75,14 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
 
         when:
         stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        stack.getStackContext()
+        stack.getStackContext(false)
         then:
         stack != null
         new File(dependenciesDir, "dummy-2.0-shathel").isDirectory()
         new File(dependenciesDir, "shathel-core-stack-1.2.3-shathel").isDirectory()
 
         when:
-        command = stack.createStartCommand();
+        command = stack.createStartCommand(false);
 
         then:
         command != null
@@ -107,14 +107,14 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         new File(root, "composed/enriched/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
-        command = stack.createStartCommand()
+        command = stack.createStartCommand(false)
 
         then:
         command != null
         command.commands.size() == 1
 
         when:
-        def stopCommand = stack.createStopCommand(true)
+        def stopCommand = stack.createStopCommand(true, true)
 
         then:
         stopCommand != null
@@ -125,7 +125,7 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand().commands.size() == 2
+        stack.createStartCommand(false).commands.size() == 2
 
         onEnd()
     }

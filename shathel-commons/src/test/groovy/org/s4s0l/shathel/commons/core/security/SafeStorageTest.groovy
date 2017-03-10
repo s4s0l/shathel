@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import spock.lang.Specification
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class SafeStorageTest extends Specification {
     static PASS = "secret".chars

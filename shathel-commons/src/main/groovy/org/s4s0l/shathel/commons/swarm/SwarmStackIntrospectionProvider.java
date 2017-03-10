@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SwarmStackIntrospectionProvider extends LocalStackIntrospectionProvider {
     private final DockerWrapper docker;

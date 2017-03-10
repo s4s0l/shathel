@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StackTreeDescription {
 

@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class TemplateUtils {
 

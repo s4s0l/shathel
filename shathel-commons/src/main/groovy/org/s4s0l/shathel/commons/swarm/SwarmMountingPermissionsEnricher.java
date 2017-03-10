@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
+import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
@@ -10,11 +11,12 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class SwarmMountingPermissionsEnricher extends EnricherExecutable {
     private final SwarmClusterWrapper swarmClusterWrapper;
@@ -25,8 +27,8 @@ public class SwarmMountingPermissionsEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnvironmentContext environmentContext, ExecutableApiFacade apiFacade,
-                                                           StackDescription stack, ComposeFileModel model) {
+    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+        ComposeFileModel model = params.getModel();
         List<Executable> execs = new ArrayList<>();
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("/shathel-data/")) {

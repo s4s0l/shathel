@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerWrapper {
     private static
@@ -160,12 +160,12 @@ class DockerWrapper {
             def ret = [:]
             ret << val[0].Spec.Labels
             ret << [
-                    "shathel.service.name": val[0].Spec.Name,
-                    "shathel.service.ratio" : it.value.ratio,
-                    "shathel.service.mode" : it.value.mode,
-                    "shathel.service.replicas" : it.value.replicas,
-                    "shathel.service.count" : it.value.count,
-                    "shathel.service.expectedCount" : it.value.expectedCount,
+                    "shathel.service.name"         : val[0].Spec.Name,
+                    "shathel.service.ratio"        : it.value.ratio,
+                    "shathel.service.mode"         : it.value.mode,
+                    "shathel.service.replicas"     : it.value.replicas,
+                    "shathel.service.count"        : it.value.count,
+                    "shathel.service.expectedCount": it.value.expectedCount,
             ]
 
         }
@@ -206,22 +206,22 @@ class DockerWrapper {
     }
 
 
-    Map<String,String> parseServiceLsOutput(String output) {
+    Map<String, String> parseServiceLsOutput(String output) {
         output.readLines()
                 .collect { it.split("\\s+") }
-                .findAll {it[0]!="ID"}
+                .findAll { it[0] != "ID" }
                 .collectEntries {
             def x = it[3] =~ /([0-9]+)/
             def count = Integer.parseInt(x[0][1]);
             def expectedCount = Integer.parseInt(x[1][1])
-            def ratio =  count / expectedCount
+            def ratio = count / expectedCount
             [(it[1]): [
-                    name : it[1],
-                    mode : it[2],
-                    replicas: it[3],
-                    ratio: "$ratio".toString(),
+                    name         : it[1],
+                    mode         : it[2],
+                    replicas     : it[3],
+                    ratio        : "$ratio".toString(),
                     expectedCount: "$expectedCount".toString(),
-                    count: "$count".toString(),
+                    count        : "$count".toString(),
             ]]
         }
     }
@@ -229,21 +229,31 @@ class DockerWrapper {
     float getServiceRunningRatio(String serviceName) {
         def output = exec.executeForOutput("service ls")
         def parsed = parseServiceLsOutput(output)
-        if(parsed[serviceName] == null){
+        if (parsed[serviceName] == null) {
             return 0f
-        }else{
+        } else {
             Float.parseFloat(parsed[serviceName].ratio)
         }
     }
 
-    void stackDeploy(File composeFile, String deploymentName) {
+    void stackDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
         LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
-        exec.executeForOutput(composeFile.getParentFile(), "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName");
+        exec.executeForOutput(composeFile.getParentFile(), environment, "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName")
     }
 
-    void stackUnDeploy(File composeFile, String deploymentName) {
+    void stackUnDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
         LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
-        exec.executeForOutput(composeFile.getParentFile(), "stack rm $deploymentName");
+        try {
+            exec.executeForOutput(composeFile.getParentFile(), environment, "stack rm $deploymentName")
+
+        } catch (ExecWrapper.ExecWrapperException e) {
+            if (e.getOutput().contains("has active endpoints")) {
+                LOGGER.trace("Unable to undeploy stack, sometimes this means docker is stupid and cannot remove network right away, will try again in 5s",e)
+                LOGGER.warn("Unable to undeploy stack, sometimes this means docker is stupid and cannot remove network right away, will try again in 5s")
+                Thread.sleep(5000)
+                exec.executeForOutput(composeFile.getParentFile(), environment, "stack rm $deploymentName")
+            }
+        }
     }
 
     /**

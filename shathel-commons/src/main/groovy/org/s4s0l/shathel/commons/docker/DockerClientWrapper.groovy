@@ -4,7 +4,7 @@ import de.gesellix.docker.client.DockerClientImpl
 import de.gesellix.docker.client.config.DockerEnv
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerClientWrapper {
 

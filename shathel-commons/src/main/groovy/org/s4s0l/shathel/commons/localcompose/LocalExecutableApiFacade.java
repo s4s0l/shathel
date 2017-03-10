@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class LocalExecutableApiFacade implements ExecutableApiFacade {
     private static final Logger LOGGER = getLogger(LocalExecutableApiFacade.class);

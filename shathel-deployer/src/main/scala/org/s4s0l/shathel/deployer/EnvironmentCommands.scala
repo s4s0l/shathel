@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommands: StorageCommands)
   extends ShathelCommands(parametersCommands) {

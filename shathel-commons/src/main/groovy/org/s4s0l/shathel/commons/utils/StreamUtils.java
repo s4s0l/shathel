@@ -8,7 +8,7 @@ import java.util.stream.StreamSupport;
 /**
  * http://bendra.github.io/java/lambda/stream/2014/11/01/fun-with-java-8-streams-ii.html
  *
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class StreamUtils {
 

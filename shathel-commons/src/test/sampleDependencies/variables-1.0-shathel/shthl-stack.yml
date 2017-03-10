@@ -1,0 +1,4 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:variables:1.0
+

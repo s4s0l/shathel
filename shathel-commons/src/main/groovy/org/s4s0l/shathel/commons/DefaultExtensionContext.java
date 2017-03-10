@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class DefaultExtensionContext {
     public static ExtensionContext create(Parameters parameterProvider) {

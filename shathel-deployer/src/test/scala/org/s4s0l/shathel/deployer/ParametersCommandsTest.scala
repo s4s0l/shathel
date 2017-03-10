@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConverters._
 
 /**
-  * @author Matcin Wielgus
+  * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
 class ParametersCommandsTest extends FeatureSpec {

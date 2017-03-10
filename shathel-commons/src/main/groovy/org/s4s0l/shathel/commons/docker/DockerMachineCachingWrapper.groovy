@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.docker
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class DockerMachineCachingWrapper extends DockerMachineWrapper{
     DockerMachineCachingWrapper(File storageDir) {

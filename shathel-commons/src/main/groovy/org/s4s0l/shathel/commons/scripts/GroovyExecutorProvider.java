@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.scripts;
 import java.util.Optional;
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 public class GroovyExecutorProvider implements ScriptExecutorProvider {
 

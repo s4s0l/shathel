@@ -12,7 +12,7 @@ import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class VBoxEnvironmentTest
         extends BaseIntegrationTest {
@@ -51,7 +51,7 @@ class VBoxEnvironmentTest
             environment.start()
         }
         def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        def command = stack.createStartCommand();
+        def command = stack.createStartCommand(false);
 
         then:
         command.commands.size() == 2
@@ -60,10 +60,10 @@ class VBoxEnvironmentTest
         stack.run(command)
 
         then:
-        stack.createStartCommand().commands.size() == 1
+        stack.createStartCommand(false).commands.size() == 1
 
         when:
-        def stopCommand = stack.createStopCommand(true)
+        def stopCommand = stack.createStopCommand(true, true)
 
         then:
         stopCommand.commands*.type == [StackCommand.Type.STOP, StackCommand.Type.STOP]
@@ -72,7 +72,7 @@ class VBoxEnvironmentTest
         stack.run(stopCommand)
 
         then:
-        stack.createStartCommand().commands.size() == 2
+        stack.createStartCommand(false).commands.size() == 2
 
         onEnd()
     }

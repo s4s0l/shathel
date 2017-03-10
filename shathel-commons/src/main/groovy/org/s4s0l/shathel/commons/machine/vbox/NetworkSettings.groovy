@@ -1,7 +1,7 @@
 package org.s4s0l.shathel.commons.machine.vbox
 
 /**
- * @author Matcin Wielgus
+ * @author Marcin Wielgus
  */
 class NetworkSettings {
     private final String network;
