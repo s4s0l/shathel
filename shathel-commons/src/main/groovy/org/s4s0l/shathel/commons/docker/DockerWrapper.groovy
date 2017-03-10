@@ -150,7 +150,7 @@ class DockerWrapper {
      * @param filter
      * @return
      */
-    List<Map<String, String>> servicesOfContainersMatching(String filter) {
+    List<Map<String, String>> servicesLabels(String filter) {
         def output = exec.executeForOutput("service ls -f $filter")
         def parsed = parseServiceLsOutput(output);
 
@@ -169,6 +169,29 @@ class DockerWrapper {
             ]
 
         }
+    }
+
+    Map serviceInspect(String serviceName){
+        String inspect = exec.executeForOutput("service inspect ${serviceName}")
+        def val = new JsonSlurper().parseText(inspect);
+        return val[0]
+    }
+    /**
+     * eg aoutput:
+     *  [{
+     *                 name:'service1'
+     *                 mode:'global'
+     *                 replicas: '1/2'
+     *                 ratio: '0.5'
+     *                 expectedCount: '2'
+     *                 count: '1'
+     *    },{...}]
+     * @param output
+     * @return
+     */
+    List<Map<String, String>> servicesStatus(String filter){
+        def output = exec.executeForOutput("service ls -f $filter")
+        return parseServiceLsOutput(output).collect {it.value}
     }
 
     boolean serviceRunning(String containerName) {
@@ -205,7 +228,22 @@ class DockerWrapper {
         return new JsonSlurper().parseText(output);
     }
 
-
+    /**
+     * eg aoutput:
+     *  ['service1': [
+     *                 name:'service1'
+     *                 mode:'global'
+     *                 replicas: '1/2'
+     *                 ratio: '0.5'
+     *                 expectedCount: '2'
+     *                 count: '1'
+     *              ],
+     *   'service2': [
+     *                  ...
+     *              ]
+     * @param output
+     * @return
+     */
     Map<String, String> parseServiceLsOutput(String output) {
         output.readLines()
                 .collect { it.split("\\s+") }
@@ -226,8 +264,8 @@ class DockerWrapper {
         }
     }
 
-    float getServiceRunningRatio(String serviceName) {
-        def output = exec.executeForOutput("service ls")
+    float serviceRunningRatio(String serviceName) {
+        def output = exec.executeForOutput("service ls -f name $serviceName")
         def parsed = parseServiceLsOutput(output)
         if (parsed[serviceName] == null) {
             return 0f

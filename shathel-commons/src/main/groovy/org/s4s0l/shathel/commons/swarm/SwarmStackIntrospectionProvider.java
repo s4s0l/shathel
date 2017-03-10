@@ -21,7 +21,7 @@ public class SwarmStackIntrospectionProvider extends LocalStackIntrospectionProv
 
     @Override
     protected List<Map<String, String>> getByFilter(String filter) {
-        return docker.servicesOfContainersMatching(filter);
+        return docker.servicesLabels(filter);
     }
 
     @Override
@@ -30,7 +30,6 @@ public class SwarmStackIntrospectionProvider extends LocalStackIntrospectionProv
                 x.get("shathel.service.name"),
                 Integer.parseInt(x.get("shathel.service.expectedCount")),
                 Integer.parseInt(x.get("shathel.service.count")
-
                 ))).collect(Collectors.toList());
     }
 

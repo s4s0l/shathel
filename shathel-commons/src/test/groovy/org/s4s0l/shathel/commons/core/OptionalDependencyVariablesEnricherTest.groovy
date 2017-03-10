@@ -64,10 +64,6 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
 
         then:
-        waitForService(environment, "dependency_service")
-        waitForService(environment, "dependency2_service")
-        waitForService(environment, "dependency3_service")
-
         "absent" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY1")
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY2")
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY3")
@@ -87,9 +83,6 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         stack.run(command)
 
         then:
-        waitForService(environment, "dependency1_service")
-
-
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY2")
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY3")
         "absent" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY4")
@@ -164,11 +157,6 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
 
         then:
-        waitForService(environment, "dependency1_service")
-        waitForService(environment, "dependency2_service")
-        waitForService(environment, "dependency3_service")
-        waitForService(environment, "dependency4_service")
-
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY2")
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY3")
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY4")
@@ -186,9 +174,6 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         stack.run(command)
 
         then:
-        waitForService(environment, "dependency_service")
-
-
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY1")
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY2")
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY3")

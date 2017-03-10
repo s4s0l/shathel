@@ -52,8 +52,6 @@ class SecretManagerTest
 
         then:
         environment.getIntrospectionProvider().allStacks.size() == 2
-        waitForService(environment, "secret-provider_service")
-        waitForService(environment, "secret-consumer_service")
         "password" == execInAnyTask(environment, "secret-consumer_service", "cat /run/secrets/consumer_password")
         "password" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/shathel_some_pass")
         "password2" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/donottouch")
@@ -89,8 +87,6 @@ class SecretManagerTest
 
         then:
         environment.getIntrospectionProvider().allStacks.size() == 2
-        waitForService(environment, "secret-provider_service")
-        waitForService(environment, "secret-consumer_service")
         "dummy" == execInAnyTask(environment, "secret-consumer_service", "cat /run/secrets/consumer_password")
         "dummy" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/shathel_some_pass")
         "password2" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/donottouch")

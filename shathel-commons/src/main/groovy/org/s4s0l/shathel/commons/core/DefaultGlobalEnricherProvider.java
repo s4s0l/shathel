@@ -83,6 +83,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
             environment.put("SHATHEL_ENV_MGM_SIZE", "" + msize);
             environment.put("SHATHEL_ENV_MGM_QUORUM", "" + mquorum);
 
+            environment.put("SHATHEL_ENV_DOMAIN", environmentContext.getEnvironmentDescription().getParameter("domain-name").orElse("localhost"));
         }
     }
 

@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.environment.Environment
-import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -27,9 +26,9 @@ abstract class BaseIntegrationTest extends Specification {
 
     }
 
-    def cleanupSpec(){
-        cleanupEnvironment()
-    }
+//    def cleanupSpec(){
+//        cleanupEnvironment()
+//    }
 
     def onEnd() {
         cleanupEnvironment()
@@ -50,6 +49,7 @@ abstract class BaseIntegrationTest extends Specification {
 
 
     Parameters prepare(Map additionalParams = [:], String sourceDir = "sampleDependencies") {
+        additionalParams = additionalParams.collectEntries {[(it.key.toString()):it.value.toString()]}
         File src = new File("src/test/$sourceDir")
         if (dependenciesDir == null)
             dependenciesDir = new File(getRootDir(), ".dependency-cache")
@@ -77,7 +77,7 @@ abstract class BaseIntegrationTest extends Specification {
     boolean waitForService(Environment e, String serviceName) {
         def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
         int i = 0;
-        while (i < 25 && node.getServiceRunningRatio(serviceName) < 0.9999f) {
+        while (i < 25 && node.serviceRunningRatio(serviceName) < 0.9999f) {
             Thread.sleep(1000)
             i++;
         }
@@ -88,6 +88,13 @@ abstract class BaseIntegrationTest extends Specification {
         def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
         def id = node.serviceContainers(serviceName)[0]
         node.containerExec(id, command)
+    }
+
+    List<String> execInAllTasks(Environment e, String serviceName, String command) {
+        def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
+        node.serviceContainers(serviceName).collect {
+            node.containerExec(it, command)
+        }
     }
 
 }

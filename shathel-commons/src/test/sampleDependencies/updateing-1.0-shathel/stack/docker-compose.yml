@@ -1,0 +1,13 @@
+version: "3.1"
+services:
+  service:
+    image: tutum/hello-world
+    environment:
+      - CURRENT_VERSION=1
+    deploy:
+      mode: replicated
+      replicas: 5
+  dummy:
+      image: tutum/hello-world
+  toremove:
+      image: tutum/hello-world

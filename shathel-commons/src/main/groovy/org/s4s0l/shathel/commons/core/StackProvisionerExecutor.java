@@ -50,10 +50,10 @@ public class StackProvisionerExecutor {
                     ComposeFileModel.dump(stackCommand.getComposeModel(), composeFile);
                     if (stackCommand.getType() != StackCommand.Type.STOP) {
                         executePreProvisioners(dstStackDir, stackCommand);
-                        ecrc.startContainers(stackCommand.getDescription().getDeployName(), stackCommand.getEnvironment(), composeFile);
+                        ecrc.startContainers(stackCommand, composeFile);
                         executePostProvisioners(dstStackDir, stackCommand);
                     } else {
-                        ecrc.stopContainers(stackCommand.getDescription().getDeployName(), stackCommand.getEnvironment(), composeFile);
+                        ecrc.stopContainers(stackCommand, composeFile);
                     }
                 }
             }

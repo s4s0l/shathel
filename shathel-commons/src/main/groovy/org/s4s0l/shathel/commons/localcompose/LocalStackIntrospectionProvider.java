@@ -23,6 +23,13 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
                 .collect(Collectors.toList());
     }
 
+    protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
+        return resolver.getLabelValues("com.docker.compose.service")
+                .entrySet().stream()
+                .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public Optional<StackIntrospection> getStackIntrospection(StackReference reference) {
         List<Map<String, String>> oneByFilter = getByFilter("label=org.shathel.stack.ga=" + reference.getGroup() + ":" + reference.getName());
@@ -41,12 +48,7 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
         return new StackIntrospection(new StackReference(o), services, resolver.getShathelLabels());
     }
 
-    protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
-        return resolver.getLabelValues("com.docker.compose.service")
-                .entrySet().stream()
-                .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
-                .collect(Collectors.toList());
-    }
+
 
     @Override
     public StackIntrospections getAllStacks() {
