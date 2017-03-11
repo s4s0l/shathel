@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.deployer
 
 import java.io.File
+import java.util.stream.Collectors
 
 import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.environment.Environment
@@ -21,9 +22,19 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
 
   @CliCommand(value = Array("environment use"), help = "Sets current env")
   def init(
-            @CliOption(key = Array(""), mandatory = false, help = "Environment name to use")
+            @CliOption(key = Array(""), mandatory = true, help = "Environment name to use")
             environment: String
           ): String = {
+    shathel(Map[String,String]().asJava, builder())(
+      context => {
+        val storage = storageCommands.getStorage(context)
+        val solution = context.shathel.getSolution(storage)
+        if(!solution.getEnvironments().contains(environment)){
+          throw new RuntimeException(s"Environment ${environment} not found possible environments are:" +
+            s" ${solution.getEnvironments().stream().collect(Collectors.joining(", "))}")
+        }
+        "ok"
+      })
     shathel(builder().environment(environment).build().asJava, builder())(
       context => {
         val (_, _, environment) = getEnvironment(context)
@@ -141,6 +152,7 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
   def getEnvironment(context: ShathelCommandContext): (Storage, Solution, Environment) = {
     val storage = storageCommands.getStorage(context)
     val solution = context.shathel.getSolution(storage)
+
     val environment = solution.getEnvironment(context.environment())
     (storage, solution, environment)
   }

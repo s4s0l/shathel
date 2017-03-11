@@ -39,9 +39,12 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
             String repoPrefix = repository == null ? "" : repository + "/";
             String tag = repoPrefix + imageName + ":" + stack.getReference().getVersion();
             execs.add(executionContext -> {
-                dockerForManagementNode.buildAndPush(
+                dockerForManagementNode.buildAndTag(
                         new File(stack.getStackResources().getComposeFileDirectory(), context),
                         dockerfile, args, tag);
+                if (repository != null) {
+                    dockerForManagementNode.push(tag);
+                }
                 return "ok";
             });
 

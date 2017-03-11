@@ -20,6 +20,10 @@ public class StackIntrospection {
         this.labels = labels;
     }
 
+    public List<Service> getServices() {
+        return services;
+    }
+
     public StackReference getReference() {
         return reference;
     }

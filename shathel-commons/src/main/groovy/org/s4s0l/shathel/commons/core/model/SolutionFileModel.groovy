@@ -40,4 +40,8 @@ class SolutionFileModel {
     String getName() {
         parsedYml['shathel-solution']['name']
     }
+
+    Set<String> getEnvironments() {
+        return parsedYml['shathel-solution']['environments'].keySet();
+    }
 }

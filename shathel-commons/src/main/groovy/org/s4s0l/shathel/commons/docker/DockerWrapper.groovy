@@ -252,7 +252,7 @@ class DockerWrapper {
             def x = it[3] =~ /([0-9]+)/
             def count = Integer.parseInt(x[0][1]);
             def expectedCount = Integer.parseInt(x[1][1])
-            def ratio = count / expectedCount
+            def ratio = expectedCount == 0  ? 0 : count / expectedCount
             [(it[1]): [
                     name         : it[1],
                     mode         : it[2],
@@ -382,10 +382,13 @@ class DockerWrapper {
         exec.executeForOutput("run $s")
     }
 
-    void buildAndPush(File file, String dockerfile, Map<String, String> args, String tag) {
+    void buildAndTag(File file, String dockerfile, Map<String, String> args, String tag) {
         LOGGER.info("docker: building $tag")
         def a = args.collect { "--build-arg $it.key=$it.value" }.join(" ")
         exec.executeForOutput(file, [:], "build -t $tag -f $dockerfile $a ${file.getAbsolutePath()}")
+    }
+
+    void push(String tag){
         exec.executeForOutput("push $tag")
     }
 

@@ -1,10 +1,20 @@
 package org.s4s0l.shathel.deployer
 
+import java.io.{PrintWriter, StringWriter}
+import java.util.logging.{Formatter, Handler, LogManager, LogRecord}
+import javax.annotation.PostConstruct
+
+import org.apache.commons.io.IOUtils
 import org.s4s0l.shathel.deployer.shell.SpringShellApplication
 import org.s4s0l.shathel.deployer.shell.customization.MapConverter
 import org.slf4j.{Logger, LoggerFactory}
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.{Bean, ComponentScan}
+import org.springframework.core.annotation.Order
+import org.springframework.shell.core.{JLineLogHandler, SimpleExecutionStrategy}
+import org.springframework.shell.support.logging.HandlerUtils
+import org.springframework.shell.support.util.OsUtils
 
 object Main {
   def main(args: Array[String]) {
@@ -15,9 +25,13 @@ object Main {
   private val LOGGER: Logger = LoggerFactory.getLogger(classOf[Main])
 }
 
+
+
+
 @SpringBootApplication
 @ComponentScan(Array("org.s4s0l.shathel.deployer.shell.customization"))
 class Main {
+
 
   @Bean
   def ParametersCommands: ParametersCommands = new ParametersCommands
@@ -42,7 +56,6 @@ class Main {
 
   @Bean
   def SnippetsCommand: SnippetsCommand = new SnippetsCommand(ParametersCommands, EnvironmentCommands)
-
 
   @Bean
   def mapConverter: MapConverter = {

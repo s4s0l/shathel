@@ -6,6 +6,7 @@ import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Marcin Wielgus
@@ -32,5 +33,9 @@ public class SolutionDescription {
     public Optional<String> getParameter(String name) {
         String s = overrides.getParameter("shathel.solution." + name).orElseGet(() -> parameters.get(name));
         return Optional.ofNullable(s);
+    }
+
+    public Set<String> getEnvironments() {
+        return model.getEnvironments();
     }
 }

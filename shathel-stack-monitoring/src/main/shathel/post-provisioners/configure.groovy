@@ -15,15 +15,12 @@ import org.apache.http.entity.mime.content.FileBody
 //@Grab('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
 //@Grab('org.apache.httpcomponents:httpmime:4.2.1')
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.scripts.HttpApis
 
-EnvironmentContext environmentContext = context;
-ExecutableApiFacade api = env;
-StackCommand stackCommand = command;
+ExecutableApiFacade apii = api;
+Map<String,String> envs = env
 HttpApis httpApi = http
-String ip = api.getIpForManagementNode();
+String ip = apii.getIpForManagementNode();
 int portainerPort = 3000
 def address = "http://${ip}:${portainerPort}"
 def grafana = httpApi.waitAndGetClient(address,[401,403],"/api/datasources")
@@ -35,8 +32,8 @@ def getClient(address){
     ret.handler['404'] = ret.handler.get(Status.SUCCESS)
     ret
 }
-
-//grafana  = getClient("http://111.111.111.99:3000")
+//envs = [:]
+//grafana  = getClient("http://localhost:3000")
 
 
 def token = Base64.getEncoder().encodeToString(("admin:adminadmin").bytes)
@@ -46,7 +43,7 @@ HttpResponseDecorator result = grafana.get([
         headers           : [Authorization: "Basic $token"],
         path              : '/api/datasources'
 ])
-
+assert result.status == 200
 def initialized = result.data.collect {it.name} . contains("Prometheus")
 
 if(!initialized){
@@ -57,11 +54,12 @@ if(!initialized){
             body: [
                     name:"Prometheus",
                     type:"prometheus",
-                    url:"http://prometheus:9090/prometheus",
+                    url:"http://prometheus:9090${envs.getOrDefault("PROMETHEUS_CONTEXT_PATH", "/")}".toString(),
                     access:"proxy",
                     isDefault:true
             ]
     ])
+    assert result.status == 200
     println("Grafana Initialized")
 }else{
     println("Grafana Already initialized")

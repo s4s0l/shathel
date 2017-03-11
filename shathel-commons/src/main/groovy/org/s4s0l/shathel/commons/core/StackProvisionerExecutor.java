@@ -97,6 +97,7 @@ public class StackProvisionerExecutor {
         ctxt.put("dir", dstStackDir);
         ctxt.put("log", LOGGER);
         ctxt.put("http", new HttpApis());
+        ctxt.put("env", stackCommand.getEnvironment());
         executable.execute(ctxt);
     }
 }

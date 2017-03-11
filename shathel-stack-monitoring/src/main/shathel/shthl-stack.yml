@@ -5,3 +5,9 @@ shathel-stack:
   post-provisioners:
     configure:
       type: groovy
+  dependencies:
+    org.s4s0l.shathel:shathel-stack-proxy:$version:
+      optional: true
+      envs:
+        GRAFANA_CONTEXT_PATH: /grafana/
+        PROMETHEUS_CONTEXT_PATH: /prometheus

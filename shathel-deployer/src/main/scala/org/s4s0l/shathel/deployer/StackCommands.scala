@@ -42,6 +42,22 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
     })
   }
 
+  @CliCommand(value = Array("stack ls"), help = "Displays what will be done with given stack.")
+  def ls(
+             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
+             map: java.util.Map[String, String]
+           ): String = {
+    shathel(map, builder())(
+      context => {
+        val (storage, solution, environment) = environmentCommands.getEnvironment(context)
+        val stacks = environment.getIntrospectionProvider.getAllStacks.getStacks.asScala
+        val ret : Map[String, AnyRef] = stacks.map(x =>
+          x.getReference.getGav -> x.getServices.asScala.map(s=>
+            s.getServiceName -> s"${s.getCurrentInstances}/${s.getRequiredInstances}").toMap.asJava).toMap
+        return response(ret)
+      })
+  }
+
   @CliCommand(value = Array("stack stop"), help = "Displays what will be done with given stack.")
   def stop(
             @CliOption(key = Array("name", ""), mandatory = true, help = "Package name in form of group:name:version to be run")

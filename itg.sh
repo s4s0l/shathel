@@ -5,6 +5,7 @@ export SHATHEL_MVN_LOCALREPO=$(pwd)/build/localrepo
 export SHATHEL_DEPLOYER_DIR=$(pwd)/build/playground
 export SHATHEL_ENV=itg
 export SHATHEL_ENV_ITG_FORCEFUL=true
+export SHATHEL_ENV_LOCAL_FORCEFUL=true
 export SHATHEL_ENV_ITG_NET=111.111.111
 export SHATHEL_ENV_ITG_SAFEPASSWORD=HelloWorld
 export JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005

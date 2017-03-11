@@ -15,6 +15,7 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Marcin Wielgus
@@ -29,7 +30,9 @@ public class Solution {
         this.params = params;
         this.storage = storage;
     }
-
+    public Set<String> getEnvironments(){
+        return getSolutionDescription().getEnvironments();
+    }
 
     public Environment getEnvironment(String environmentName) {
         SolutionDescription solutionDescription = getSolutionDescription();

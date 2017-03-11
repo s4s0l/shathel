@@ -6,7 +6,13 @@
         <encoder>
             <!--<pattern>%-5level: %msg%n</pattern>-->
             <!--todo append error if level > INFO-->
-            <pattern>%msg%n</pattern>
+            <pattern>%-5level: %m%n%rEx{full,
+                java.lang,
+                sun,
+                org.springframework,
+                net.sf.cglib,
+                ByCGLIB
+                }</pattern>
         </encoder>
     </appender>
 

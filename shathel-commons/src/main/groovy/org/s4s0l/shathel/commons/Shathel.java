@@ -9,6 +9,7 @@ import org.s4s0l.shathel.commons.filestorage.FileStorage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * @author Marcin Wielgus

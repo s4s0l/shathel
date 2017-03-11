@@ -55,8 +55,8 @@ services:
             -storage.local.path=/prometheus
             -web.console.libraries=/etc/prometheus/console_libraries
             -web.console.templates=/etc/prometheus/consoles
-            -web.external-url=http://localhost/prometheus
-            -web.route-prefix=/prometheus
+            -web.external-url=http://${SHATHEL_ENV_DOMAIN}${PROMETHEUS_CONTEXT_PATH:-/}
+            -web.route-prefix=${PROMETHEUS_CONTEXT_PATH:-/}
       deploy:
         labels:
             com.df.notify: "true"
@@ -89,7 +89,8 @@ services:
         - ./grafana/grafana.ini:/etc/grafana/grafana.ini
         - ./grafana_dashboards/:/var/lib/grafana/dashboards
       environment:
-        - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+        - GF_SERVER_DOMAIN=$SHATHEL_ENV_DOMAIN
+        - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s${GRAFANA_CONTEXT_PATH:-/}
         - GF_AUTH_ANONYMOUS_ENABLED=true
 #        - GF_AUTH_BASIC_ENABLED=false
 #          - DASHBOARDS_IMPORT=609:20

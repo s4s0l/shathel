@@ -28,9 +28,9 @@ public class SwarmStackIntrospectionProvider extends LocalStackIntrospectionProv
     protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
         return resolver.getMap().stream().map(x -> new StackIntrospection.Service(
                 x.get("shathel.service.name"),
-                Integer.parseInt(x.get("shathel.service.expectedCount")),
-                Integer.parseInt(x.get("shathel.service.count")
-                ))).collect(Collectors.toList());
+                Integer.parseInt(x.get("shathel.service.count")),
+                Integer.parseInt(x.get("shathel.service.expectedCount"))
+        )).collect(Collectors.toList());
     }
 
 }
