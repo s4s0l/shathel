@@ -1,9 +1,8 @@
 version: "3"
 services:
   portainer:
-    image: portainer/portainer:1.11.3
-#    --no-auth
-    command: -H unix:///var/run/docker.sock
+    image: portainer/portainer:1.11.4
+    command: -H unix:///var/run/docker.sock  --no-auth
     ports:
       - 9001:9000
     volumes:
@@ -15,9 +14,10 @@ services:
       labels:
           com.df.notify: "true"
           com.df.distribute: "true"
-          com.df.servicePath: "/portainer"
-          com.df.reqPathReplace: "/"
-          com.df.reqPathSearch: "/portainer"
+          com.df.usersSecret: "monitoring"
+          com.df.servicePath: "/portainer/,/portainer/api"
+          com.df.reqPathReplace: /
+          com.df.reqPathSearch: /portainer/
           com.df.port: "9000"
 
 

@@ -30,48 +30,52 @@ int portainerPort = 9001
 String adminPassword = "qwerty"
 def address = "http://${ip}:${portainerPort}"
 def portainer = httpApi.waitAndGetClient(address)
-
+def AUTH_ON = false
+def HEADERS = [:]
 log "Checking if already initialized"
 
-HttpResponseDecorator result = portainer.post([
-        requestContentType: JSON,
-        contentType       : JSON,
-        path              : '/api/auth',
-        body              : [username: "admin", password: adminPassword]]
+if (AUTH_ON) {
+    HttpResponseDecorator result = portainer.post([
+            requestContentType: JSON,
+            contentType       : JSON,
+            path              : '/api/auth',
+            body              : [username: "admin", password: adminPassword]]
 
-)
-if (result.status != 200) {
-    log "Initiating password"
+    )
+    if (result.status != 200) {
+        log "Initiating password"
+
+        result = portainer.post(
+                requestContentType: JSON,
+                contentType: JSON,
+                path: '/api/users/admin/init',
+                body: [password: adminPassword]
+        )
+        assert result.status == 200
+
+    }
+    log "Getting token"
 
     result = portainer.post(
             requestContentType: JSON,
             contentType: JSON,
-            path: '/api/users/admin/init',
-            body: [password: adminPassword]
+            path: '/api/auth',
+            body: [username: "admin", password: adminPassword]
     )
     assert result.status == 200
 
+
+    def token = result.data.jwt;
+    HEADERS = [Authorization: "Bearer $token"]
 }
-log "Getting token"
-
-result = portainer.post(
-        requestContentType: JSON,
-        contentType: JSON,
-        path: '/api/auth',
-        body: [username: "admin", password: adminPassword]
-)
-assert result.status == 200
-
-def token = result.data.jwt;
-
 
 result = portainer.get(
         contentType: JSON,
         path: '/api/endpoints',
-        headers: [Authorization: "Bearer $token"],
+        headers: HEADERS,
 )
 
-def nodesDefined = result.data.collect  { it.Name }
+def nodesDefined = result.data.collect { it.Name }
 
 
 portainer.encoder.'multipart/form-data' = {
@@ -83,7 +87,7 @@ portainer.encoder.'multipart/form-data' = {
 }
 
 apii.getNodeNames()
-        .findAll {!nodesDefined.contains(it)}
+        .findAll { !nodesDefined.contains(it) }
         .each {
 
     def machineName = it
@@ -100,7 +104,7 @@ apii.getNodeNames()
             contentType: JSON,
             query: [active: false],
             path: '/api/endpoints',
-            headers: [Authorization: "Bearer $token"],
+            headers: HEADERS,
             body: [Name: machineName, URL: machineIp, TLS: tls]
     )
     assert result.status == 200
@@ -112,7 +116,7 @@ apii.getNodeNames()
                     requestContentType: 'multipart/form-data',
                     contentType: JSON,
                     path: "/api/upload/tls/$endpointId/$fileName",
-                    headers: [Authorization: "Bearer $token"],
+                    headers: HEADERS,
                     body: new File(certPath, "${fileName}.pem"),
             )
             assert result.status == 200

@@ -12,8 +12,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner;
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider;
 import org.slf4j.Logger;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -36,6 +35,12 @@ public class LocalSwarmEnvironment implements Environment {
     @Override
     public void initialize() {
         new DockerWrapper().swarmInit();
+        String nodeName = new DockerWrapper().swarmNodes().keySet().iterator().next();
+        Map<String, String> labels = new HashMap<>();
+        labels.put("shathel.node.name", "manager-1");
+        labels.put("shathel.node.main", "true");
+        new DockerWrapper().swarmNodeSetLabels(nodeName, labels);
+
     }
 
     @Override
