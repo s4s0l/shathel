@@ -1,24 +1,38 @@
 version: "3"
+#volumes:
+#      consul-data:
 services:
   consul:
-    image: consul:0.7.4
+    image: consul:0.7.5
     ports:
       - 8500:8500
+#    volumes:
+#      - consul-data:/consul/data
+    hostname: '{{.Node.ID}}-consul'
     environment:
+      - 'asfsadf=asdfsdf'
       - "CONSUL_BIND_INTERFACE=eth0"
-      - "CONSUL_LOCAL_CONFIG={\"skip_leave_on_interrupt\": true}"
+      - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true, "skip_leave_on_interrupt": false}'
     command: agent   -server -ui -client=0.0.0.0 -bootstrap-expect=${SHATHEL_ENV_QUORUM:-1} -retry-join=tasks.consul
     deploy:
       mode: global
       update_config:
         delay: 20s
+      labels:
+        com.df.notify: 'true'
+        com.df.usersSecret: "monitoring"
+        com.df.distribute: 'true'
+        com.df.servicePath: "/consul/,/v1/"
+        com.df.reqPathReplace: /ui/
+        com.df.reqPathSearch: /consul/
+        com.df.port: '8500'
+
   consul-client:
-      image: consul:0.7.4
+      image: consul:0.7.5
       environment:
         - 'CONSUL_BIND_INTERFACE=eth0'
-        - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}'
+        - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true, "skip_leave_on_interrupt": false}'
       command: agent -retry-join=tasks.consul -rejoin
       deploy:
-        mode: replicated
-        replicas: 1
-
+        mode: global
+      hostname: '{{.Node.ID}}-consul-client'
