@@ -27,7 +27,7 @@ class SecretManager {
         return getAllSecrets(secretName)[0].Spec.Name
     }
 
-    String secretInitialName(String secretName){
+    String secretInitialName(String secretName) {
         secretName + "_1"
     }
 
@@ -48,9 +48,10 @@ class SecretManager {
         return value
     }
 
-    void secretUpdate(String secretName, File defaultValue) {
-        secretAddNewVersion(secretName, defaultValue)
+    String secretUpdate(String secretName, File defaultValue) {
+        def finalName = secretAddNewVersion(secretName, defaultValue)
         secretUpdateForServices(secretName)
+        return finalName
     }
 
 
@@ -73,6 +74,41 @@ class SecretManager {
         return finalSecretName
     }
 
+    List<String> getAllSecretNames() {
+        List secretsMatching = dockerWrapper.secrets().content
+        return secretsMatching.sort {
+            o1, o2 -> -o1.Spec.Name.compareTo(o2.Spec.Name)
+        }.collect { it.Spec.Name }
+    }
+
+    List<String> getAllSecretNames(String secretName) {
+        def pattern = /${secretName}(_[0-9]+)?/
+        List secretsList = dockerWrapper.secrets().content
+        def secretsMatching = secretsList.findAll {
+            it.Spec.Name.startsWith(secretName) && it.Spec.Name ==~ pattern
+        }
+        return secretsMatching.sort {
+            o1, o2 -> -o1.Spec.Name.compareTo(o2.Spec.Name)
+        }.collect { it.Spec.Name }
+    }
+
+    List<String> getServicesUsingSecret(String secretName) {
+        List secretsMatching = getAllSecrets(secretName)
+        if (secretsMatching.isEmpty()) {
+            throw new RuntimeException("Secret $secretName is not present")
+        }
+        List<String> oldPasswordsID = secretsMatching.collect { it.ID }
+        def servicesToReload = dockerWrapper.services().content
+                .findAll {
+            it?.Spec?.TaskTemplate?.ContainerSpec?.Secrets?.find { s ->
+                oldPasswordsID.contains(s.SecretID)
+            } != null
+
+        }
+        return servicesToReload.collect {
+            it.Spec.Name
+        }.sort()
+    }
 
     void secretUpdateForServices(String secretName) {
         List secretsMatching = getAllSecrets(secretName)
@@ -106,16 +142,16 @@ class SecretManager {
 
             }
             try {
-                LOGGER.info("Updating service ${it.Name} with new secrets")
+                LOGGER.info("Updating service ${it.Spec.Name} with new secrets")
                 dockerWrapper.updateService(it.ID, [version: it.Version.Index], it.Spec)
             } catch (Exception e) {
-                throw new RuntimeException("Unable to swap password for service ${it.Name}")
+                throw new RuntimeException("Unable to swap password for service ${it.Spec.Name}")
             }
-            LOGGER.info("Waiting for update process to finish for service ${it.Name}")
+            LOGGER.info("Waiting for update process to finish for service ${it.Spec.Name}")
             def status = "updating"
             while (status != "completed") {
                 status = dockerWrapper.inspectService(it.ID).content?.UpdateStatus?.State
-                LOGGER.debug("Waiting for update status completed for service ${it.ID}. Status is ${status}...")
+                LOGGER.debug("Waiting for update status completed for service ${it.Spec.Name}. Status is ${status}...")
                 if (status != "completed") {
                     Thread.sleep(1000)
                 }
@@ -130,7 +166,7 @@ class SecretManager {
             parameters.getParameter(secretName.toLowerCase() + "_secret_value")
                     .map { it.bytes }
                     .orElseGet {
-                if(defaultValue == null){
+                if (defaultValue == null) {
                     throw new RuntimeException("Unable to find value of secret $secretName.")
                 }
                 LOGGER.warn("For secret $secretName default value will be used from file ${defaultValue.absolutePath}")
@@ -140,9 +176,10 @@ class SecretManager {
     }
 
     private List getAllSecrets(String secretName) {
+        def pattern = /${secretName}(_[0-9]+)?/
         List secretsList = dockerWrapper.secrets().content
         def secretsMatching = secretsList.findAll {
-            it.Spec.Name.startsWith(secretName) && it.Spec.Name ==~ /${secretName}(_[0-9]+)?/
+            it.Spec.Name.startsWith(secretName) && it.Spec.Name ==~ pattern
         }
         secretsMatching.sort {
             o1, o2 -> -o1.Spec.Name.compareTo(o2.Spec.Name)

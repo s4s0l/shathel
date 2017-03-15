@@ -33,6 +33,14 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
     new Yaml().dump(map.asJava)
   }
 
+  def response(map: List[String]): String = {
+    new Yaml().dump(map.asJava)
+  }
+
+  def response(map: java.util.List[String]): String = {
+    new Yaml().dump(map)
+  }
+
   def ok(): String = {
     new Yaml().dump(Map("status" -> "ok").asJava)
   }

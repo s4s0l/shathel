@@ -58,6 +58,9 @@ class Main {
   def SnippetsCommand: SnippetsCommand = new SnippetsCommand(ParametersCommands, EnvironmentCommands)
 
   @Bean
+  def SecretsCommand: SecretsCommand = new SecretsCommand(ParametersCommands, EnvironmentCommands)
+
+  @Bean
   def mapConverter: MapConverter = {
     return new MapConverter
   }

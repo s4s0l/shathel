@@ -91,6 +91,16 @@ class SecretManagerTest
         "dummy" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/shathel_some_pass")
         "password2" == execInAnyTask(environment, "secret-provider_service", "cat /run/secrets/donottouch")
 
+        when:
+        def servicesUsing = environment.environmentApiFacade.secretManager.getServicesUsingSecret("shathel_some_pass")
+        def allSecretNames = environment.environmentApiFacade.secretManager.getAllSecretNames("shathel_some_pass")
+        def currentName = environment.environmentApiFacade.secretManager.secretCurrentName("shathel_some_pass")
+
+        then:
+        ["secret-consumer_service","secret-provider_service"] == servicesUsing
+        ["shathel_some_pass_2","shathel_some_pass_1"] == allSecretNames
+        "shathel_some_pass_2" == currentName
+
         onEnd()
 
 
