@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  logstorage-data:
+
 services:
   logstorage:
     image: elasticsearch:5.2.0-alpine
@@ -10,7 +13,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-        - /shathel-data/elastic:/usr/share/elasticsearch/data
+        - logstorage-data:/usr/share/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xms300m -Xmx300m"
     deploy:
@@ -24,8 +27,6 @@ services:
       ELASTICSEARCH_URL: http://logstorage:9200
     networks:
       - network
-#    volumes:
-#      - ./kibana/config/:/usr/share/kibana/config
     ports:
       - "5601:5601"
     deploy:

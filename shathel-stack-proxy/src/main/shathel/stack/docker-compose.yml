@@ -4,8 +4,8 @@ services:
     image: sasol/docker-flow-proxy:beta
     ports:
       - 8080:8080
-      - 80:80
-      - 443:443
+      - ${SHATHEL_PROXY_PORT_HTTP:-80}:80
+      - ${SHATHEL_PROXY_PORT_HTTPS:-443}:443
     networks:
       - network
     environment:

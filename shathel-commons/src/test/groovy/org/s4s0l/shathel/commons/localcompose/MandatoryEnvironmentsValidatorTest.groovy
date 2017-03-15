@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.core
+package org.s4s0l.shathel.commons.localcompose
 
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.stack.StackReference
@@ -9,7 +9,7 @@ import testutils.BaseIntegrationTest
 /**
  * @author Marcin Wielgus
  */
-class VariablesEnricherTest extends BaseIntegrationTest {
+class MandatoryEnvironmentsValidatorTest extends BaseIntegrationTest {
 
     @Override
     def setupEnvironment() {
@@ -20,12 +20,6 @@ class VariablesEnricherTest extends BaseIntegrationTest {
 version: 1
 shathel-solution:
   name: playground
-  envs:
-    FROM_SHATHEL_FILE_SOLUTION: FROM_SHATHEL_FILE_SOLUTION 
-  variables:
-    envs:
-      FROM_SHATHEL_FILE_STACK: FROM_SHATHEL_FILE_STACK
-      MANDATORY_PARAM: MANDATORY_PARAM
   environments:
     local:
       type: local-swarm
@@ -43,9 +37,9 @@ shathel-solution:
         }
     }
 
-    def "Variables should be exposed to Stack compose"() {
+    def "Missing variables should be reported"() {
         given:
-        Shathel sht = new Shathel(prepare(["shathel.env.${environmentName}.domain":"mydomain.com"]))
+        Shathel sht = new Shathel(prepare())
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {
@@ -60,13 +54,8 @@ shathel-solution:
 
 
         then:
-        "1" == execInAnyTask(environment, "variables_service", "printenv ENV_SIZE")
-        "1" == execInAnyTask(environment, "variables_service", "printenv ENV_QUORUM")
-        "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_SIZE")
-        "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_QUORUM")
-        "FROM_SHATHEL_FILE_STACK" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_STACK")
-        "FROM_SHATHEL_FILE_SOLUTION" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_SOLUTION")
-        "mydomain.com" == execInAnyTask(environment, "variables_service", "printenv DNS")
+        RuntimeException ex = thrown()
+        ex.message == 'Missing env vars: MANDATORY_PARAM'
 
         onEnd()
 

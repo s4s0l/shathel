@@ -118,4 +118,8 @@ public class StackDescriptionImpl implements StackDescription {
         return solutionStackDesctiption.getEnvironments();
     }
 
+    @Override
+    public Map<String, String> getMandatoryEnvs() {
+        return fileModel.getMandatoryEnvs();
+    }
 }

@@ -1,0 +1,23 @@
+version: "3.1"
+volumes:
+  letsencrypt-data:
+services:
+  letsencrypt-companion:
+      image: hamburml/docker-flow-letsencrypt:latest
+      environment:
+        - DOMAIN_1=('${SHATHEL_ENV_DOMAIN}')
+        - DOMAIN_COUNT=1
+        - CERTBOT_EMAIL=${SHATHEL_LETSENCRYPT_EMAIL}
+        - PROXY_ADDRESS=proxy
+        - CERTBOT_CRON_RENEW=('0 3 * * *')
+      volumes:
+        - letsencrypt-data:/etc/letsencrypt
+      deploy:
+        labels:
+          com.df.servicePath: "/.well-known/acme-challenge"
+          com.df.notify: "true"
+          com.df.distribute: "true"
+          com.df.port: "80"
+        placement:
+          constraints: [node.labels.shathel.node.main == true]
+        replicas: 1

@@ -4,6 +4,7 @@ import groovy.lang.Tuple;
 import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
+import org.s4s0l.shathel.commons.localcompose.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.scripts.Executable;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
 import org.slf4j.Logger;
@@ -186,7 +187,8 @@ public class SwarmEnvironment implements Environment {
                 new SwarmMountingEnricher(swarmClusterWrapper),
                 new SwarmBuildingEnricher(repository),
                 new SwarmPullingEnricher(swarmClusterWrapper),
-                new SecretsEnricher()
+                new SecretsEnricher(),
+                new MandatoryEnvironmentsValidator()
         );
     }
 

@@ -118,4 +118,8 @@ class StackFileModel implements Cloneable {
 
         }
     }
+
+    Map<String, String> getMandatoryEnvs() {
+        parsedYml['shathel-stack']['mandatoryEnvs'] ?: [:]
+    }
 }

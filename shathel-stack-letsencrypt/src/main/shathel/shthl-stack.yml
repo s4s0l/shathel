@@ -1,0 +1,7 @@
+version: 1
+shathel-stack:
+  mandatoryEnvs:
+    SHATHEL_LETSENCRYPT_EMAIL: Email address for CERTBOT_EMAIL
+  deployName: letsencrypt
+  dependencies:
+    org.s4s0l.shathel:shathel-stack-proxy:$version:

@@ -23,8 +23,6 @@ public class LocalEnvironment implements Environment {
     }
 
 
-
-
     @Override
     public boolean isInitialized() {
         return true;
@@ -79,7 +77,6 @@ public class LocalEnvironment implements Environment {
     }
 
 
-
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
         return new LocalEnvironmentContainerRunner();
@@ -92,7 +89,8 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public List<Executable> getEnvironmentEnrichers() {
-        return Arrays.asList(new LocalMountingEnricher());
+        return Arrays.asList(new LocalMountingEnricher(),
+                new MandatoryEnvironmentsValidator());
     }
 
     private static final Logger LOGGER = getLogger(LocalEnvironment.class);

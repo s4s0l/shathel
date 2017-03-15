@@ -35,4 +35,5 @@ public interface StackDescription {
 
     Map<String, String> getEnvs();
 
+    Map<String,String> getMandatoryEnvs();
 }
