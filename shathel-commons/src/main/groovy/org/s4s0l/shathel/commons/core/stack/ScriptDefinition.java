@@ -16,6 +16,11 @@ public class ScriptDefinition implements TypedScript {
     private final String inline;
     private final String type;
 
+    @Override
+    public String getScriptName() {
+        return getType() + ":" + origin.getReference().getGav() + "/" + getName();
+    }
+
     public ScriptDefinition(StackDescription origin, String category, String name, String inline, String type) {
         this.origin = origin;
         this.category = category;

@@ -8,7 +8,7 @@ import java.util.Optional;
 public class GroovyExecutorProvider implements ScriptExecutorProvider {
 
     @Override
-    public Optional<Executable> findExecutor(TypedScript typedScript) {
+    public Optional<NamedExecutable> findExecutor(TypedScript typedScript) {
         if ("groovy".equals(typedScript.getType())) {
             return Optional.of(new GroovyExecutable(typedScript));
         } else {

@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.localcompose.MandatoryEnvironmentsValidator;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
 import org.slf4j.Logger;
 
@@ -178,7 +178,7 @@ public class SwarmEnvironment implements Environment {
     }
 
     @Override
-    public List<Executable> getEnvironmentEnrichers() {
+    public List<NamedExecutable> getEnvironmentEnrichers() {
         //todo lokalizacja repo powinna byc cecha env?
         String repository = swarmClusterWrapper.getIp(environmentContext.getContextName() + "-manager-1") + ":4000";
         //todo why there is cluster wrapper passed to enrichers?!?!

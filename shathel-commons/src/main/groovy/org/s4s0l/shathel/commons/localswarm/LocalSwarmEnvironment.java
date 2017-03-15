@@ -5,7 +5,7 @@ import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.localcompose.LocalExecutableApiFacade;
 import org.s4s0l.shathel.commons.localcompose.LocalMountingEnricher;
 import org.s4s0l.shathel.commons.localcompose.MandatoryEnvironmentsValidator;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.secrets.SecretManager;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
 import org.s4s0l.shathel.commons.swarm.SwarmBuildingEnricher;
@@ -107,7 +107,7 @@ public class LocalSwarmEnvironment implements Environment {
     }
 
     @Override
-    public List<Executable> getEnvironmentEnrichers() {
+    public List<NamedExecutable> getEnvironmentEnrichers() {
         return Arrays.asList(
                 new LocalMountingEnricher(),
                 new SwarmBuildingEnricher(null),

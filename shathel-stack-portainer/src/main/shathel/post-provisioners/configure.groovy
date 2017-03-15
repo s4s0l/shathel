@@ -29,6 +29,7 @@ String ip = apii.getIpForManagementNode();
 int portainerPort = 9001
 String adminPassword = "qwerty"
 def address = "http://${ip}:${portainerPort}"
+log("Waiting for connection")
 def portainer = httpApi.waitAndGetClient(address)
 def AUTH_ON = false
 def HEADERS = [:]

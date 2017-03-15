@@ -1,6 +1,6 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 
 import java.util.List;
 
@@ -66,6 +66,6 @@ public interface Environment {
 
     ExecutableApiFacade getEnvironmentApiFacade();
 
-    List<Executable> getEnvironmentEnrichers();
+    List<NamedExecutable> getEnvironmentEnrichers();
 
 }

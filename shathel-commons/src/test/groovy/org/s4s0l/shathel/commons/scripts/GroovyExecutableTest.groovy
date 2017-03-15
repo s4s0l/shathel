@@ -10,12 +10,12 @@ class GroovyExecutableTest extends Specification {
     def "Script should getGrapes"() {
         given:
         GroovyExecutable ge = new GroovyExecutable()
-
+        def output = [:]
         when:
-        Map<String, String> res = ge.execute(getClass().getResource("/scala.groovy").text, ["input":{ x -> x }])
+        Map<String, String> res = ge.execute(getClass().getResource("/scala.groovy").text, ["input":{ x -> x }, output:output])
 
         then:
-        res['groovy'] == 'groovy'
-        res['scala'] == 'scala.Option'
+        output['groovy'] == 'groovy'
+        output['scala'] == 'scala.Option'
     }
 }

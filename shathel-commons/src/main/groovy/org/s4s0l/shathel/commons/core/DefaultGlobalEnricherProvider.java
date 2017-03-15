@@ -4,7 +4,7 @@ import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDependency;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
 
 
     @Override
-    public List<Executable> getGlobalEnrichers() {
+    public List<NamedExecutable> getGlobalEnrichers() {
         return Arrays.asList(
                 new LabelingEnricher(),
                 new VariablesEnricher(),

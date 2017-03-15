@@ -4,5 +4,5 @@
 )
 import scala.Option
 
-return ['groovy': input('groovy'),
+output << ['groovy': input('groovy'),
         'scala' : Option.class.getName()]

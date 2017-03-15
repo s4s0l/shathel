@@ -23,7 +23,13 @@ HttpApis httpApi = http
 String ip = apii.getIpForManagementNode();
 int portainerPort = 3000
 def address = "http://${ip}:${portainerPort}"
+def log(String x) {
+    LOGGER.info("-----grafana:" + x);
+}
+log("Waiting for connection")
 def grafana = httpApi.waitAndGetClient(address,[401,403],"/api/datasources")
+
+
 
 
 def getClient(address){
@@ -60,8 +66,8 @@ if(!initialized){
             ]
     ])
     assert result.status == 200
-    println("Grafana Initialized")
+    log("Initialized")
 }else{
-    println("Grafana Already initialized")
+    log("Already initialized")
 }
 

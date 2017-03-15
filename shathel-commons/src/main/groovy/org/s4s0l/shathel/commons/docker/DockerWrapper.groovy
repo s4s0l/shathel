@@ -57,7 +57,7 @@ class DockerWrapper {
      * @return
      */
     void networkRemove(String networkId) {
-        LOGGER.info("docker: removing network $networkId")
+        LOGGER.debug("docker: removing network $networkId")
         exec.executeForOutput("network rm $networkId")
     }
 
@@ -102,7 +102,7 @@ class DockerWrapper {
      * @param containerId
      */
     void containerRemove(String containerId) {
-        LOGGER.info("docker: removing container $containerId")
+        LOGGER.debug("docker: removing container $containerId")
         exec.executeForOutput("rm -f -v $containerId")
     }
 
@@ -275,12 +275,12 @@ class DockerWrapper {
     }
 
     void stackDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
-        LOGGER.info("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
+        LOGGER.debug("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
         exec.executeForOutput(composeFile.getParentFile(), environment, "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName")
     }
 
     void stackUnDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
-        LOGGER.info("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
+        LOGGER.debug("docker: undeploying stack $deploymentName from ${composeFile.absolutePath}")
         try {
             exec.executeForOutput(composeFile.getParentFile(), environment, "stack rm $deploymentName")
 
@@ -383,7 +383,7 @@ class DockerWrapper {
     }
 
     void buildAndTag(File file, String dockerfile, Map<String, String> args, String tag) {
-        LOGGER.info("docker: building $tag")
+        LOGGER.debug("docker: building $tag")
         def a = args.collect { "--build-arg $it.key=$it.value" }.join(" ")
         exec.executeForOutput(file, [:], "build -t $tag -f $dockerfile $a ${file.getAbsolutePath()}")
     }
@@ -393,7 +393,7 @@ class DockerWrapper {
     }
 
     void pull(String tag) {
-        LOGGER.info("docker: pulling $tag")
+        LOGGER.debug("docker: pulling $tag")
         exec.executeForOutput("pull $tag")
     }
 

@@ -34,6 +34,7 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
 
     @Override
     public void startContainers(StackCommand command, File composeFile) {
+        LOGGER.info("Running: {} ({}).", command.getDescription().getGav(), command.getType().toString());
         docker.stackDeploy(composeFile, command.getDescription().getDeployName(), command.getEnvironment());
 
         //waiting for startup
@@ -59,7 +60,7 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
                 Map map = docker.serviceInspect(serviceName);
                 Map updateStatus = (Map) map.get("UpdateStatus");
                 status = (String) updateStatus.get("State");
-                LOGGER.debug("Waiting for update status completed for service ${}. Status is ${}...", serviceName, status);
+                LOGGER.info("Running: {}. Service {} has update status {}, waiting...", reference.getGav(), serviceName, status);
                 if (null == status || "completed".equals(status)) {
                     continue services;
                 }
@@ -79,7 +80,7 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
             Optional<Map<String, String>> notStarted = maps.stream()
                     .filter(x -> !"1".equals(x.get("ratio")))
                     .findAny()
-                    .map(this::logNotStartedService);
+                    .map(x -> logNotStartedService(reference, x));
             if (!notStarted.isPresent()) {
                 return;
             }
@@ -97,13 +98,14 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
         }
     }
 
-    private Map<String, String> logNotStartedService(Map<String, String> x) {
-        LOGGER.info("service {} is started in {}*100%", x.get("name"), x.get("ratio"));
+    private Map<String, String> logNotStartedService(StackReference ref, Map<String, String> x) {
+        LOGGER.info("Running: {}. Service {} is started in {}%, waiting...", ref.getGav(), x.get("name"), 100 * Float.parseFloat(x.get("ratio")));
         return x;
     }
 
     @Override
     public void stopContainers(StackCommand command, File composeFile) {
+        LOGGER.info("Stopping: {}.", command.getDescription().getGav());
         docker.stackUnDeploy(composeFile, command.getDescription().getDeployName(), command.getEnvironment());
     }
 

@@ -7,4 +7,6 @@ public interface TypedScript {
     String getType();
 
     String getScriptContents();
+
+    String getScriptName();
 }

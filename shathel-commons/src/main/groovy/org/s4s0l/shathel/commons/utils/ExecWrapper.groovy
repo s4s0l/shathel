@@ -23,7 +23,7 @@ class ExecWrapper {
     int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String... args) {
         StringBuilder sb = new StringBuilder()
         List<?> flatten = fix(args)
-        LOGGER.info("Running ${flatten.join(",")}")
+        LOGGER.debug("Running ${flatten.join(",")}")
         Process process = createProcess(flatten, dir, env)
         process.inputStream.eachLine {
             LOGGER.debug("output:  [$it]")
@@ -44,7 +44,7 @@ class ExecWrapper {
     String executeForOutput(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], String... args) {
         StringBuilder sb = new StringBuilder()
         List<?> flatten = fix(args)
-        LOGGER.info("Running ${flatten.join(",")}")
+        LOGGER.debug("Running ${flatten.join(",")}")
         Process process = createProcess(flatten, dir, env)
         if (input != null) {
             process.outputStream.write(input)

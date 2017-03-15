@@ -5,18 +5,23 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
-class GroovyExecutable implements Executable {
+class GroovyExecutable implements NamedExecutable {
     private final TypedScript script;
 
     GroovyExecutable(TypedScript script) {
         this.script = script
     }
 
-    Object execute(File scriptFile, Map<String, Object> variables) {
-        return execute(scriptFile.text, variables)
+    @Override
+    String getName() {
+        return script.getScriptName();
     }
 
-    Object execute(String scriptFile, Map<String, Object> variables) {
+    void execute(File scriptFile, Map<String, Object> variables) {
+        execute(scriptFile.text, variables)
+    }
+
+    void execute(String scriptFile, Map<String, Object> variables) {
         GroovyShell shell = new GroovyShell()
         def scrpt = shell.parse(scriptFile)
         Binding binding = new Binding()
@@ -25,11 +30,11 @@ class GroovyExecutable implements Executable {
         }
         binding.setVariable("LOGGER", LoggerFactory.getLogger(GroovyExecutable.class))
         scrpt.setBinding(binding)
-        return scrpt.run()
+        scrpt.run()
     }
 
     @Override
-    Object execute(Map<String, Object> context) {
-        return execute(script.getScriptContents(), context)
+    void execute(Map<String, Object> context) {
+        execute(script.getScriptContents(), context)
     }
 }

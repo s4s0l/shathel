@@ -2,7 +2,7 @@ package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 
 import java.util.List;
 import java.util.Map;
@@ -27,11 +27,11 @@ public class StackCommand {
     private final Type type;
     private final ComposeFileModel mutableModel;
     private final StackDescription description;
-    private final List<Executable> provisioners;
+    private final List<NamedExecutable> provisioners;
     private final Map<String, String> environment;
 
 
-    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<Executable> provisioners, Map<String, String> environment) {
+    public StackCommand(Type type, ComposeFileModel mutableModel, StackDescription description, List<NamedExecutable> provisioners, Map<String, String> environment) {
         this.type = type;
         this.mutableModel = mutableModel;
         this.description = description;
@@ -55,7 +55,7 @@ public class StackCommand {
         return mutableModel;
     }
 
-    public List<Executable> getEnricherPreProvisioners() {
+    public List<NamedExecutable> getEnricherPreProvisioners() {
         return provisioners;
     }
 }

@@ -2,7 +2,6 @@ package org.s4s0l.shathel.commons.localcompose;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
-import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

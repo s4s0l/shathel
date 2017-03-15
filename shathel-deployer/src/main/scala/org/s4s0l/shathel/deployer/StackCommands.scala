@@ -8,6 +8,7 @@ import org.s4s0l.shathel.commons.core.{Stack, StackOperations}
 import org.s4s0l.shathel.commons.core.environment.{Environment, StackCommand}
 import org.s4s0l.shathel.commons.core.model.GavUtils
 import org.s4s0l.shathel.commons.core.stack.{StackProvisionerDefinition, StackReference}
+import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.deployer.shell.customization.CustomBanner
 import org.slf4j.LoggerFactory
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
@@ -26,13 +27,13 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
              @CliOption(key = Array("name", ""), mandatory = true, help = "Package name in form of group:name:version to be run")
              name: String,
              @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
-               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
              inspect: Boolean,
              @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
-               specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
              inspectLong: Boolean,
              @CliOption(key = Array("with-optional"), mandatory = false, help = "If true will start with optional dependencies",
-               specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
              withOptional: Boolean,
              @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
              map: java.util.Map[String, String]
@@ -44,15 +45,15 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
 
   @CliCommand(value = Array("stack ls"), help = "Displays what will be done with given stack.")
   def ls(
-             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
-             map: java.util.Map[String, String]
-           ): String = {
+          @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
+          map: java.util.Map[String, String]
+        ): String = {
     shathel(map, builder())(
       context => {
         val (storage, solution, environment) = environmentCommands.getEnvironment(context)
         val stacks = environment.getIntrospectionProvider.getAllStacks.getStacks.asScala
-        val ret : Map[String, AnyRef] = stacks.map(x =>
-          x.getReference.getGav -> x.getServices.asScala.map(s=>
+        val ret: Map[String, AnyRef] = stacks.map(x =>
+          x.getReference.getGav -> x.getServices.asScala.map(s =>
             s.getServiceName -> s"${s.getCurrentInstances}/${s.getRequiredInstances}").toMap.asJava).toMap
         return response(ret)
       })
@@ -63,16 +64,16 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
             @CliOption(key = Array("name", ""), mandatory = true, help = "Package name in form of group:name:version to be run")
             name: String,
             @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
-              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
             inspect: Boolean,
             @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
-              specifiedDefaultValue = "true", unspecifiedDefaultValue = "true")
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
             inspectLong: Boolean,
             @CliOption(key = Array("with-dependencies"), mandatory = false, help = "If true will stop all dependencies also",
-              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
             withDependencies: Boolean,
             @CliOption(key = Array("with-optional"), mandatory = false, help = "If true will stop optional dependencies",
-              specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
             withOptional: Boolean,
             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
             map: java.util.Map[String, String]
@@ -90,18 +91,20 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
         val openStack = solution.openStack(environment, getStackReference(name))
         val command = factory(openStack, context)
 
-        val output = this.inspect(command, inspectLong)
-        if (!inspect) {
+        if (inspect) {
+          return response(this.inspect(command, inspectLong))
+        } else {
           try {
             openStack.run(command)
+            return ok();
           } catch {
             case e: Exception => {
-              LOGGER.warn(response(output))
+              LOGGER.warn(response(this.inspect(command, true)))
               throw e
             }
           }
         }
-        return response(output)
+
       })
   }
 
@@ -118,18 +121,18 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
   private def inspect(command: StackOperations, inspectLong: Boolean): Map[String, AnyRef] = {
     def arrayToMap = collection.breakOut[Seq[StackCommand], (String, util.Map[String, AnyRef]), Map[String, util.Map[String, AnyRef]]]
 
-    def display = (p: Object) => s"${p.getClass.getSimpleName}:${p.toString}"
+    def display = (p: NamedExecutable) => p.getName
 
-    def displayProv = (p: StackProvisionerDefinition) => s"${p.getName}:${p.getType}"
+    def displayProv = (p: StackProvisionerDefinition) => p.getScriptName
 
     return command.getCommands.asScala.map((elem) => {
       elem.getDescription.getDeployName -> Map(
-        "gav" -> elem.getDescription.getGav,
         "type" -> elem.getType.name(),
+        "gav" -> elem.getDescription.getGav,
+        "compose" -> (if (inspectLong) elem.getComposeModel.getParsedYml else "<hidden>"),
         "pre-provisioners" -> elem.getDescription.getPreProvisioners.asScala.map(displayProv).asJava,
         "enriching-provisioners" -> elem.getEnricherPreProvisioners.asScala.map(display).asJava,
-        "post-provisioners" -> elem.getDescription.getPostProvisioners.asScala.map(displayProv).asJava,
-        "compose" -> (if (inspectLong) elem.getComposeModel.getParsedYml else "<hidden>")
+        "post-provisioners" -> elem.getDescription.getPostProvisioners.asScala.map(displayProv).asJava
       ).asJava
     })(arrayToMap)
   }

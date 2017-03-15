@@ -7,16 +7,18 @@ import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackEnricherDefinition;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
+import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Marcin Wielgus
@@ -24,6 +26,7 @@ import java.util.stream.Stream;
 public class StackEnricherExecutor {
     private final Stack.StackContext stack;
     private final boolean withOptional;
+    private static final Logger LOGGER = getLogger(StackEnricherExecutor.class);
 
     public StackEnricherExecutor(Stack.StackContext stack, boolean withOptional) {
         this.stack = stack;
@@ -53,7 +56,7 @@ public class StackEnricherExecutor {
     private StackCommand createStackCommand(StackDescription stackDescription, StackCommand.Type commandType, boolean withOptional) {
         ComposeFileModel composeModel = stackDescription.getStackResources().getComposeFileModel();
         Map<String, String> environment = new HashMap<>();
-        List<Executable> provisionersExtra;
+        List<NamedExecutable> provisionersExtra;
         if (commandType.willRun) {
             provisionersExtra = Streams.concat(
                     GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext()).stream()
@@ -74,37 +77,26 @@ public class StackEnricherExecutor {
         return stack.getEnvironment().getEnvironmentContext().getExtensionContext();
     }
 
-    private List<Executable> execute(Optional<Executable> executor,
-                                     ComposeFileModel composeModel,
-                                     StackDescription stackDescription,
-                                     Map<String, String> environment, boolean withOptional) {
-
+    private List<NamedExecutable> execute(Optional<NamedExecutable> executor,
+                                          ComposeFileModel composeModel,
+                                          StackDescription stackDescription,
+                                          Map<String, String> environment, boolean withOptional) {
+        EnricherExecutableParams.Provisioners provisioners = new EnricherExecutableParams.Provisioners();
         EnricherExecutableParams params = new EnricherExecutableParams(
+                LOGGER,
                 stackDescription,
                 composeModel,
                 environment,
-                stack, withOptional
+                stack, withOptional,
+                provisioners
         );
 
         Map<String, Object> ctxt = params.toMap();
-
-        return executor
-                .map(x -> x.execute(ctxt))
-                .map(x -> {
-                    if (x instanceof Collection) {
-                        return new ArrayList<Executable>((Collection<? extends Executable>) x);
-                    }
-                    if (x instanceof Executable) {
-                        return Collections.singletonList((Executable) x);
-                    }
-                    return Collections.EMPTY_LIST;
-                })
-                .map(o -> {
-                    Collector<Executable, ?, List<Executable>> collector = Collectors.toList();
-                    Stream<Executable> stream = o.stream().filter(x -> (x instanceof Executable));
-                    return stream.collect(collector);
-                })
-                .orElse(Collections.emptyList());
+        if (executor.isPresent()) {
+            LOGGER.info("Enriching with {}.", executor.get().getName());
+            executor.get().execute(ctxt);
+        }
+        return provisioners;
     }
 
     private StackOperations buildOperations(Stream<StackCommand> stackCommandStream) {
@@ -140,5 +132,6 @@ public class StackEnricherExecutor {
         }
         return commandType;
     }
+
 
 }

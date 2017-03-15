@@ -2,16 +2,8 @@ package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
-import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
-import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,20 +19,19 @@ public class SwarmMountingPermissionsEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+    protected void execute(EnricherExecutableParams params) {
         ComposeFileModel model = params.getModel();
-        List<Executable> execs = new ArrayList<>();
+        EnricherExecutableParams.Provisioners provisioners = params.getProvisioners();
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("/shathel-data/")) {
                 String[] split = volume.split(":");
                 String localPart = split[0].replace("/shathel-data", swarmClusterWrapper.getDataDirectory());
                 LOGGER.debug("Changing path {} to be owned by 1000", localPart);
-                execs.add(context -> {
-                    for (String nodeName : swarmClusterWrapper.getNodeNames()) {
+                provisioners.add("prepare-mount-dir:" + localPart, context -> {
+                    for (String nodeName : context.getCurrentNodes()) {
                         swarmClusterWrapper.sudo(nodeName, "mkdir -p " + localPart);
                         swarmClusterWrapper.sudo(nodeName, "chown -R 1000 " + localPart);
                     }
-                    return "ok";
                 });
                 return localPart + ":" + split[1];
 
@@ -48,7 +39,6 @@ public class SwarmMountingPermissionsEnricher extends EnricherExecutable {
                 return volume;
             }
         });
-        return execs;
     }
 
 

@@ -2,18 +2,14 @@ package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
-import org.s4s0l.shathel.commons.scripts.Executable;
 import org.s4s0l.shathel.commons.utils.TemplateUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,13 +23,13 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams paramz) {
+    protected void execute(EnricherExecutableParams paramz) {
         ExecutableApiFacade apiFacade = paramz.getApiFacade();
         ComposeFileModel model = paramz.getModel();
         StackDescription stack = paramz.getStack();
+        EnricherExecutableParams.Provisioners provisioners = paramz.getProvisioners();
         Map<String, String> environment = paramz.getEnvironment();
         DockerWrapper dockerForManagementNode = apiFacade.getDockerForManagementNode();
-        List<Executable> execs = new ArrayList<>();
         model.mapBuilds((service, params) -> {
             String dockerfile = TemplateUtils.fillEnvironmentVariables((String) params.get("dockerfile"), environment);
             String context = TemplateUtils.fillEnvironmentVariables((String) params.get("context"), environment);
@@ -49,20 +45,20 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
             String imageName = (stack.getReference().getName() + "." + service).toLowerCase().replaceAll("[^a-z0-9]", ".");
             String repoPrefix = repository == null ? "" : repository + "/";
             String tag = repoPrefix + imageName + ":" + stack.getReference().getVersion();
-            execs.add(executionContext -> {
+            File contextDir = new File(stack.getStackResources().getComposeFileDirectory(), context);
+            provisioners.add("build-and-tag:" + contextDir.getAbsolutePath(), executionContext -> {
                 dockerForManagementNode.buildAndTag(
-                        new File(stack.getStackResources().getComposeFileDirectory(), context),
+                        contextDir,
                         dockerfile, args, tag);
                 if (repository != null) {
                     dockerForManagementNode.push(tag);
                 }
-                return "ok";
             });
 
             return tag;
 
         });
-        return execs;
+
     }
 
 

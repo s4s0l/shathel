@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.localcompose;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -88,7 +88,7 @@ public class LocalEnvironment implements Environment {
     }
 
     @Override
-    public List<Executable> getEnvironmentEnrichers() {
+    public List<NamedExecutable> getEnvironmentEnrichers() {
         return Arrays.asList(new LocalMountingEnricher(),
                 new MandatoryEnvironmentsValidator());
     }

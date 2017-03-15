@@ -1,11 +1,10 @@
 package org.s4s0l.shathel.commons.core;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
-import org.s4s0l.shathel.commons.scripts.Executable;
+import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.scripts.HttpApis;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.utils.IoUtils;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -67,7 +65,7 @@ public class StackProvisionerExecutor {
     public void executePreProvisioners(File dstStackDir, StackCommand stackCommand) {
         List<StackProvisionerDefinition> preProvisioners = stackCommand.getDescription().getPreProvisioners();
         executeProvisioners(dstStackDir, stackCommand, preProvisioners);
-        for (Executable executable : stackCommand.getEnricherPreProvisioners()) {
+        for (NamedExecutable executable : stackCommand.getEnricherPreProvisioners()) {
             execute(dstStackDir, executable, stackCommand);
         }
     }
@@ -80,7 +78,7 @@ public class StackProvisionerExecutor {
 
     private void executeProvisioners(File dstStackDir, StackCommand stackCommand, List<StackProvisionerDefinition> postProvisioners) {
         for (StackProvisionerDefinition postProvisioner : postProvisioners) {
-            Executable executable = ScriptExecutorProvider
+            NamedExecutable executable = ScriptExecutorProvider
                     .findExecutor(environmentContext.getExtensionContext(), postProvisioner)
                     .orElseThrow(() -> new RuntimeException("No executable fouind for " + postProvisioner));
             execute(dstStackDir, executable, stackCommand);
@@ -89,15 +87,18 @@ public class StackProvisionerExecutor {
 
     private static final Logger LOGGER = getLogger(StackProvisionerExecutor.class);
 
-    private void execute(File dstStackDir, Executable executable, StackCommand stackCommand) {
-        Map<String, Object> ctxt = new HashedMap();
-        ctxt.put("context", environmentContext);
-        ctxt.put("api", executableApiFacade);
-        ctxt.put("command", stackCommand);
-        ctxt.put("dir", dstStackDir);
-        ctxt.put("log", LOGGER);
-        ctxt.put("http", new HttpApis());
-        ctxt.put("env", stackCommand.getEnvironment());
-        executable.execute(ctxt);
+    private void execute(File dstStackDir, NamedExecutable executable, StackCommand stackCommand) {
+        ProvisionerExecutableParams params = new ProvisionerExecutableParams(
+                environmentContext,
+                executableApiFacade,
+                stackCommand,
+                dstStackDir,
+                LOGGER,
+                new HttpApis(),
+                stackCommand.getEnvironment(),
+                executableApiFacade.getNodeNames()
+        );
+        LOGGER.info("Provisioning with: {}.", executable.getName());
+        executable.execute(params.toMap());
     }
 }

@@ -4,20 +4,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
-import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executable;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,10 +30,10 @@ public class SwarmMountingEnricher extends EnricherExecutable {
     }
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+    protected void execute(EnricherExecutableParams params) {
         ComposeFileModel model = params.getModel();
         StackDescription stack = params.getStack();
-        List<Executable> execs = new ArrayList<>();
+        EnricherExecutableParams.Provisioners provisioners = params.getProvisioners();
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("./")) {
                 String toPath = swarmClusterWrapper.getDataDirectory() + "/" + stack.getReference().getSimpleName() + "-" + service + "/" + getDirectory(volume);
@@ -47,22 +42,18 @@ public class SwarmMountingEnricher extends EnricherExecutable {
                 File file = new File(stack.getStackResources().getComposeFileDirectory(), split[0]);
                 final File directoryToCopy;
                 String resultingMount = toPath + ":" + remotePart;
-                if(file.isFile()){
-                    resultingMount = toPath + "/" + file.getName()+ ":" + remotePart;
+                if (file.isFile()) {
+                    resultingMount = toPath + "/" + file.getName() + ":" + remotePart;
                     directoryToCopy = file.getParentFile();
-                }else{
+                } else {
                     directoryToCopy = file;
                 }
-                execs.add(context -> {
-                    prepareMounts(directoryToCopy, toPath);
-                    return "ok";
-                });
+                provisioners.add("prepare-mount-dir:" + toPath, context -> prepareMounts(context.getCurrentNodes(), directoryToCopy, toPath));
                 return resultingMount;
             } else {
                 return volume;
             }
         });
-        return execs;
     }
 
 
@@ -75,10 +66,10 @@ public class SwarmMountingEnricher extends EnricherExecutable {
         }
     }
 
-    private void prepareMounts(File fromDirectory, String toRemotePath) {
+    private void prepareMounts(List<String> nodeNames, File fromDirectory, String toRemotePath) {
         //ALL nodes must be running!!!!
         Path basePath = Paths.get(fromDirectory.getAbsolutePath());
-        List<String> nodeNames = swarmClusterWrapper.getNodeNames();
+
         LOGGER.debug("Moving {} to {} on remotes", fromDirectory.getAbsolutePath(), toRemotePath);
         for (String nodeName : nodeNames) {
             Iterator<File> fileIterator = FileUtils.iterateFilesAndDirs(fromDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);

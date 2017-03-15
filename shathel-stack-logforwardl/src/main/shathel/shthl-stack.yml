@@ -16,7 +16,6 @@ shathel-stack:
 
                     ]
           }
-          []
   dependencies:
       org.s4s0l.shathel:shathel-stack-logstore:$version:
 

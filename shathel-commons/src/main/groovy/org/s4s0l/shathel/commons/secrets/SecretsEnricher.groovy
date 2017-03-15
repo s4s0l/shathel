@@ -2,11 +2,8 @@ package org.s4s0l.shathel.commons.secrets
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.core.model.ComposeFileModel
-import org.s4s0l.shathel.commons.core.stack.StackDescription
-import org.s4s0l.shathel.commons.scripts.Executable
+import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable
+import org.s4s0l.shathel.commons.scripts.NamedExecutable
 
 /**
  * @author Marcin Wielgus
@@ -14,12 +11,12 @@ import org.s4s0l.shathel.commons.scripts.Executable
 class SecretsEnricher extends EnricherExecutable {
 
     @Override
-    protected List<Executable> executeProvidingProvisioner(EnricherExecutableParams params) {
+    protected void execute(EnricherExecutableParams params) {
         def apiFacade = params.getApiFacade();
         def model = params.model
         def stack = params.stack
         def manager = apiFacade.getSecretManager()
-        List<Executable> executables = []
+        def provisioners = params.getProvisioners();
         model.mapSecrets {
             secret ->
                 if (secret.name.startsWith("shathel_")) {
@@ -31,10 +28,9 @@ class SecretsEnricher extends EnricherExecutable {
                             return [name: currentName, external: true]
                         } else {
                             //does not exist will be created in pre provisioning
-                            executables.add({ context ->
+                            provisioners.add("secret-add:${secret.name}", { context ->
                                 manager.secretCreate(secret.name, new File(stack.getStackResources().getComposeFileDirectory(), secret.file))
-                                return "ok"
-                            } as Executable)
+                            } as ProvisionerExecutable)
                             return [name: manager.secretInitialName(secret.name), external: true]
                         }
 
@@ -56,7 +52,6 @@ class SecretsEnricher extends EnricherExecutable {
                 }
 
         }
-        return executables
     }
 }
 
