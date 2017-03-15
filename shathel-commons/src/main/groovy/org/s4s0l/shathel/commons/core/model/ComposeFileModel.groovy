@@ -106,9 +106,34 @@ class ComposeFileModel {
         }
     }
 
+    void addLabelToNetworks(String key, String value) {
+        parsedYml.networks?.findAll {
+            if (it.value == null){
+                it.value = [:]
+            }
+            (it.value.external ?: false) == false
+        }
+        .each {
+            it.value.labels = (it.value.labels ?: [:])
+            it.value.labels << [(key): value]
+        }
+    }
+
+    void addLabelToVolumes(String key, String value) {
+        parsedYml.volumes?.each {
+            if (it.value == null){
+                it.value = [:]
+            }
+            it.value.labels = (it.value.labels ?: [:])
+            it.value.labels << [(key): value]
+        }
+    }
 
     void addLabelToServices(String key, String value) {
         parsedYml.services?.each {
+            if (it.value == null){
+                it.value = [:]
+            }
             if (it.value.labels == null) {
                 it.value.labels = [:]
             }
@@ -158,7 +183,7 @@ class ComposeFileModel {
 
     private updateSecretInServices(String oldSecret, String newSecret) {
         yml.services.each { srv ->
-            if(srv.value == null || srv.value.secrets == null){
+            if (srv.value == null || srv.value.secrets == null) {
                 return
             }
             srv.value.secrets = srv.value.secrets?.collect { secret ->

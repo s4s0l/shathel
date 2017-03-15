@@ -27,15 +27,22 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
     }
 
     private static class LabelingEnricher extends EnricherExecutable {
+
+        private void addLabels(ComposeFileModel model, String name, String value) {
+            model.addLabelToServices(name, value);
+            model.addLabelToNetworks(name, value);
+            model.addLabelToVolumes(name, value);
+        }
+
         @Override
         protected void execute(EnricherExecutableParams params) {
             ComposeFileModel model = params.getModel();
             StackDescription stack = params.getStack();
-            model.addLabelToServices("org.shathel.stack.gav", stack.getGav());
-            model.addLabelToServices("org.shathel.stack.deployName", stack.getDeployName());
-            model.addLabelToServices("org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
-            model.addLabelToServices("org.shathel.stack.marker", "true");
-            model.addLabelToServices("org.shathel.deployer.version", versionInfo());
+            addLabels(model,"org.shathel.stack.gav", stack.getGav());
+            addLabels(model,"org.shathel.stack.deployName", stack.getDeployName());
+            addLabels(model,"org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
+            addLabels(model,"org.shathel.stack.marker", "true");
+            addLabels(model,"org.shathel.deployer.version", versionInfo());
             List<StackDependency> dependencies = stack.getDependencies();
             int i = 0;
             for (StackDependency dependency : dependencies) {

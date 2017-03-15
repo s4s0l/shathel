@@ -43,6 +43,52 @@ class ComposeFileModelTest extends Specification {
 
     }
 
+    def "addLabels"() {
+        given:
+        ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
+        version: "3"
+        services:
+          service1:
+          service2:
+            labels:
+                label: value
+            deploy:
+              labels:
+                label: value        
+        volumes:
+          volume1:
+          volume2:
+            labels:
+                label: value
+        networks:
+            network1:
+                external: true 
+            network2:
+            network3:
+                labels:
+                    label: value          
+        """))
+
+        when:
+        x.addLabelToServices("sss", "sss")
+        x.addLabelToNetworks("nnn", "nnn")
+        x.addLabelToVolumes("vvv", "vvv")
+        def dump = new Yaml().dump(x.parsedYml)
+        def res = new Yaml().load(dump)
+
+
+        then:
+        res.services.service1.labels  == [sss:'sss']
+        res.services.service1.deploy.labels  == [sss:'sss']
+        res.services.service2.labels  == [label:'value',sss:'sss']
+        res.services.service2.deploy.labels  == [label:'value',sss:'sss']
+        res.volumes.volume1.labels == [vvv:'vvv']
+        res.volumes.volume2.labels == [label:'value',vvv:'vvv']
+        res.networks.network1.labels == null
+        res.networks.network2.labels == [nnn:'nnn']
+        res.networks.network3.labels == [label:'value',nnn:'nnn']
+    }
+
     def "Map mounts"() {
         given:
         ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
