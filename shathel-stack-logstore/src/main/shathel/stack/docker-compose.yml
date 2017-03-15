@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  elasticsearch:
+  logstorage:
     image: elasticsearch:5.2.0-alpine
     command: -Enetwork.host=0.0.0.0
     networks:
@@ -19,14 +19,24 @@ services:
             cpus: '0.5'
             memory: 550M
   kibana:
-    image: kibana:5.2.0
+    build: ${PROXY_BUILD_TO_USE:-kibana/}
+    environment:
+      ELASTICSEARCH_URL: http://logstorage:9200
     networks:
       - network
-    volumes:
-      - ./kibana/config/:/usr/share/kibana/config
+#    volumes:
+#      - ./kibana/config/:/usr/share/kibana/config
     ports:
       - "5601:5601"
     deploy:
+      labels:
+          com.df.notify: 'true'
+          com.df.usersSecret: "monitoring"
+          com.df.distribute: 'true'
+          com.df.servicePath: "/kibana"
+          com.df.reqPathReplace: /
+          com.df.reqPathSearch: /kibana/
+          com.df.port: '5601'
       resources:
         limits:
             cpus: '0.5'

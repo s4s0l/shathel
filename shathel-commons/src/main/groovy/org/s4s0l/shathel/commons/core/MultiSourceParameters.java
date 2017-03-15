@@ -23,9 +23,9 @@ public class MultiSourceParameters implements Parameters {
                 .findFirst().orElseGet(() -> Optional.empty());
     }
 
-    public Parameters over(Parameters x) {
+    public Parameters hiddenBy(Parameters x) {
         List<Parameters> nl = new ArrayList<>(params);
-        nl.add(x);
+        nl.add(0,x);
         return new MultiSourceParameters(nl);
     }
 

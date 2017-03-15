@@ -4,3 +4,6 @@ shathel-stack:
   post-provisioners:
     configure:
       type: groovy
+  dependencies:
+    org.s4s0l.shathel:shathel-stack-proxy:$version:
+      optional: true

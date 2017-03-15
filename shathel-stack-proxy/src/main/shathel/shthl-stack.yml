@@ -3,15 +3,30 @@ shathel-stack:
   deployName: proxy
   enrichers:
     addNetwork:
-        target: ALL
+        target: DEPS
         inline: |
           def services = compose.findServicesWithLabels("com.df.notify","true")
+          def added = false
+          def disabledMonitoring = env['SHATHEL_PROXY_DISABLE_MONITORING'] == "true"
           if (!services.isEmpty()){
-              compose.addExternalNetwork("proxy_network")
               services.each {
-                  compose.addNetworkToService(it, "proxy_network")
-                  if (it.deploy.labels['com.df.usersSecret'] == 'monitoring') {
-                          it.deploy.labels['com.df.usersPassEncrypted'] = 'true'
+                  def monitoringProxy = it.deploy.labels['com.df.usersSecret'] == 'monitoring'
+                  if(disabledMonitoring && monitoringProxy){
+                      LOGGER.info("Disabled proxy for service ${stack.name} as SHATHEL_PROXY_DISABLE_MONITORING=false")
+                      it.deploy.labels['com.df.notify'] = 'false'
+                      def selfReference = new org.s4s0l.shathel.commons.core.stack.StackReference("org.s4s0l.shathel:shathel-stack-proxy:any")
+                      stack.dependencies.find {it.stackReference.isSameStack(selfReference)}.envs.keySet().each {
+                          env.remove(it)
+                      }
+                  }else{
+                      compose.addNetworkToService(it, "proxy_network")
+                      if (monitoringProxy) {
+                              it.deploy.labels['com.df.usersPassEncrypted'] = 'true'
+                      }
+                      added = true
                   }
               }
+          }
+          if (added){
+            compose.addExternalNetwork("proxy_network")
           }

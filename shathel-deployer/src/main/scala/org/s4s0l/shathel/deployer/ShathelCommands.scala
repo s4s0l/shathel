@@ -16,9 +16,9 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
 
 
   def shathel(parametersMap: java.util.Map[String, String], commandOverrides: DeployerParameters.Builder = new DeployerParameters.Builder())(work: (DeployerParameters.ShathelCommandContext) => String): String = {
-    val build = commandOverrides.build()
+    val commandOverridesParams = commandOverrides.build()
     val buildParameters = parametersCommands.buildParameters(parametersMap)
-    val allParameters = MapParameters.builder().parameters(build.asJava).build().over(buildParameters)
+    val allParameters = buildParameters.hiddenBy(MapParameters.builder().parameters(commandOverridesParams.asJava).build())
     val extensionContext = DefaultExtensionContext.create(allParameters, List[ExtensionInterface](new MvnDependencyDownloader(allParameters)).asJava)
     val shathel = new Shathel(allParameters, extensionContext)
     val context = new DeployerParameters.ShathelCommandContext(shathel, () => allParameters)

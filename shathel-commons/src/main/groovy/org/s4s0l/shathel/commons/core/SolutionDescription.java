@@ -2,6 +2,8 @@ package org.s4s0l.shathel.commons.core;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
+import org.s4s0l.shathel.commons.core.stack.SolutionStackDesctiption;
+import org.s4s0l.shathel.commons.core.stack.StackReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +14,11 @@ import java.util.Set;
  * @author Marcin Wielgus
  */
 public class SolutionDescription {
-    private final ParameterProvider overrides;
+    private final Parameters overrides;
     private final SolutionFileModel model;
     private final Map<String, String> parameters = new HashMap<>();
 
-    public SolutionDescription(ParameterProvider overrides, SolutionFileModel model) {
+    public SolutionDescription(Parameters overrides, SolutionFileModel model) {
         this.overrides = overrides;
         this.model = model;
     }
@@ -37,5 +39,19 @@ public class SolutionDescription {
 
     public Set<String> getEnvironments() {
         return model.getEnvironments();
+    }
+
+    public SolutionStackDesctiption getSolutionStackDescription(StackReference stackReference) {
+        Map<String, Map<String, String>> stack = model.getStack(stackReference.getName());
+        return new SolutionStackDesctiption(
+                stackReference,
+                stack.get("envs"),
+                stack.get("params"),
+                overrides);
+
+    }
+
+    Map<String,String> getEnvs(){
+        return model.getEnvs();
     }
 }

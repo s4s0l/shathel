@@ -20,8 +20,8 @@ class SolutionFileModel {
     }
 
     SolutionFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;      \
-              if (this.parsedYml.version != 1) {
+        this.parsedYml = parsedYml;         \
+                 if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
     }
@@ -43,5 +43,18 @@ class SolutionFileModel {
 
     Set<String> getEnvironments() {
         return parsedYml['shathel-solution']['environments'].keySet();
+    }
+
+    Map<String, Map<String, String>> getStack(String name) {
+        def stack = parsedYml['shathel-solution'][name] ?: [:]
+        if (stack['envs'] == null) {
+            stack['envs'] = [:]
+        }
+        return ['envs'  : stack['envs'],
+                'params': stack.findAll { it.key != 'envs' }]
+    }
+
+    Map<String, String> getEnvs() {
+        return parsedYml['shathel-solution']['envs'] ?: [:]
     }
 }

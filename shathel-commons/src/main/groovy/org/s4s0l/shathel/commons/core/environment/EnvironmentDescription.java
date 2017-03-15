@@ -1,20 +1,24 @@
 package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.core.ParameterProvider;
+import org.s4s0l.shathel.commons.core.Parameters;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
  */
 public class EnvironmentDescription implements ParameterProvider {
-    private final ParameterProvider overrides;
+    private final Parameters overrides;
     private final String name;
     private final String type;
     private final Map<String, String> parameters;
 
-    public EnvironmentDescription(ParameterProvider overrides, String name, String type, Map<String, String> parameters) {
+    public EnvironmentDescription(Parameters overrides, String name, String type, Map<String, String> parameters) {
         this.overrides = overrides;
         this.name = name;
         this.type = type;
@@ -48,5 +52,27 @@ public class EnvironmentDescription implements ParameterProvider {
         return type;
     }
 
+
+    public Map<String, String> getAsEnvironmentVariables() {
+        Map<String, String> ret = new HashMap<>();
+        parameters.entrySet()
+                .forEach(x ->
+                        ret.put(
+                                Parameters.parameterNameToEnvName("shathel.env." + x.getKey()),
+                                getParameter(x.getKey()).orElse(null)));
+        String thisEnvPrefix = "shathel.env." + getName() + ".";
+        overrides.getAllParameters().stream()
+                .filter(it -> it.startsWith(thisEnvPrefix))
+                .map(it -> it.substring(thisEnvPrefix.length()))
+                .filter(it -> !ret.containsKey(Parameters.parameterNameToEnvName("shathel.env." + it)))
+                .forEach(it -> ret.put(
+                        Parameters.parameterNameToEnvName("shathel.env." + it),
+                        getParameter(it).orElse(null)));
+
+        return ret.entrySet().stream().filter(it -> it.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
+    }
 
 }

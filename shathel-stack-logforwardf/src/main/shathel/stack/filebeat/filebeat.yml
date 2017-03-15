@@ -17,7 +17,7 @@ processors:
 output:
 #  console.pretty: true
   elasticsearch:
-    hosts: ["111.111.111.99:9200"]
+    hosts: ["logstorage:9200"]
     template.enabled: true
     template.path: "filebeat.template.json"
     template.overwrite: false

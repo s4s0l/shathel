@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
 import org.apache.commons.io.FileUtils;
+import org.s4s0l.shathel.commons.core.SolutionDescription;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.*;
@@ -23,13 +24,15 @@ public class DependencyManager {
 
     private final File dependenciesDir;
     private final DependencyDownloader downloader;
-
+    private final SolutionDescription solutionDescription;
 
     private final boolean forcefull;
 
-    public DependencyManager(File dependenciesDir, DependencyDownloader downloader, boolean forcefull) {
+    public DependencyManager(File dependenciesDir, DependencyDownloader downloader,
+                             SolutionDescription solutionDescription, boolean forcefull) {
         this.dependenciesDir = dependenciesDir;
         this.downloader = downloader;
+        this.solutionDescription = solutionDescription;
         this.forcefull = forcefull;
 
     }
@@ -94,8 +97,7 @@ public class DependencyManager {
         if (!stackFile.exists()) {
             throw new RuntimeException("Stack package with no shthl-stack.yml file");
         }
-
-        return new StackDescriptionImpl(StackFileModel.load(stackFile), new StackResources(destDirectory));
+        return new StackDescriptionImpl(StackFileModel.load(stackFile), new StackResources(destDirectory), solutionDescription.getSolutionStackDescription(stackReference));
     }
 
 

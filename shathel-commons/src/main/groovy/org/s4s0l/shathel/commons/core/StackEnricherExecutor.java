@@ -56,10 +56,10 @@ public class StackEnricherExecutor {
         List<Executable> provisionersExtra;
         if (commandType.willRun) {
             provisionersExtra = Streams.concat(
-                    getEnricherDefinitions(stackDescription).stream()
-                            .map(x -> ScriptExecutorProvider.findExecutor(getExtensionContext(), x)),
                     GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext()).stream()
                             .map(Optional::of),
+                    getEnricherDefinitions(stackDescription).stream()
+                            .map(x -> ScriptExecutorProvider.findExecutor(getExtensionContext(), x)),
                     stack.getEnvironment().getEnvironmentEnrichers().stream()
                             .map(Optional::of)
             ).flatMap(x -> execute(x, composeModel, stackDescription, environment, withOptional).stream())

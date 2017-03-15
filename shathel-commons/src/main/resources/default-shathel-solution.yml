@@ -5,7 +5,7 @@ shathel-solution:
     local:
       type: local-swarm
       build-allowed: true
-      domain-name: localhost
+      domain: localhost
     dev:
       pull: false
       type: dind
@@ -13,7 +13,7 @@ shathel-solution:
       managers: 2
       workers: 1
       net: 33.33.33
-      domain-name: 33.33.33.99
+      domain: 33.33.33.99
     itg:
       forceful: false
       pull: true
@@ -22,8 +22,8 @@ shathel-solution:
       managers: 2
       workers: 1
       net: 22.22.22
-      domain-name: 22.22.22.99
+      domain: 22.22.22.99
     composed:
       type: docker-compose
       build-allowed: true
-      domain-name: localhost
+      domain: localhost

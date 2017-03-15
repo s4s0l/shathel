@@ -15,6 +15,22 @@ class VariablesEnricherTest extends BaseIntegrationTest {
     def setupEnvironment() {
         environmentName = "local"
         network = "222.222.222"
+        solutionDescription =
+                """
+version: 1
+shathel-solution:
+  name: playground
+  envs:
+    FROM_SHATHEL_FILE_SOLUTION: FROM_SHATHEL_FILE_SOLUTION 
+  variables:
+    envs:
+      FROM_SHATHEL_FILE_STACK: FROM_SHATHEL_FILE_STACK
+  environments:
+    local:
+      type: local-swarm
+      build-allowed: true
+      domain-name: localhost
+"""
     }
 
 
@@ -28,7 +44,7 @@ class VariablesEnricherTest extends BaseIntegrationTest {
 
     def "Variables should be exposed to Stack compose"() {
         given:
-        Shathel sht = new Shathel(prepare(["shathel.env.${environmentName}.domain-name":"mydomain.com"]))
+        Shathel sht = new Shathel(prepare(["shathel.env.${environmentName}.domain":"mydomain.com"]))
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {
@@ -47,6 +63,8 @@ class VariablesEnricherTest extends BaseIntegrationTest {
         "1" == execInAnyTask(environment, "variables_service", "printenv ENV_QUORUM")
         "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_SIZE")
         "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_QUORUM")
+        "FROM_SHATHEL_FILE_STACK" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_STACK")
+        "FROM_SHATHEL_FILE_SOLUTION" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_SOLUTION")
         "mydomain.com" == execInAnyTask(environment, "variables_service", "printenv DNS")
 
         onEnd()

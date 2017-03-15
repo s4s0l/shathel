@@ -13,10 +13,12 @@ public class StackDescriptionImpl implements StackDescription {
 
     private final StackFileModel fileModel;
     private final StackResources stackResources;
+    private final SolutionStackDesctiption solutionStackDesctiption;
 
-    public StackDescriptionImpl(StackFileModel fileModel, StackResources stackResources) {
+    public StackDescriptionImpl(StackFileModel fileModel, StackResources stackResources, SolutionStackDesctiption solutionStackDesctiption) {
         this.fileModel = fileModel;
         this.stackResources = stackResources;
+        this.solutionStackDesctiption = solutionStackDesctiption;
     }
 
     @Override
@@ -110,4 +112,10 @@ public class StackDescriptionImpl implements StackDescription {
                 ", version='" + getVersion() + '\'' +
                 '}';
     }
+
+    @Override
+    public Map<String, String> getEnvs() {
+        return solutionStackDesctiption.getEnvironments();
+    }
+
 }

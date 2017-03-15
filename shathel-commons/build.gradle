@@ -27,10 +27,8 @@ dependencies {
 
 
 test {
-    environment "SHT_ENV_OVER_BY_MAP", "from env"
-    environment "SHT_PROP_OVER_BY_MAP", "from env"
-    environment "SHT_ENV_OVER_BY_PROP", "from env"
+    environment "SHT_ENV_HIDES_PROP", "from env"
+    environment "SHT_ENV_HIDES_MAP", "from env"
     environment "SHT_ENV_NOOVER", "from env"
-    environment "SHT_PROP_NOOVER", "from env"
-    environment "SHT_MAP_NOOVER", "from env"
+    environment "SHATHEL_ENV_TEST_ENVPROP", "envprop"
 }

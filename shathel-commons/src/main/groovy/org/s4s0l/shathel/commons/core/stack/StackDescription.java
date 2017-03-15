@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.core.stack;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marcin Wielgus
@@ -22,7 +23,6 @@ public interface StackDescription {
 
     List<StackDependency> getDependencies();
 
-
     List<StackProvisionerDefinition> getPreProvisioners();
 
     List<StackProvisionerDefinition> getPostProvisioners();
@@ -32,4 +32,7 @@ public interface StackDescription {
     boolean isDependantOn(StackReference reference, boolean includeOptional);
 
     String getGav();
+
+    Map<String, String> getEnvs();
+
 }

@@ -17,6 +17,8 @@ abstract class BaseIntegrationTest extends Specification {
     @Shared
     String network
     @Shared
+    String solutionDescription
+    @Shared
     File dependenciesDir
 
     def setupSpec() {
@@ -60,7 +62,7 @@ abstract class BaseIntegrationTest extends Specification {
                 .parameter("shathel.env.${environmentName}.net", network)
                 .parameter("shathel.solution.name", getClass().getSimpleName())
                 .parameters(additionalParams)
-                .build().overSystemProperties()
+                .build().hiddenBySystemProperties()
         src.listFiles()
                 .findAll { it.isDirectory() }
                 .findAll {
@@ -69,6 +71,9 @@ abstract class BaseIntegrationTest extends Specification {
         .each {
             IoUtils.zipIt(it,
                     new File(dependenciesDir, "${it.getName()}.zip"))
+        }
+        if(solutionDescription!=null){
+            new File(getRootDir(), "shathel-solution.yml").text = solutionDescription
         }
         return parameters
     }

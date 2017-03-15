@@ -4,14 +4,11 @@ import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDependency;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.scripts.Executable;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Marcin Wielgus
@@ -82,8 +79,11 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
 
             environment.put("SHATHEL_ENV_MGM_SIZE", "" + msize);
             environment.put("SHATHEL_ENV_MGM_QUORUM", "" + mquorum);
-
-            environment.put("SHATHEL_ENV_DOMAIN", environmentContext.getEnvironmentDescription().getParameter("domain-name").orElse("localhost"));
+            environment.put("SHATHEL_ENV_DOMAIN", environmentContext.getEnvironmentDescription().getParameter("domain").orElse("localhost"));
+            environment.putAll(params.getEnvironmentContext().getSolutionDescription().getEnvs());
+            environment.putAll(params.getStack().getEnvs());
+            environment.putAll(environmentContext.getEnvironmentDescription().getAsEnvironmentVariables());
+            environment.putAll(System.getenv());
         }
     }
 

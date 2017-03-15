@@ -6,14 +6,11 @@ import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import org.s4s0l.shathel.commons.core.security.LazyInitiableSafeStorage;
 import org.s4s0l.shathel.commons.core.security.SafeStorageProvider;
-import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
-import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,10 +19,10 @@ import java.util.Set;
  */
 public class Solution {
     private final ExtensionContext extensionContext;
-    private final ParameterProvider params;
+    private final Parameters params;
     private final Storage storage;
 
-    public Solution(ExtensionContext extensionContext, ParameterProvider params, Storage storage) {
+    public Solution(ExtensionContext extensionContext, Parameters params, Storage storage) {
         this.extensionContext = extensionContext;
         this.params = params;
         this.storage = storage;
@@ -73,7 +70,7 @@ public class Solution {
         Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");
         return new DependencyManager(
                 e.getEnvironmentContext().getDependencyCacheDirectory(),
-                extensionContext.lookupOne(DependencyDownloader.class).get(), forceful.orElse(false));
+                extensionContext.lookupOne(DependencyDownloader.class).get(), getSolutionDescription(), forceful.orElse(false));
     }
 
 

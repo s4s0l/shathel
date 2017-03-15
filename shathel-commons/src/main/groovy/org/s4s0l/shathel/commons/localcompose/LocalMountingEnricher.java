@@ -31,21 +31,21 @@ public class LocalMountingEnricher extends EnricherExecutable {
         StackDescription stack = params.getStack();
         EnvironmentContext environmentContext = params.getEnvironmentContext();
         List<Executable> execs = new ArrayList<>();
-        AtomicReference<Boolean> dirCleanerAdded = new AtomicReference<>(false);
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("/shathel-data/")) {
-                String p = stack.getReference().getName() + "-" + service;
-                p = p.toLowerCase();
-                File file = new File(environmentContext.getDataDirectory(), p);
-                String absolutePath = file.getAbsolutePath();
+                String subDirName = stack.getReference().getName() + "/" + service + "/";
+                File subDir = new File(environmentContext.getDataDirectory(), subDirName);
+
+                String pathToCreate = volume.split(":")[0].replaceAll("/shathel-data/", subDir.getAbsolutePath() + "/");
+
                 execs.add(context -> {
-                    file.mkdirs();
+                    new File(pathToCreate).mkdirs();
                     return "ok";
                 });
-                return volume.replace("/shathel-data", absolutePath);
+                return volume.replace("/shathel-data/", subDir.getAbsolutePath() + "/");
             } else if (volume.startsWith("./")) {
                 String upperDir = getDirectory(volume);
-                String baseToPath = environmentContext.getDataDirectory() + "/" + stack.getReference().getSimpleName() + "-" + service + "/";
+                String baseToPath = environmentContext.getDataDirectory() + "/" + stack.getReference().getSimpleName() + "/";
                 String[] split = volume.split(":");
 
                 String resultingMount = baseToPath + split[0].substring(2) + ":" + split[1];
