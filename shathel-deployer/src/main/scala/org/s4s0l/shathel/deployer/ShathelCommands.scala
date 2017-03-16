@@ -2,6 +2,7 @@ package org.s4s0l.shathel.deployer
 
 import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
 import org.s4s0l.shathel.commons.core.{MapParameters, Parameters}
+import org.s4s0l.shathel.commons.git.GitDependencyDownloader
 import org.s4s0l.shathel.commons.utils.ExtensionInterface
 import org.s4s0l.shathel.commons.{DefaultExtensionContext, Shathel}
 import org.springframework.shell.core.CommandMarker
@@ -30,7 +31,7 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
 
   private def getExtensions(allParameters: Parameters) = {
     List[ExtensionInterface](new MvnDependencyDownloader(allParameters),
-      new FileDependencyDownloader())
+      new FileDependencyDownloader(), new GitDependencyDownloader)
   }
 
   def builder(): DeployerParameters.Builder = new DeployerParameters.Builder()
