@@ -29,6 +29,8 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
     private static class LabelingEnricher extends EnricherExecutable {
 
         private void addLabels(ComposeFileModel model, String name, String value) {
+            name = name.replace("$", "$$");
+            value = value.replace("$", "$$");
             model.addLabelToServices(name, value);
             model.addLabelToNetworks(name, value);
             model.addLabelToVolumes(name, value);

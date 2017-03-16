@@ -130,6 +130,8 @@ class ComposeFileModel {
     }
 
     void addLabelToServices(String key, String value) {
+
+
         parsedYml.services?.each {
             if (it.value == null){
                 it.value = [:]

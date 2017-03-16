@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.deployer
 
-import org.s4s0l.shathel.commons.core.MapParameters
+import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
+import org.s4s0l.shathel.commons.core.{MapParameters, Parameters}
 import org.s4s0l.shathel.commons.utils.ExtensionInterface
 import org.s4s0l.shathel.commons.{DefaultExtensionContext, Shathel}
 import org.springframework.shell.core.CommandMarker
@@ -19,7 +20,7 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
     val commandOverridesParams = commandOverrides.build()
     val buildParameters = parametersCommands.buildParameters(parametersMap)
     val allParameters = buildParameters.hiddenBy(MapParameters.builder().parameters(commandOverridesParams.asJava).build())
-    val extensionContext = DefaultExtensionContext.create(allParameters, List[ExtensionInterface](new MvnDependencyDownloader(allParameters)).asJava)
+    val extensionContext = DefaultExtensionContext.create(allParameters, getExtensions(allParameters).asJava)
     val shathel = new Shathel(allParameters, extensionContext)
     val context = new DeployerParameters.ShathelCommandContext(shathel, () => allParameters)
     val ret = work(context)
@@ -27,10 +28,15 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
     return ret;
   }
 
+  private def getExtensions(allParameters: Parameters) = {
+    List[ExtensionInterface](new MvnDependencyDownloader(allParameters),
+      new FileDependencyDownloader())
+  }
+
   def builder(): DeployerParameters.Builder = new DeployerParameters.Builder()
 
 
-  def yaml : Yaml = {
+  def yaml: Yaml = {
     val options = new DumperOptions()
     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
     new Yaml(options)

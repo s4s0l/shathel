@@ -23,22 +23,22 @@ public class StackDescriptionImpl implements StackDescription {
 
     @Override
     public String getName() {
-        return fileModel.getName();
+        return getReference().getName();
     }
 
     @Override
     public String getVersion() {
-        return fileModel.getVersion();
+        return getReference().getVersion();
     }
 
     @Override
     public String getGroup() {
-        return fileModel.getGroup();
+        return getReference().getGroup();
     }
 
     @Override
     public String getDeployName() {
-        return fileModel.getDeployName();
+        return fileModel.getDeployName() == null ? getName() : fileModel.getDeployName();
     }
 
     @Override
@@ -55,8 +55,7 @@ public class StackDescriptionImpl implements StackDescription {
     public List<StackDependency> getDependencies() {
         return fileModel.getDependencies().stream()
                 .map(map -> new StackDependency(
-                        new StackReference((String) map.get("group"),
-                                (String) map.get("name"), (String) map.get("version")),
+                        new StackReference((String) map.get("gav")),
                         (Boolean) map.get("optional"),
                         (Map<String, String>) map.get("envs")))
                 .collect(Collectors.toList());

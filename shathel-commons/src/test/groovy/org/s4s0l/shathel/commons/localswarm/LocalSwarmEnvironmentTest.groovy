@@ -48,8 +48,7 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
     def "Run stack in local swarm integration test"() {
         given:
         File root = getRootDir()
-        def parameters = prepare()
-        Shathel sht = new Shathel(parameters)
+        Shathel sht = shathel()
 
         when:
         def storage = sht.initStorage(root, true)
@@ -76,8 +75,6 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
 
 
         then:
-
-        new File(dependenciesDir, "sidekick-1.0-shathel").isDirectory()
         command.commands.size() == 1
         environment.getIntrospectionProvider().allStacks.size() == 1
         //        SIDEKICK INSTALLATION
@@ -88,9 +85,6 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
 
         then:
         stack != null
-        new File(dependenciesDir, "dummy-2.0-shathel").isDirectory()
-        new File(dependenciesDir, "shathel-core-stack-1.2.3-shathel").isDirectory()
-
         command != null
         command.commands.size() == 2
         command.commands[0].description.name == 'shathel-core-stack'

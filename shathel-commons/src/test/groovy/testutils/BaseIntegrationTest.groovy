@@ -1,8 +1,11 @@
 package testutils
 
 import org.apache.commons.io.FileUtils
+import org.s4s0l.shathel.commons.DefaultExtensionContext
+import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
+import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.utils.IoUtils
 import spock.lang.Shared
@@ -50,9 +53,10 @@ abstract class BaseIntegrationTest extends Specification {
     }
 
 
-    Parameters prepare(Map additionalParams = [:], String sourceDir = "sampleDependencies") {
-        additionalParams = additionalParams.collectEntries {[(it.key.toString()):it.value.toString()]}
-        File src = new File("src/test/$sourceDir")
+    Shathel shathel(Map additionalParams = [:], String sourceDir = "sampleDependencies") {
+        additionalParams = additionalParams.collectEntries {
+            [(it.key.toString()): it.value.toString()]
+        }
         if (dependenciesDir == null)
             dependenciesDir = new File(getRootDir(), ".dependency-cache")
         dependenciesDir.mkdirs()
@@ -63,19 +67,15 @@ abstract class BaseIntegrationTest extends Specification {
                 .parameter("shathel.solution.name", getClass().getSimpleName())
                 .parameters(additionalParams)
                 .build().hiddenBySystemProperties()
-        src.listFiles()
-                .findAll { it.isDirectory() }
-                .findAll {
-            !new File(dependenciesDir, "${it.getName()}.zip").exists()
-        }
-        .each {
-            IoUtils.zipIt(it,
-                    new File(dependenciesDir, "${it.getName()}.zip"))
-        }
-        if(solutionDescription!=null){
+
+        File src = new File("src/test/$sourceDir")
+        if (solutionDescription != null) {
             new File(getRootDir(), "shathel-solution.yml").text = solutionDescription
         }
-        return parameters
+        def extCtxt = DefaultExtensionContext.create(parameters, [
+                new FileDependencyDownloader(src)
+        ])
+        return new Shathel(parameters, extCtxt)
     }
 
 

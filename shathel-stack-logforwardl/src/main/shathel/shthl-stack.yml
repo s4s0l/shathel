@@ -1,5 +1,6 @@
 version: 1
 shathel-stack:
+  gav: org.s4s0l.shathel:shathel-stack-logforwardl:$version
   deployName: logforwardl
 
   enrichers:

@@ -10,11 +10,5 @@ import scala.Option
 class PromptProvider(params: ParametersCommands) extends DefaultPromptProvider {
 
 
-  override def getPrompt = {
-    params.getParameters.getNoDefault("shathel.env") match {
-      case Some(some) => s"$$shathel ${some}>"
-      case None => "$shathel>"
-    }
-
-  }
+  override def getPrompt = s"$$shathel ${params.getParameters.environment()}>"
 }

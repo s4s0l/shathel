@@ -28,7 +28,7 @@ class SwarmContainerRunnerTest extends BaseIntegrationTest {
 
     def "Runner should wait for update to finish"() {
         given:
-        Shathel sht = new Shathel(prepare())
+        Shathel sht = shathel()
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {

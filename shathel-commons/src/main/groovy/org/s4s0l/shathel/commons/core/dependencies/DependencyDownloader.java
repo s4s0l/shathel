@@ -1,13 +1,14 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
-import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
  */
 public interface DependencyDownloader extends ExtensionInterface {
-    void download(StackReference reference, File directory);
+
+    Optional<File> download(StackLocator reference, File directory, boolean forceful);
 }

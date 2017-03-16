@@ -1,7 +1,9 @@
 package org.s4s0l.shathel.commons.core;
 
 import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
+import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloaderRegistry;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
+import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import org.s4s0l.shathel.commons.core.security.LazyInitiableSafeStorage;
@@ -27,7 +29,8 @@ public class Solution {
         this.params = params;
         this.storage = storage;
     }
-    public Set<String> getEnvironments(){
+
+    public Set<String> getEnvironments() {
         return getSolutionDescription().getEnvironments();
     }
 
@@ -59,8 +62,11 @@ public class Solution {
         return new SolutionDescription(params, model);
     }
 
-
     public Stack openStack(Environment e, StackReference reference) {
+        return openStack(e, new StackLocator(reference));
+    }
+
+    public Stack openStack(Environment e, StackLocator reference) {
         e.verify();
         DependencyManager dependencyManager = getDependencyManager(e);
         return new Stack(reference, dependencyManager, e);
@@ -68,9 +74,10 @@ public class Solution {
 
     private DependencyManager getDependencyManager(Environment e) {
         Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");
+        DependencyDownloaderRegistry dependencyDownloaderRegistry = new DependencyDownloaderRegistry(extensionContext);
         return new DependencyManager(
                 e.getEnvironmentContext().getDependencyCacheDirectory(),
-                extensionContext.lookupOne(DependencyDownloader.class).get(), getSolutionDescription(), forceful.orElse(false));
+                dependencyDownloaderRegistry, getSolutionDescription(), forceful.orElse(false));
     }
 
 

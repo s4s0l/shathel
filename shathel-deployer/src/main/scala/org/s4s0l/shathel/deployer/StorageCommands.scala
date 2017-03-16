@@ -31,8 +31,8 @@ class StorageCommands(parametersCommands: ParametersCommands) extends ShathelCom
 
   def getStorage(ctxt: ShathelCommandContext): Storage = {
     val file = ctxt.storageFile()
-    if (!file.exists() && ctxt.storageInit()) {
-      ctxt.shathel.initStorage(file, true)
+    if (ctxt.storageInit()) {
+      ctxt.shathel.initStorage(file, false)
     } else {
       ctxt.shathel.getStorage(file)
     }

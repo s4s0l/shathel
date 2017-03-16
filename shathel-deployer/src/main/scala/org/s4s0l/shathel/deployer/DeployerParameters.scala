@@ -52,8 +52,9 @@ object DeployerParameters {
   }
 
   val defaults: Map[String, String] = Map(
-    "shathel.deployer.dir" -> ".",
-    "shathel.deployer.init" -> "true"
+    "shathel.deployer.dir" -> ".shathel",
+    "shathel.deployer.init" -> "true",
+    "shathel.env" -> "local"
   )
 
   class Builder(values: Map[String, String] = Map()) {

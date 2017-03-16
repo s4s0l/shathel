@@ -23,7 +23,7 @@ public class IoUtils {
      */
     public static void copyContents(File srcDir, File dstDir) {
         try {
-            FileUtils.copyDirectoryToDirectory(srcDir, dstDir);
+            FileUtils.copyDirectory(srcDir, dstDir);
         } catch (IOException e) {
             throw new RuntimeException("Unable to copy");
         }

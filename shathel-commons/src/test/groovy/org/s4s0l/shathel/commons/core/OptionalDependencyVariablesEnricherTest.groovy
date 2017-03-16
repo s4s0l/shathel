@@ -44,7 +44,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
     def "Optional dependencies should not be started"() {
         given:
-        Shathel sht = new Shathel(prepare())
+        Shathel sht = shathel()
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {
@@ -137,7 +137,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
     def "Optional dependencies should be started"() {
         given:
-        Shathel sht = new Shathel(prepare())
+        Shathel sht = shathel()
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {

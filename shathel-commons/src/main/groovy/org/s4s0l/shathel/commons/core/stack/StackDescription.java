@@ -16,7 +16,7 @@ public interface StackDescription {
     String getDeployName();
 
     default StackReference getReference() {
-        return new StackReference(getGroup(), getName(), getVersion());
+        return new StackReference(getGav());
     }
 
     StackResources getStackResources();

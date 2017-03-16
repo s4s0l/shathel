@@ -18,8 +18,8 @@ class StackFileModel implements Cloneable {
     }
 
     StackFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;            \
-                    if (this.parsedYml.version != 1) {
+        this.parsedYml = parsedYml;              \
+                      if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
     }
@@ -39,23 +39,9 @@ class StackFileModel implements Cloneable {
     }
 
 
-    String getName() {
-        GavUtils.getName(parsedYml['shathel-stack']['gav'])
-    }
-
-
-    String getGroup() {
-        GavUtils.getGroup(parsedYml['shathel-stack']['gav'])
-    }
-
-    String getVersion() {
-        GavUtils.getVersion(parsedYml['shathel-stack']['gav'])
-    }
-
-
     String getDeployName() {
 
-        (parsedYml['shathel-stack']['deployName']) ?: getName();
+        parsedYml['shathel-stack']['deployName']
     }
 
     Collection<Map<String, Object>> getDependencies() {
@@ -63,9 +49,7 @@ class StackFileModel implements Cloneable {
         deps.collect {
             kv ->
                 [
-                        group     : GavUtils.getGroup(kv.key),
-                        name      : GavUtils.getName(kv.key),
-                        version   : GavUtils.getVersion(kv.key),
+                        gav       : kv.key,
                         minVersion: kv.value?.min,
                         maxVersion: kv.value?.max,
                         optional  : kv.value?.optional ?: false,

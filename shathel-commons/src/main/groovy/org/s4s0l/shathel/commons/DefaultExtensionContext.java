@@ -2,7 +2,7 @@ package org.s4s0l.shathel.commons;
 
 import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider;
 import org.s4s0l.shathel.commons.core.Parameters;
-import org.s4s0l.shathel.commons.core.dependencies.NoopDependencyProvider;
+import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader;
 import org.s4s0l.shathel.commons.core.security.DefaultSafeStorageProvider;
 import org.s4s0l.shathel.commons.dind.DindEnvironmentProvider;
 import org.s4s0l.shathel.commons.localcompose.LocalEnvironmentProvider;
@@ -12,6 +12,7 @@ import org.s4s0l.shathel.commons.scripts.GroovyExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +35,6 @@ public class DefaultExtensionContext {
                 .extension(new VBoxMachineEnvironmentProvider(parameterProvider))
                 .extension(new DindEnvironmentProvider())
                 .extension(new DefaultSafeStorageProvider(parameterProvider))
-                .extension(new NoopDependencyProvider())
                 .extension(new DefaultGlobalEnricherProvider())
                 .extension(new GroovyExecutorProvider());
         for (ExtensionInterface extraExtension : extraExtensions) {

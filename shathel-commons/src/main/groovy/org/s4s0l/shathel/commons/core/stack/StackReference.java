@@ -13,7 +13,7 @@ public class StackReference {
 
     public StackReference(String group, String name, String version) {
         this.name = name;
-        this.group = group == null ? GavUtils.DEFAULT_GROUP : group;
+        this.group = group;
         this.version = version;
     }
 

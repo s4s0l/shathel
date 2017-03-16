@@ -43,7 +43,7 @@ public class StackProvisionerExecutor {
 
                     File srcStackDirectory = stackCommand.getDescription().getStackResources().getStackDirectory();
                     File dstStackDir = new File(executionDirectory, stackCommand.getDescription().getReference().getStackDirecctoryName());
-                    IoUtils.copyContents(srcStackDirectory, executionDirectory);
+                    IoUtils.copyContents(srcStackDirectory, dstStackDir);
                     File composeFile = new File(dstStackDir, "stack/docker-compose.yml");
                     ComposeFileModel.dump(stackCommand.getComposeModel(), composeFile);
                     if (stackCommand.getType() != StackCommand.Type.STOP) {

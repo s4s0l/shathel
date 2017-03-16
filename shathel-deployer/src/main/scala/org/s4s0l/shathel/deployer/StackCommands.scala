@@ -4,6 +4,7 @@ import java.io.File
 import java.lang.Boolean
 import java.util
 
+import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.s4s0l.shathel.commons.core.{Stack, StackOperations}
 import org.s4s0l.shathel.commons.core.environment.{Environment, StackCommand}
 import org.s4s0l.shathel.commons.core.model.GavUtils
@@ -88,7 +89,7 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
     shathel(map, builder())(
       context => {
         val (storage, solution, environment) = environmentCommands.getEnvironment(context)
-        val openStack = solution.openStack(environment, getStackReference(name))
+        val openStack = solution.openStack(environment, new StackLocator(name))
         val command = factory(openStack, context)
 
         if (inspect) {
@@ -108,15 +109,6 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
       })
   }
 
-  private def getStackReference(name: String) = {
-    val groupNoVersion = "org.s4s0l.shathel:([a-zA-Z-0-9\\.]+)".r
-    val noGroupNoVersion = "([a-zA-Z-0-9\\.]+)".r
-    new StackReference(name match {
-      case groupNoVersion(_) => s"X${name}:${CustomBanner.versionInfo()}"
-      case noGroupNoVersion(_) => s"${name}:${CustomBanner.versionInfo()}"
-      case _ => name
-    })
-  }
 
   private def inspect(command: StackOperations, inspectLong: Boolean): Map[String, AnyRef] = {
     def arrayToMap = collection.breakOut[Seq[StackCommand], (String, util.Map[String, AnyRef]), Map[String, util.Map[String, AnyRef]]]

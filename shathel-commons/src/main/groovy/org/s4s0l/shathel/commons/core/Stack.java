@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.core;
 
 import com.google.common.collect.Streams;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
+import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
@@ -16,11 +17,11 @@ import java.util.Optional;
  * @author Marcin Wielgus
  */
 public class Stack {
-    private final StackReference stackReference;
+    private final StackLocator stackReference;
     private final DependencyManager dependencyManager;
     private final Environment environment;
 
-    public Stack(StackReference stackReference, DependencyManager dependencyManager, Environment environment) {
+    public Stack(StackLocator stackReference, DependencyManager dependencyManager, Environment environment) {
         this.stackReference = stackReference;
         this.dependencyManager = dependencyManager;
         this.environment = environment;

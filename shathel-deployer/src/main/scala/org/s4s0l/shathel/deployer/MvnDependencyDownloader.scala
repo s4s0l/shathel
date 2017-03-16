@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.deployer
 
 import java.io.File
+import java.util.Optional
 
 import org.apache.commons.io.FileUtils
 import org.eclipse.aether.artifact.{Artifact, DefaultArtifact}
@@ -8,11 +9,13 @@ import org.eclipse.aether.graph.{Dependency, Exclusion}
 import org.eclipse.aether.repository.RemoteRepository
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader
+import org.s4s0l.shathel.commons.core.dependencies.{DependencyDownloader, StackLocator}
 import org.s4s0l.shathel.commons.core.stack.StackReference
+import org.s4s0l.shathel.commons.utils.IoUtils
 import org.s4s0l.shathel.deployer.mvn.ShathelMavenRepository
 import org.s4s0l.shathel.deployer.mvn.ShathelMavenRepository.ShathelMavenSettings
 import org.s4s0l.shathel.deployer.mvn.ShathelMavenRepository.ShathelMavenSettings.ShathelMavenSettingsBuilder
+import org.s4s0l.shathel.deployer.shell.customization.CustomBanner
 
 import scala.collection.JavaConverters._
 
@@ -20,10 +23,36 @@ import scala.collection.JavaConverters._
   * @author Marcin Wielgus
   */
 class MvnDependencyDownloader(parameters: Parameters) extends DependencyDownloader {
+  val reg = "(([^:]+):)?([^:]+):?([^:]+)?".r
 
 
-  override def download(reference: StackReference, directory: File): Unit = {
+  def defaultVersion = CustomBanner.versionInfo()
 
+  def defaultGroup = "org.s4s0l.shathel"
+
+  override def download(locator: StackLocator, directory: File, forceful: Boolean): Optional[File] = {
+    val reference: StackReference = if (locator.getReference.isPresent) {
+      locator.getReference.get()
+    } else {
+      new StackReference(locator.getLocation match {
+        case reg(_, null, name, null) => s"${defaultGroup}:${name}:${defaultVersion}"
+        case reg(_, group, name, null) => s"${group}:${name}:${defaultVersion}"
+        case reg(_, group, name, "$version") => s"${group}|${name}:${defaultVersion}"
+        case reg(_, group, name, version) => s"${group}:${name}:${version}"
+      })
+    }
+
+
+    val destDirectory = new File(directory, reference.getStackDirecctoryName)
+    if (!forceful && destDirectory.exists()) {
+      return Optional.of(destDirectory)
+    }
+    return downloadZipFile(reference, directory).map(it => Optional.of(it)).getOrElse(Optional.empty())
+
+
+  }
+
+  private def downloadZipFile(reference: StackReference, directory: File): Option[File] = {
     def getLocalRepoLocation = parameters.getParameter("shathel.mvn.localRepo")
       .orElseGet(() => ShathelMavenSettingsBuilder.getDefaultLocalRepo)
 
@@ -41,7 +70,6 @@ class MvnDependencyDownloader(parameters: Parameters) extends DependencyDownload
       "default",
       parameters.getParameter("shathel.mvn.repoUrl").orElseGet(() => ShathelMavenSettingsBuilder.getMavenCentrajUrl)
     ).build
-
 
     val instance = new ShathelMavenRepository(
       ShathelMavenSettings
@@ -62,10 +90,18 @@ class MvnDependencyDownloader(parameters: Parameters) extends DependencyDownload
 
     val nlg = new PreorderNodeListGenerator()
     node.accept(nlg)
-
-    nlg.getArtifacts(true).asScala
+    return nlg.getArtifacts(true).asScala
       .filter(_.getClassifier.equals("shathel"))
-      .foreach[Unit]((artifact: Artifact) => FileUtils.copyFileToDirectory(artifact.getFile, directory))
-
+      .map((artifact: Artifact) => {
+        FileUtils.copyFileToDirectory(artifact.getFile, directory)
+        new File(directory, artifact.getFile.getName)
+      })
+      .map((file) => {
+        val ff = new File(directory, reference.getStackDirecctoryName)
+        IoUtils.unZipIt(file, ff)
+        ff
+      })
+      .headOption;
   }
+
 }

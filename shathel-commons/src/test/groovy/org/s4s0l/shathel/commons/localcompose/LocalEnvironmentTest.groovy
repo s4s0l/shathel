@@ -34,8 +34,7 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
     def "Run stack in local docker integration test"() {
         given:
         File root = getRootDir()
-        def parameters = prepare()
-        Shathel sht = new Shathel(parameters)
+        Shathel sht = shathel()
 
         when:
         def storage = sht.initStorage(root, true)
@@ -53,13 +52,6 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
         //        SIDEKICK INSTALLATION
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
-        stack.getStackContext(false)
-
-        then:
-        stack != null
-        new File(dependenciesDir, "sidekick-1.0-shathel").isDirectory()
-
-        when:
         def command = stack.createStartCommand(false);
 
         then:
@@ -75,13 +67,6 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
 
         when:
         stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        stack.getStackContext(false)
-        then:
-        stack != null
-        new File(dependenciesDir, "dummy-2.0-shathel").isDirectory()
-        new File(dependenciesDir, "shathel-core-stack-1.2.3-shathel").isDirectory()
-
-        when:
         command = stack.createStartCommand(false);
 
         then:
