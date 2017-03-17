@@ -49,7 +49,7 @@ public class EnvironmentContext {
     }
 
     public File getDataDirectory() {
-        return storage.getSettingsDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getDataDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
     }
 
     public File getTempDirectory() {
@@ -67,4 +67,6 @@ public class EnvironmentContext {
     public File getDependencyCacheDirectory() {
         return storage.getDependencyCacheDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
     }
+
+
 }

@@ -3,8 +3,6 @@ package org.s4s0l.shathel.commons.machine
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.docker.DockerMachineCachingWrapper
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
-import org.s4s0l.shathel.commons.docker.DockerWrapper
-import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings
 import org.s4s0l.shathel.commons.swarm.SwarmClusterWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

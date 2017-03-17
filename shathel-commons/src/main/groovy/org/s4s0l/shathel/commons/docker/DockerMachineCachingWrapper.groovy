@@ -3,6 +3,10 @@ package org.s4s0l.shathel.commons.docker
 import java.util.concurrent.ConcurrentHashMap
 
 /**
+ * todo:
+ * This caching is bullshit as it invalidates cache only on docker machine commands but
+ * caches docker state also, especially swarm info, so after joining leaving swarm
+ * this cache is inconsistent:/ Maybe caching should be pushed to swarmwrapper or sth....
  * @author Marcin Wielgus
  */
 class DockerMachineCachingWrapper extends DockerMachineWrapper{

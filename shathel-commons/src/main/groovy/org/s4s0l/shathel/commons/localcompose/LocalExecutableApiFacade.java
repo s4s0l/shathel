@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -65,6 +66,11 @@ public class LocalExecutableApiFacade implements ExecutableApiFacade {
     @Override
     public void setKernelParam(String param) {
         LOGGER.warn("!Set parameter like: sudo sysctl -w " + param);
+    }
+
+    @Override
+    public Optional<String> getRegistry() {
+        return Optional.empty();
     }
 
     @Override

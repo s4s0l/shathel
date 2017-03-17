@@ -11,14 +11,15 @@ import org.s4s0l.shathel.commons.utils.TemplateUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
  */
 public class SwarmBuildingEnricher extends EnricherExecutable {
-    private final String repository;
+    private final Optional<String> repository;
 
-    public SwarmBuildingEnricher(String repository) {
+    public SwarmBuildingEnricher(Optional<String> repository) {
         this.repository = repository;
     }
 
@@ -43,14 +44,14 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
             }
 
             String imageName = (stack.getReference().getName() + "." + service).toLowerCase().replaceAll("[^a-z0-9]", ".");
-            String repoPrefix = repository == null ? "" : repository + "/";
+            String repoPrefix = repository.isPresent() ? repository.get() + "/" : "";
             String tag = repoPrefix + imageName + ":" + stack.getReference().getVersion();
             File contextDir = new File(stack.getStackResources().getComposeFileDirectory(), context);
             provisioners.add("build-and-tag:" + contextDir.getAbsolutePath(), executionContext -> {
                 dockerForManagementNode.buildAndTag(
                         contextDir,
                         dockerfile, args, tag);
-                if (repository != null) {
+                if (repository.isPresent()) {
                     dockerForManagementNode.push(tag);
                 }
             });

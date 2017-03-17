@@ -46,11 +46,15 @@ class SwarmClusterCreator {
 
 
         startRegistries("${clusterName}-manager-1", MANAGER_IP)
+        def mirrorAddress = "https://${MANAGER_IP}:4001"
+        def registryAddress = "${MANAGER_IP}:4000"
+
 
         initSwarm("${clusterName}-manager-1", MANAGER_IP)
         swarmClusterWrapper.labelNode("${clusterName}-manager-1", "${clusterName}-manager-1", [
                 "shathel.node.main": "true",
-                "shathel.node.name": "manager-1"
+                "shathel.node.name": "manager-1",
+                "shathel.node.registry": registryAddress
         ])
 
         log "Saving tokens"
@@ -60,7 +64,8 @@ class SwarmClusterCreator {
 
         (numberOfManagers < 2 ? [] : 2..numberOfManagers).each { n ->
             String nodeName = "${clusterName}-manager-${n}"
-            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, "https://${MANAGER_IP}:4001")
+
+            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, mirrorAddress)
 
             def ip = cr.ip
             modified = modified || cr.modified
@@ -68,13 +73,14 @@ class SwarmClusterCreator {
             joinSwarm(nodeName, ip, manager_token, MANAGER_IP)
             swarmClusterWrapper.labelNode(nodeName, [
                     "shathel.node.main": "false",
-                    "shathel.node.name": "manager-${n}"
+                    "shathel.node.name": "manager-${n}",
+                    "shathel.node.registry": registryAddress
             ])
         }
 
         (numberOfWorkers < 1 ? [] : 1..numberOfWorkers).each { n ->
             String nodeName = "${clusterName}-worker-${n}"
-            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, "https://${MANAGER_IP}:4001")
+            cr = swarmNodeCreator.createNodeIfNotExists(nodeName, networkSettings, currentIp--, mirrorAddress)
 
             def ip = cr.ip
             modified = modified || cr.modified
@@ -82,7 +88,8 @@ class SwarmClusterCreator {
             joinSwarm(nodeName, ip, worker_token, MANAGER_IP)
             swarmClusterWrapper.labelNode(nodeName, [
                     "shathel.node.main": "false",
-                    "shathel.node.name": "worker-${n}"
+                    "shathel.node.name": "worker-${n}",
+                    "shathel.node.registry": registryAddress
             ])
 
         }

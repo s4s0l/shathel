@@ -61,7 +61,7 @@ class GitDependencyDownloader implements DependencyDownloader {
 
         String remote() {
             def group = reference.group
-            return "ssh://${group}"
+            return "https://${group-"git@"}"
         }
 
         String repoName() {

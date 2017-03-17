@@ -94,6 +94,11 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
     }
 
 
+    default Optional<String> getRegistry() {
+        return Optional.ofNullable(getEnvironmentContext().getEnvironmentDescription().getParameter("registry").orElseGet(() ->
+                getNodeLabels(getNameForManagementNode()).getOrDefault("shathel.node.registry", null)));
+    }
+
     default boolean isInitialized(int managersCount, int workersCount) {
         return getNodeNames().size() >= managersCount + workersCount;
     }
@@ -123,6 +128,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
             this.ip = ip;
             this.envs = envs;
         }
+
 
         public String getName() {
             return name;

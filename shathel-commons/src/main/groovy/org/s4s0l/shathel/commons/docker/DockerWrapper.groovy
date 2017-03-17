@@ -171,27 +171,26 @@ class DockerWrapper {
         }
     }
 
-    Map serviceInspect(String serviceName){
+    Map serviceInspect(String serviceName) {
         String inspect = exec.executeForOutput("service inspect ${serviceName}")
         def val = new JsonSlurper().parseText(inspect);
         return val[0]
     }
     /**
      * eg aoutput:
-     *  [{
-     *                 name:'service1'
+     *  [{*                 name:'service1'
      *                 mode:'global'
      *                 replicas: '1/2'
      *                 ratio: '0.5'
      *                 expectedCount: '2'
      *                 count: '1'
-     *    },{...}]
+     *},{...}]
      * @param output
      * @return
      */
-    List<Map<String, String>> servicesStatus(String filter){
+    List<Map<String, String>> servicesStatus(String filter) {
         def output = exec.executeForOutput("service ls -f $filter")
-        return parseServiceLsOutput(output).collect {it.value}
+        return parseServiceLsOutput(output).collect { it.value }
     }
 
     boolean serviceRunning(String containerName) {
@@ -252,7 +251,7 @@ class DockerWrapper {
             def x = it[3] =~ /([0-9]+)/
             def count = Integer.parseInt(x[0][1]);
             def expectedCount = Integer.parseInt(x[1][1])
-            def ratio = expectedCount == 0  ? 0 : count / expectedCount
+            def ratio = expectedCount == 0 ? 0 : count / expectedCount
             [(it[1]): [
                     name         : it[1],
                     mode         : it[2],
@@ -286,7 +285,7 @@ class DockerWrapper {
 
         } catch (ExecWrapper.ExecWrapperException e) {
             if (e.getOutput().contains("has active endpoints")) {
-                LOGGER.trace("Unable to undeploy stack, sometimes this means docker is stupid and cannot remove network right away, will try again in 5s",e)
+                LOGGER.trace("Unable to undeploy stack, sometimes this means docker is stupid and cannot remove network right away, will try again in 5s", e)
                 LOGGER.warn("Unable to undeploy stack, sometimes this means docker is stupid and cannot remove network right away, will try again in 5s")
                 Thread.sleep(5000)
                 exec.executeForOutput(composeFile.getParentFile(), environment, "stack rm $deploymentName")
@@ -388,7 +387,7 @@ class DockerWrapper {
         exec.executeForOutput(file, [:], "build -t $tag -f $dockerfile $a ${file.getAbsolutePath()}")
     }
 
-    void push(String tag){
+    void push(String tag) {
         exec.executeForOutput("push $tag")
     }
 
@@ -399,6 +398,11 @@ class DockerWrapper {
 
     void swarmNodeSetLabels(String nodeName, Map<String, String> labels) {
         exec.executeForOutput("node update ${labels.collect { "--label-add ${it.key}=${it.value}" }.join(" ")} $nodeName")
+    }
+
+    Map<String, String> swarmNodeGetLabels(String nodeName) {
+        def output = exec.executeForOutput("node inspect $nodeName")
+        new JsonSlurper().parseText(output)[0].Spec.Labels
     }
 
     boolean secretExists(String name) {

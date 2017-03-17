@@ -6,6 +6,7 @@ import org.s4s0l.shathel.commons.secrets.SecretManager;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
@@ -27,6 +28,8 @@ public interface ExecutableApiFacade {
      */
     Map<String, String> getDockerEnvs(String nodeName);
 
+
+
     DockerWrapper getDockerForManagementNode();
 
     String getIpForManagementNode();
@@ -35,9 +38,13 @@ public interface ExecutableApiFacade {
 
     void setKernelParam(String param);
 
-
+    Optional<String> getRegistry();
 
     SecretManager getSecretManager();
+
+    default Map<String, String> getNodeLabels(String nodeName){
+        return getDockerForManagementNode().swarmNodeGetLabels(nodeName);
+    }
 
     default DockerClientWrapper getClientForManagementNode() {
         String nameForManagementNode = getNameForManagementNode();

@@ -110,13 +110,15 @@ public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator
         boolean started = x.getOrDefault("Status", "").startsWith("Up");
         String ip = started ? getLocalWrapper().containerGetIpInNetwork(nodeName, getNetworkName()) : "";
         DockerWrapper wrapper = started ? new DockerWrapper(new ExecWrapper(LOGGER, "docker --host " + ip)) : null;
+        DockerInfoWrapper dockerInfoWrapper = started ? new DockerInfoWrapper(wrapper.daemonInfo(), nodeName) : null;
         return new Node(
                 nodeName,
                 started,
                 wrapper,
-                started ? new DockerInfoWrapper(wrapper.daemonInfo(), nodeName) : null,
+                dockerInfoWrapper,
                 ip,
-                started ? getDockerEnvironments(ip) : Collections.EMPTY_MAP);
+                started ? getDockerEnvironments(ip) : Collections.EMPTY_MAP
+                );
     }
 
 

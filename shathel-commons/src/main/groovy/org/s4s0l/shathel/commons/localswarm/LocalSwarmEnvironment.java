@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.localswarm;
 
+import org.apache.commons.lang.StringUtils;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.localcompose.LocalExecutableApiFacade;
@@ -30,11 +31,13 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public boolean isInitialized() {
+
         return new DockerWrapper().swarmActive();
     }
 
     @Override
     public void initialize() {
+
         new DockerWrapper().swarmInit();
         String nodeName = new DockerWrapper().swarmNodes().keySet().iterator().next();
         Map<String, String> labels = new HashMap<>();
@@ -66,6 +69,9 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public void verify() {
+        if(!StringUtils.isEmpty(System.getenv("DOCKER_HOST"))){
+            throw new RuntimeException("DOCKER_HOST env var is not empty, not allowed in local swarm environment");
+        }
         if (!isInitialized()) {
             throw new RuntimeException("Not initialized. Local docker is not in swarm mode.");
         }
@@ -110,7 +116,7 @@ public class LocalSwarmEnvironment implements Environment {
     public List<NamedExecutable> getEnvironmentEnrichers() {
         return Arrays.asList(
                 new LocalMountingEnricher(),
-                new SwarmBuildingEnricher(null),
+                new SwarmBuildingEnricher(getEnvironmentApiFacade().getRegistry()),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator()
         );

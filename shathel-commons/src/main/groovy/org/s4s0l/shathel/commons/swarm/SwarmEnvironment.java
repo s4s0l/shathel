@@ -179,13 +179,11 @@ public class SwarmEnvironment implements Environment {
 
     @Override
     public List<NamedExecutable> getEnvironmentEnrichers() {
-        //todo lokalizacja repo powinna byc cecha env?
-        String repository = swarmClusterWrapper.getIp(environmentContext.getContextName() + "-manager-1") + ":4000";
         //todo why there is cluster wrapper passed to enrichers?!?!
         return Arrays.asList(
                 new SwarmMountingPermissionsEnricher(swarmClusterWrapper),
                 new SwarmMountingEnricher(swarmClusterWrapper),
-                new SwarmBuildingEnricher(repository),
+                new SwarmBuildingEnricher(getEnvironmentApiFacade().getRegistry()),
                 new SwarmPullingEnricher(swarmClusterWrapper),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator()

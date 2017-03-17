@@ -14,7 +14,8 @@ class DockerMachineNode {
     final DockerInfoWrapper swarmInfo
     final DockerWrapper docker;
 
-    DockerMachineNode(String name, String driver, String state, String url, String version, Map<String, String> envs, String ip, DockerInfoWrapper swarmInfo, DockerWrapper docker) {
+    DockerMachineNode(String name, String driver, String state, String url, String version,
+                      Map<String, String> envs, String ip, DockerInfoWrapper swarmInfo, DockerWrapper docker) {
         this.name = name
         this.driver = driver
         this.state = state
