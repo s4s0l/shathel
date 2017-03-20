@@ -39,6 +39,10 @@ public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator
         return context;
     }
 
+    @Override
+    public void refreshCaches() {
+
+    }
 
     @Override
     public String getDataDirectory() {

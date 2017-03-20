@@ -33,8 +33,7 @@ class DindEnvironmentTest extends BaseIntegrationTest {
     def "Run stack in local docker integration test"() {
         given:
         File root = getRootDir()
-        def parameters = prepare()
-        Shathel sht = new Shathel(parameters)
+        Shathel sht = shathel()
 
         when:
         def storage = sht.initStorage(root, true)

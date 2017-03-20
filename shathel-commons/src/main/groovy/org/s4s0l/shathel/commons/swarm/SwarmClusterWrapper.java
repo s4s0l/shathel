@@ -111,6 +111,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
         getDockerForManagementNode().swarmNodeSetLabels(nodeName, labels);
     }
 
+    void refreshCaches();
 
     class Node {
         private final String name;

@@ -12,11 +12,16 @@ import org.slf4j.LoggerFactory
  */
 class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     private final EnvironmentContext environmentContext;
-    private final DockerMachineWrapper dockerMachineWrapper;
+    private final DockerMachineCachingWrapper dockerMachineWrapper;
 
     MachineSwarmClusterWrapper(EnvironmentContext environmentContext) {
         this.environmentContext = environmentContext
         this.dockerMachineWrapper = new DockerMachineCachingWrapper(environmentContext.getSettingsDirectory())
+    }
+
+    @Override
+    void refreshCaches() {
+        this.dockerMachineWrapper.clearCache()
     }
 
     @Override

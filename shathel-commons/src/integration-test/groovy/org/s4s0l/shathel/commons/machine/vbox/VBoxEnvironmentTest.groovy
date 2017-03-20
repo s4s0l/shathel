@@ -38,8 +38,8 @@ class VBoxEnvironmentTest
     def "Run stack in vbox integration test"() {
         given:
         File root = getRootDir()
-        def parameters = prepare()
-        Shathel sht = new Shathel(parameters)
+
+        Shathel sht = shathel()
         def solution = sht.getSolution(sht.initStorage(root, false))
         def environment = solution.getEnvironment("itg")
 

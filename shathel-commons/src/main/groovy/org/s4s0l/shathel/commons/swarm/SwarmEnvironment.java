@@ -81,6 +81,7 @@ public class SwarmEnvironment implements Environment {
                     environmentContext);
 
             if (changed) {
+                swarmClusterWrapper.refreshCaches();
                 LOGGER.info("Remember to save docker machine settings");
             }
         } catch (Exception e) {

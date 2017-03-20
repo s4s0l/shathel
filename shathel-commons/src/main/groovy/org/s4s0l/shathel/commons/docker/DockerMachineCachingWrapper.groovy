@@ -61,5 +61,9 @@ class DockerMachineCachingWrapper extends DockerMachineWrapper{
         return machinesCache
     }
 
+    synchronized void clearCache(){
+        machinesCache = null;
+    }
+
     private Map<String, DockerMachineNode> machinesCache;
 }
