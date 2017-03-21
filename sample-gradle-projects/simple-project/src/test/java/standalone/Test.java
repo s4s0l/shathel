@@ -16,7 +16,7 @@ public class Test {
     public void checkIfComposedProjectAStarted() throws Exception {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         RestAssured.baseURI = "http://localhost:8080";
-        tryNTimes(10, () -> {
+        tryNTimes(60, () -> {
             // @formatter:off
         Response S = when()
                 .get("/");
@@ -31,7 +31,7 @@ public class Test {
     public void checkIfComposedProjectBStarted() throws Exception {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         RestAssured.baseURI = "http://localhost:9090";
-        tryNTimes(10, () -> {
+        tryNTimes(60, () -> {
             // @formatter:off
             Response S = when()
                     .get("/");

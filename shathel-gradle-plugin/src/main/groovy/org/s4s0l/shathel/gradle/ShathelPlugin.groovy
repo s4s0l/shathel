@@ -2,6 +2,8 @@ package org.s4s0l.shathel.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.tasks.bundling.Zip
 
@@ -39,12 +41,16 @@ class ShathelPlugin implements Plugin<Project> {
             eachFile { FileCopyDetails details ->
             }
         }
-
-//        project.assemble.dependsOn shathelAssemble
-//        project.artifacts {
-//            archives shathelAssemble
-//            shathel shathelAssemble
-//        }
+        project.artifacts {
+            shathel shathelAssemble
+        }
+        project.tasks.matching {it.name == "bootRepackage"}.each {
+            Set<Object> deps =  it.taskDependencies.values
+            def toBeeRemoved = deps.find {
+                it.class.name.startsWith("org.gradle.api.internal.artifacts.DefaultPublishArtifactSet")
+            }
+            deps.removeAll(toBeeRemoved)
+        }
     }
 
     private Map<String, ShathelDockerTaskSettings> createDockerTasks(Project project) {
