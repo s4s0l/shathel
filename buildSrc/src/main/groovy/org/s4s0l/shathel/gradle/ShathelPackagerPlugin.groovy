@@ -25,8 +25,6 @@ class ShathelPackagerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-//        project.extensions.create('shathel', ShathelPackagerExtension)
-
         project.configurations.create('shathel')
 
         def shtlStackModel = new Yaml().load(project.file('./src/main/shathel/shthl-stack.yml').text)

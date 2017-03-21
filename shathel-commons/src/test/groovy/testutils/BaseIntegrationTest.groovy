@@ -60,21 +60,20 @@ abstract class BaseIntegrationTest extends Specification {
         if (dependenciesDir == null)
             dependenciesDir = new File(getRootDir(), ".dependency-cache")
         dependenciesDir.mkdirs()
+        File src = new File("src/test/$sourceDir")
         Parameters parameters = MapParameters.builder()
                 .parameter("shathel.env.${environmentName}.safePassword", "MySecretPassword")
                 .parameter("shathel.env.${environmentName}.dependenciesDir", dependenciesDir.absolutePath)
                 .parameter("shathel.env.${environmentName}.net", network)
+                .parameter("shathel.file.base_dir", src.getAbsolutePath())
                 .parameter("shathel.solution.name", getClass().getSimpleName())
                 .parameters(additionalParams)
                 .build().hiddenBySystemProperties()
 
-        File src = new File("src/test/$sourceDir")
         if (solutionDescription != null) {
             new File(getRootDir(), "shathel-solution.yml").text = solutionDescription
         }
-        def extCtxt = DefaultExtensionContext.create(parameters, [
-                new FileDependencyDownloader(src)
-        ])
+        def extCtxt = DefaultExtensionContext.create(parameters)
         return new Shathel(parameters, extCtxt)
     }
 

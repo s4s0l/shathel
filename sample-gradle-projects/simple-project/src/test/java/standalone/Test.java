@@ -12,17 +12,49 @@ import io.restassured.response.Response;
  */
 public class Test {
 
-	@org.junit.Test
-	public void checkIfComposedProjectStarted() {
-		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-		RestAssured.baseURI = "http://" + getProperty("me.host") + ":"
-				+ getProperty("me.tcp.8080");
-		// @formatter:off
+    @org.junit.Test
+    public void checkIfComposedProjectAStarted() throws Exception {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.baseURI = "http://localhost:8080";
+        tryNTimes(10, () -> {
+            // @formatter:off
         Response S = when()
                 .get("/");
         S.then()
                 .statusCode(200)
                 .body(equalTo("Hello World!"));
-        // @formatter:off
+        // @formatter:on
+        });
+    }
+
+    @org.junit.Test
+    public void checkIfComposedProjectBStarted() throws Exception {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.baseURI = "http://localhost:9090";
+        tryNTimes(10, () -> {
+            // @formatter:off
+            Response S = when()
+                    .get("/");
+            S.then()
+                    .statusCode(200)
+                    .body(equalTo("Hello World!"));
+            // @formatter:on
+        });
+
+    }
+
+    void tryNTimes(int n, Runnable r) throws Exception {
+        for (int i = 1; i <= n; i++) {
+            try {
+                r.run();
+            } catch (Exception e) {
+                if (i == n) {
+                    throw e;
+                } else {
+                    System.out.println("Will try again...");
+                    Thread.sleep(1000);
+                }
+            }
+        }
     }
 }

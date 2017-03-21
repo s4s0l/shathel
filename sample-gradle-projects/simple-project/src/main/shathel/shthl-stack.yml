@@ -1,17 +1,6 @@
 version: 1
 shathel-stack:
+  gav: org.s4s0l.shathel.gradle.sample:simple-project:@VERSION@
   dependencies:
-
-  provisioners:
-    provisioner1:
-
-  metadata:
-      some.key.understandable.by.someone.else: value
-      more.keys.like.i.need.vault.password: passwordvalue
-      i.need.password.or.token.to.servicex.in.stack.y: asdf
-
-  enrichers:
-      enricher1:
-        applyon: all
-      enricher2:
-        applyon: dependant
+#      org.s4s0l.shathel:shathel-stack-core:0.0.6:
+      git@github.com/s4s0l/shathel-sample-stacks:shathel-sample-stacks:0.0.2:

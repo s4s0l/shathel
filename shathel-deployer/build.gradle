@@ -1,9 +1,6 @@
 description = "Automated tool for deploying shathel packages to docker machine swarm cluster"
 ext {
     displayName = "Shathel Deployer"
-    aetherVersion = "1.1.0"
-    mavenVersion = "3.1.0"
-    wagonVersion = "1.0"
 }
 
 apply from: '../gradle/spring.gradle'
@@ -15,19 +12,6 @@ apply plugin: 'scala'
 dependencies {
 
     compile 'org.scala-lang:scala-library:2.12.1'
-    compile 'org.apache.ant:ant:1.8.2'
-    compile "org.eclipse.aether:aether-api:${aetherVersion}"
-    compile("org.eclipse.aether:aether-ant-tasks:1.0.1.v20141111") {
-        exclude group: 'org.slf4j', module: 'slf4j-nop'
-    }
-    compile "org.eclipse.aether:aether-util:${aetherVersion}"
-    compile "org.eclipse.aether:aether-impl:${aetherVersion}"
-    compile "org.eclipse.aether:aether-connector-basic:${aetherVersion}"
-    compile "org.eclipse.aether:aether-transport-file:${aetherVersion}"
-    compile "org.eclipse.aether:aether-transport-http:${aetherVersion}"
-    compile "org.eclipse.aether:aether-transport-wagon:${aetherVersion}"
-    compile "org.apache.maven:maven-aether-provider:${mavenVersion}"
-    compile "org.apache.maven.wagon:wagon-ssh:${wagonVersion}"
     compile project(":shathel-commons")
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'org.beryx:text-io:1.7.0'

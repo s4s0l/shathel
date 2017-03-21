@@ -21,7 +21,7 @@ class DeployerTest extends FeatureSpec {
 
   def destroyCommand = {
     "environment destroy --params " +
-      "shathel.env=dev,shathel.mvn.localRepo=$ROOT/../build/localrepo,shathel.deployer.dir=$ROOT/build/TempSolution"
+      "shathel.env=dev,shathel.file.base_dir=$ROOT/../build/localrepo,shathel.deployer.dir=$ROOT/build/TempSolution"
         .replace("$ROOT", new File(".").getAbsolutePath)
   }
 

@@ -102,13 +102,28 @@ class ComposeFileModel {
 
     void mapImages(Function<String, String> mapper) {
         parsedYml.services.each {
-            it.value.image = mapper.apply(it.value.image)
+            def changed = mapper.apply(it.value.image)
+            if (changed instanceof String) {
+                it.value.image = changed
+            } else {
+                String context = changed.context
+                String dockerfile = changed.dockerfile
+                Map args = changed.args ?: [:]
+                it.value.remove('image')
+                it.value.build = [
+                        context   : context,
+                        dockerfile: dockerfile
+                ]
+                if (!args.isEmpty()) {
+                    it.value.build << [args: args]
+                }
+            }
         }
     }
 
     void addLabelToNetworks(String key, String value) {
         parsedYml.networks?.findAll {
-            if (it.value == null){
+            if (it.value == null) {
                 it.value = [:]
             }
             (it.value.external ?: false) == false
@@ -121,7 +136,7 @@ class ComposeFileModel {
 
     void addLabelToVolumes(String key, String value) {
         parsedYml.volumes?.each {
-            if (it.value == null){
+            if (it.value == null) {
                 it.value = [:]
             }
             it.value.labels = (it.value.labels ?: [:])
@@ -133,7 +148,7 @@ class ComposeFileModel {
 
 
         parsedYml.services?.each {
-            if (it.value == null){
+            if (it.value == null) {
                 it.value = [:]
             }
             if (it.value.labels == null) {

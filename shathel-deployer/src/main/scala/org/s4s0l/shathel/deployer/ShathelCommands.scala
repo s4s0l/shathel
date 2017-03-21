@@ -21,7 +21,7 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
     val commandOverridesParams = commandOverrides.build()
     val buildParameters = parametersCommands.buildParameters(parametersMap)
     val allParameters = buildParameters.hiddenBy(MapParameters.builder().parameters(commandOverridesParams.asJava).build())
-    val extensionContext = DefaultExtensionContext.create(allParameters, getExtensions(allParameters).asJava)
+    val extensionContext = DefaultExtensionContext.create(allParameters)
     val shathel = new Shathel(allParameters, extensionContext)
     val context = new DeployerParameters.ShathelCommandContext(shathel, () => allParameters)
     val ret = work(context)
@@ -29,10 +29,6 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
     return ret;
   }
 
-  private def getExtensions(allParameters: Parameters) = {
-    List[ExtensionInterface](new MvnDependencyDownloader(allParameters),
-      new FileDependencyDownloader(), new GitDependencyDownloader)
-  }
 
   def builder(): DeployerParameters.Builder = new DeployerParameters.Builder()
 

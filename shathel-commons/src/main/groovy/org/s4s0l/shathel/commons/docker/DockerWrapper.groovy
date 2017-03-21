@@ -387,6 +387,13 @@ class DockerWrapper {
         exec.executeForOutput(file, [:], "build -t $tag -f $dockerfile $a ${file.getAbsolutePath()}")
     }
 
+    void buildAndTag(File file, String dockerfile, Map<String, String> args, List<String> tags) {
+        LOGGER.debug("docker: building $tags")
+        def a = args.collect { "--build-arg $it.key=$it.value" }.join(" ")
+        def t = tags.collect { "-t $it" }.join(" ")
+        exec.executeForOutput(file, [:], "build ${t} -f $dockerfile ${a} ${file.getAbsolutePath()}")
+    }
+
     void push(String tag) {
         exec.executeForOutput("push $tag")
     }

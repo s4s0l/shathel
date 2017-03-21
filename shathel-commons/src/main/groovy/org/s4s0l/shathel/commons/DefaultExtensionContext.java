@@ -5,6 +5,8 @@ import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader;
 import org.s4s0l.shathel.commons.core.security.DefaultSafeStorageProvider;
 import org.s4s0l.shathel.commons.dind.DindEnvironmentProvider;
+import org.s4s0l.shathel.commons.git.GitDependencyDownloader;
+import org.s4s0l.shathel.commons.ivy.IvyDownloader;
 import org.s4s0l.shathel.commons.localcompose.LocalEnvironmentProvider;
 import org.s4s0l.shathel.commons.localswarm.LocalSwarmEnvironmentProvider;
 import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineEnvironmentProvider;
@@ -12,7 +14,6 @@ import org.s4s0l.shathel.commons.scripts.GroovyExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +37,12 @@ public class DefaultExtensionContext {
                 .extension(new DindEnvironmentProvider())
                 .extension(new DefaultSafeStorageProvider(parameterProvider))
                 .extension(new DefaultGlobalEnricherProvider())
-                .extension(new GroovyExecutorProvider());
+                .extension(new GroovyExecutorProvider())
+                .extension(new IvyDownloader(parameterProvider))
+                .extension(new FileDependencyDownloader(parameterProvider))
+                .extension(new GitDependencyDownloader())
+                ;
+
         for (ExtensionInterface extraExtension : extraExtensions) {
             extension.extension(extraExtension);
         }

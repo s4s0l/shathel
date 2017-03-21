@@ -1,7 +1,7 @@
 #!/bin/bash
 gradle :shathel-deployer:install
 
-export SHATHEL_MVN_LOCALREPO=$(pwd)/build/localrepo
+export SHATHEL_FILE_BASE_DIR=$(pwd)/build/localrepo
 export SHATHEL_DEPLOYER_DIR=$(pwd)/build/playground
 export SHATHEL_ENV=itg
 export SHATHEL_ENV_ITG_FORCEFUL=true
