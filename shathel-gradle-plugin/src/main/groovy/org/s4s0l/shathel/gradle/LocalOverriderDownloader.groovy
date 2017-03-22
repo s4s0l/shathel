@@ -39,6 +39,6 @@ class LocalOverriderDownloader implements DependencyDownloader {
         if (!targetFile.exists()) {
             LOGGER.warn("${targetFile} does not exist but is pointed in file ${gavFile}, and was needed:(")
         }
-        return targetFile
+        return Optional.of(targetFile)
     }
 }

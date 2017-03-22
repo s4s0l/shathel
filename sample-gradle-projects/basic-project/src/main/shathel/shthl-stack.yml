@@ -1,0 +1,5 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel.gradle.sample:basic-project:@VERSION@
+  dependencies:
+      git@github.com/s4s0l/shathel-sample-stacks:shathel-sample-stacks:0.0.2:

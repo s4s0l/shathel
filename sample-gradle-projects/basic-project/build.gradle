@@ -1,0 +1,31 @@
+System.setProperty("maven.repo.local", "${System.getProperty('bootcker_localrepo') ?: "../../build/localrepo"}")
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "${System.getProperty('bootcker_localrepo') ?: "../../build/localrepo"}"
+        }
+    }
+    dependencies {
+        classpath "org.s4s0l.shathel:shathel-gradle-plugin:${System.getProperty('bootcker_project_version') ?: "DEVELOPER-SNAPSHOT"}"
+    }
+}
+
+group 'org.s4s0l.shathel.gradle.sample'
+
+
+apply plugin: 'shathel'
+
+
+version = "1.0-SNAPSHOT"
+
+repositories {
+    jcenter()
+}
+
+
+
+
+
+
+

@@ -22,7 +22,7 @@ class ShathelOperationTask extends DefaultTask {
     Map<String, String> shathelParams = [:]
 
     String getShathelEnvironmentName() {
-        return shathelParams.getOrDefault("shathel.env", "local")
+        return getCombinedParams().getOrDefault("shathel.env", "local")
     }
 
     File getShathelDir() {
@@ -43,7 +43,7 @@ class ShathelOperationTask extends DefaultTask {
     }
 
     File getShathelMappingsDir() {
-        new File(project.buildDir, "shathel-mappings")
+        new File(project.rootProject.buildDir, "shathel-mappings")
     }
 
     File getShathelCurrentStackDir() {
@@ -61,10 +61,15 @@ class ShathelOperationTask extends DefaultTask {
     }
 
     Map<String, String> getParamsWithDefaults() {
-        ShathelExtension extension = getExtension()
-        def paramsWithDefault = [:] << extension.shathelParams << shathelParams
+        Map paramsWithDefault = getCombinedParams()
         fillDefault(paramsWithDefault, "shathel.env.${getShathelEnvironmentName()}.dependenciesDir", new File(project.rootProject.buildDir, "shathel-dependencies").absolutePath)
         return paramsWithDefault
+    }
+
+    private Map getCombinedParams() {
+        ShathelExtension extension = getExtension()
+        def paramsWithDefault = [:] << extension.shathelParams << shathelParams
+        paramsWithDefault
     }
 
     private ShathelExtension getExtension() {

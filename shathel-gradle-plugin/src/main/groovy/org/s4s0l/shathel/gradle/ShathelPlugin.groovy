@@ -44,8 +44,8 @@ class ShathelPlugin implements Plugin<Project> {
         project.artifacts {
             shathel shathelAssemble
         }
-        project.tasks.matching {it.name == "bootRepackage"}.each {
-            Set<Object> deps =  it.taskDependencies.values
+        project.tasks.matching { it.name == "bootRepackage" }.each {
+            Set<Object> deps = it.taskDependencies.values
             def toBeeRemoved = deps.find {
                 it.class.name.startsWith("org.gradle.api.internal.artifacts.DefaultPublishArtifactSet")
             }
@@ -53,11 +53,14 @@ class ShathelPlugin implements Plugin<Project> {
         }
     }
 
-    private Map<String, ShathelDockerTaskSettings> createDockerTasks(Project project) {
+    private void createDockerTasks(Project project) {
         ShathelExtension extension = project.extensions.findByName("shathel")
         extension.images.each {
             ShathelDockerTask task = project.task("shathelDockerBuild-${it.key}", type: ShathelDockerTask)
             task.setSettings(it.value)
+        }
+        if (extension.images.isEmpty() && project.file("src/main/docker").exists()) {
+            project.task("shathelDockerBuild-${ShathelDockerTask.getDefaultDockerImageName(project)}", type: ShathelDockerTask)
         }
     }
 
