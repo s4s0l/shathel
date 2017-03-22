@@ -3,5 +3,5 @@ services:
   project1:
     image: project(:project1)
     ports:
-      - 8080:8080
+      - 8081:8080
 

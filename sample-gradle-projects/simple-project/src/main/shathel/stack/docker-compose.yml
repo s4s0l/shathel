@@ -7,5 +7,5 @@ services:
   project1b:
     image: project(:):dummyExtra
     ports:
-      - 9090:9090
+      - 9091:9090
 

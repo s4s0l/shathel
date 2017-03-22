@@ -156,11 +156,17 @@ class DockerWrapper {
 
         parsed.collect {
             String inspect = exec.executeForOutput("service inspect ${it.key}")
-            def val = new JsonSlurper().parseText(inspect);
+            def val = new JsonSlurper().parseText(inspect)
+
+            def service = val[0]
+            def ports = service.Endpoint?.Ports?.collectEntries {
+                [("shathel.service.port.${it.TargetPort}".toString()): "${it.PublishedPort}".toString()]
+            } ?: [:]
             def ret = [:]
-            ret << val[0].Spec.Labels
+            ret << ports
+            ret << service.Spec.Labels
             ret << [
-                    "shathel.service.name"         : val[0].Spec.Name,
+                    "shathel.service.name"         : service.Spec.Name,
                     "shathel.service.ratio"        : it.value.ratio,
                     "shathel.service.mode"         : it.value.mode,
                     "shathel.service.replicas"     : it.value.replicas,

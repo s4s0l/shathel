@@ -116,8 +116,21 @@ class ShathelStartTask extends ShathelOperationTask {
         stack.run(command)
         def ip = stack.environment.getEnvironmentApiFacade().getIpForManagementNode()
 
-        tasksToNotify.each {
-            it.systemProperties.put("shathel.plugin.ip", ip)
+        def propsToleaveForOthers = ["shathel.plugin.ip": ip]
+
+        stack.environment.introspectionProvider.allStacks.stacks.each { stk ->
+            stk.services.each { service ->
+                def keyPrefix = "shathel.plugin.${stk.reference.name}.${service.serviceName}"
+                service.getPortMapping().each {
+                    propsToleaveForOthers << ["${keyPrefix}.${it.key}": "${it.value}"]
+                }
+
+            }
+        }
+        tasksToNotify.each { task ->
+            propsToleaveForOthers.each {
+                task.systemProperties.put(it.key.toString(), it.value.toString())
+            }
         }
 
     }

@@ -6,9 +6,7 @@ import org.s4s0l.shathel.commons.core.environment.StackIntrospectionResolver;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,9 +22,11 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
     }
 
     protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
+        String deployName = resolver.getShathelLabels().get("org.shathel.stack.deployName");
+
         return resolver.getLabelValues("com.docker.compose.service")
                 .entrySet().stream()
-                .map(x -> new StackIntrospection.Service(x.getKey(), x.getValue().intValue(), x.getValue().intValue()))
+                .map(x -> new StackIntrospection.Service(deployName, x.getKey(), x.getValue().intValue(), x.getValue().intValue(), new HashMap<Integer, Integer>()))
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +47,6 @@ public class LocalStackIntrospectionProvider implements StackIntrospectionProvid
 
         return new StackIntrospection(new StackReference(o), services, resolver.getShathelLabels());
     }
-
 
 
     @Override

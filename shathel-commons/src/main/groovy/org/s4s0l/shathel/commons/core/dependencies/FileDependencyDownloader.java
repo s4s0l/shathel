@@ -69,7 +69,6 @@ public class FileDependencyDownloader implements DependencyDownloader {
         path = path + "/" + stackReference.getVersion();
         path = path + "/" + stackReference.getName() + "-" + stackReference.getVersion() + "-shathel.zip";
         File f = new File(getBaseSearchPath(), path);
-        System.out.println("TESTING: " + f.getAbsolutePath());
         if (f.exists()) {
             File dest = new File(destination, "files/" + stackReference.getStackDirecctoryName());
             if (dest.exists()) {
