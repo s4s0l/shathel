@@ -24,6 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class LocalSwarmEnvironment implements Environment {
     private static final Logger LOGGER = getLogger(LocalSwarmEnvironment.class);
     private final EnvironmentContext context;
+    private final DockerWrapper dockerWrapper = new DockerWrapper();
 
     public LocalSwarmEnvironment(EnvironmentContext context) {
         this.context = context;
@@ -32,19 +33,23 @@ public class LocalSwarmEnvironment implements Environment {
     @Override
     public boolean isInitialized() {
 
-        return new DockerWrapper().swarmActive();
+        return getDockerWrapper().swarmActive();
     }
 
     @Override
     public void initialize() {
 
-        new DockerWrapper().swarmInit();
-        String nodeName = new DockerWrapper().swarmNodes().keySet().iterator().next();
+        getDockerWrapper().swarmInit();
+        String nodeName = getDockerWrapper().swarmNodes().keySet().iterator().next();
         Map<String, String> labels = new HashMap<>();
         labels.put("shathel.node.name", "manager-1");
         labels.put("shathel.node.main", "true");
-        new DockerWrapper().swarmNodeSetLabels(nodeName, labels);
+        getDockerWrapper().swarmNodeSetLabels(nodeName, labels);
 
+    }
+
+    private DockerWrapper getDockerWrapper() {
+        return dockerWrapper;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public void verify() {
-        if(!StringUtils.isEmpty(System.getenv("DOCKER_HOST"))){
+        if (!StringUtils.isEmpty(System.getenv("DOCKER_HOST"))) {
             throw new RuntimeException("DOCKER_HOST env var is not empty, not allowed in local swarm environment");
         }
         if (!isInitialized()) {
@@ -89,12 +94,12 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public StackIntrospectionProvider getIntrospectionProvider() {
-        return new SwarmStackIntrospectionProvider(new DockerWrapper());
+        return new SwarmStackIntrospectionProvider(getDockerWrapper());
     }
 
     @Override
     public EnvironmentContainerRunner getContainerRunner() {
-        return new SwarmContainerRunner(new DockerWrapper());
+        return new SwarmContainerRunner(getDockerWrapper());
     }
 
     @Override
@@ -104,12 +109,7 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public ExecutableApiFacade getEnvironmentApiFacade() {
-        return new LocalExecutableApiFacade(new DockerWrapper()) {
-            @Override
-            public SecretManager getSecretManager() {
-                return new SecretManager(context.getEnvironmentDescription(), getClientForManagementNode());
-            }
-        };
+        return new LocalSwarmApiFacade(getDockerWrapper(), context);
     }
 
     @Override

@@ -14,19 +14,24 @@ public class Test {
 
     @org.junit.Test
     public void checkIfComposedProjectAStarted() throws Exception {
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        RestAssured.baseURI = "http://localhost:8080";
-        tryNTimes(60, () -> {
-            // @formatter:off
-        Response S = when()
-                .get("/");
-        S.then()
-                .statusCode(200)
-                .body(equalTo("Hello World1!"));
-        // @formatter:on
-        });
+        String ip = System.getProperty("shathel.plugin.ip");
+        tryAddress("http://" + ip + ":8080", "Hello World1!");
     }
 
+    void tryAddress(String address, String expectedString) throws Exception {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.baseURI = address;
+        tryNTimes(60, () -> {
+            // @formatter:off
+            Response S = when()
+                    .get("/");
+            S.then()
+                    .statusCode(200)
+                    .body(equalTo(expectedString));
+            // @formatter:on
+        });
+
+    }
 
     void tryNTimes(int n, Runnable r) throws Exception {
         for (int i = 1; i <= n; i++) {

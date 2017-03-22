@@ -295,7 +295,7 @@ class DockerWrapper {
 
     /**
      * Returns all swarm nodes
-     * @return
+     * @return map name -> [id:, hostName:, status:,availability:, managerStatus:]
      */
     Map<String, Map<String, String>> swarmNodes() {
         String output = exec.executeForOutput("node list")
@@ -423,5 +423,10 @@ class DockerWrapper {
     void secretRemove(String name) {
         if (secretExists(name))
             exec.executeForOutput("secret rm $name")
+    }
+
+    Map swarmNodeInspect(String nodeName) {
+        def output = exec.executeForOutput("node inspect $nodeName")
+        return new JsonSlurper().parseText(output)[0]
     }
 }

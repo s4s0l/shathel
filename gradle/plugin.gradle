@@ -36,9 +36,16 @@ tasks.withType(Test) {
     environment "GRADLE_USER_HOME", gradle.gradleUserHomeDir
     environment "PROJECT_VERSION", project.version
     environment "LOCAL_REPO", localRepoUrl.absolutePath
-    environment "LOCAL_BUILD_DIR", rootProject.buildDir.absolutePath
+    environment "LOCAL_BUILD_DIR", rootProject.buildDir.absolutePath + "/PluginTests"
     dependsOn install
     testLogging {
         exceptionFormat 'full'
     }
 }
+
+task("cleanupPluginTests", type:org.gradle.api.tasks.Delete) {
+    delete rootProject.buildDir.absolutePath + "/PluginTests"
+}
+clean.dependsOn cleanupPluginTests
+
+

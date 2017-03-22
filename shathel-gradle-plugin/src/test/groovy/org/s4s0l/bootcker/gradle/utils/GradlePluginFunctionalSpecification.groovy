@@ -125,7 +125,7 @@ class TemporaryDirectory extends ExternalResource {
     String projectName;
 
     TemporaryDirectory(TestName name) {
-        this(new File(System.getenv("LOCAL_BUILD_DIR"), "functionalTestTemp"), name);
+        this(new File(System.getenv("LOCAL_BUILD_DIR")), name);
     }
 
     TemporaryDirectory(File parentFolder, TestName name) {

@@ -14,9 +14,10 @@ public class Test {
 
     @org.junit.Test
     public void checkIfComposedProjectAStarted() throws Exception {
-        tryAddress("http://localhost:8080", "Hello World1!");
-        tryAddress("http://localhost:7070", "Hello World1!");
-        tryAddress("http://localhost:9090", "Hello World2!");
+        String ip = System.getProperty("shathel.plugin.ip");
+        tryAddress("http://"+ip+":8080", "Hello World1!");
+        tryAddress("http://"+ip+":7070", "Hello World1!");
+        tryAddress("http://"+ip+":9090", "Hello World2!");
     }
 
 

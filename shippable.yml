@@ -18,8 +18,12 @@ build:
   ci:
     - docker pull sasol/dind4j:${DIND4J_VERSION}
     - >
-      docker run --privileged -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm sasol/dind4j:${DIND4J_VERSION}
-      ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test --info --stacktrace
+      docker run -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm
+      -v /var/run/docker.sock:/var/run/docker.sock --entrypoint ""
+      sasol/dind4j:${DIND4J_VERSION}
+      bash -c "./gradlew --no-daemon --gradle-user-home=.cache --project-cache-dir=.cache clean test --info --stacktrace"
+#       --privileged
+#      ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test --info --stacktrace
   on_failure:
     - docker logs -f DindTest-dev-manager-2
     - docker logs -f DindTest-dev-manager-1
