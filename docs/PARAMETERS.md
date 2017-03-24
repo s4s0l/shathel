@@ -10,6 +10,7 @@
 * shathel.solution.name
 * shathel.solution.file_default_version
 * shathel.solution.file_default_group
+* shathel.solution.file_base_dir
 * shathel.solution.git_default_version
 * shathel.solution.git_default_group
 * shathel.solution.ivy_default_version

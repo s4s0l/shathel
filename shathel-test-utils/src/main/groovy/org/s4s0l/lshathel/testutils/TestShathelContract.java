@@ -32,12 +32,6 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
         return new File(parameters().getParameter(CommonParams.SHATHEL_DIR).orElse(".shathel"));
     }
 
-    @Value.Derived
-    default boolean isShathelInitEnabled() {
-        return parameters().getParameterAsBoolean("shathel.env."+shathelEnv()+".init")
-                .orElse(true);
-    }
-
     @Value.Lazy
     default ExtensionContext extensionContext() {
         return DefaultExtensionContext.create(parameters(), extensions());
@@ -61,7 +55,11 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
     @Value.Derived
     default Environment environment() {
         Environment e = solution().getEnvironment(shathelEnv());
-        if (isShathelInitEnabled() && !e.isInitialized()) {
+        boolean initEnabled = e.getEnvironmentContext()
+                .getEnvironmentDescription()
+                .getParameterAsBoolean("init")
+                .orElse(true);
+        if (initEnabled && !e.isInitialized()) {
             e.initialize();
         }
         return e;

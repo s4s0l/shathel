@@ -1,57 +1,28 @@
 package org.s4s0l.shathel.deployer
 
 import java.io.{File, PrintWriter}
+import java.util.UUID
 
 import org.junit.runner.RunWith
 import org.scalatest.FeatureSpec
 import org.scalatest.junit.JUnitRunner
+
 import sys.process._
 
 /**
   * @author Marcin Wielgus
   */
 @RunWith(classOf[JUnitRunner])
-class DeployerTest extends FeatureSpec {
-
-  def getPath(): String = {
-    val x = "../build/localrepo/org/s4s0l/shathel/shathel-deployer/DEVELOPER-SNAPSHOT/shathel-deployer-DEVELOPER-SNAPSHOT.jar"
-    new File(x).setExecutable(true)
-    x
-  }
-
-  def destroyCommand = {
-    "environment destroy --params " +
-      "shathel.env=dev,shathel.file.base_dir=$ROOT/../build/localrepo,shathel.deployer.dir=$ROOT/build/TempSolution"
-        .replace("$ROOT", new File(".").getAbsolutePath)
-  }
-
-  def prepareScript(scriptTemplate: String) = {
-    new File(s"build/${getClass.getSimpleName}").mkdirs()
-    val script = scala.io.Source.fromURL(getClass.getResource(s"/${scriptTemplate}"))
-      .mkString
-      .replace("$ROOT", new File("./..").getAbsolutePath)
-    val out = new File(s"build/${getClass.getSimpleName}/${scriptTemplate}");
-    new PrintWriter(out) {
-      write(script);
-      close
-    }
-    out.getAbsolutePath
-  }
-
+class DeployerTest extends FeatureSpec with ShathelCommandLine {
   feature("Starting stopping stacks") {
-    scenario("in composed environment") {
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-compose")}".toString) !))
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-compose-stop")}") !))
-    }
-
-    scenario("in dind environment") {
-      def cmd1 = s"${getPath()} --cmdfile ${prepareScript("script-dind")}";
-      assert(0 == ((cmd1) !))
-      assert(0 == ((s"${getPath()} --cmdfile ${prepareScript("script-dind-stop")}".toString) !))
-
-      def cmd3 = s"${getPath()} ${destroyCommand}"
-
-      assert(0 == ((cmd3) !))
+    scenario("in local environment") {
+      runScript(
+        """environment use local
+          |stack start --name git@github.com/s4s0l/shathel-stacks:core:%version%
+          |stack start --name git@github.com/s4s0l/shathel-stacks:portainer:%version% --inspect 0""")
+      runScript(
+        """
+          |stack stop --name git@github.com/s4s0l/shathel-stacks:portainer:%version% --with-dependencies --with-optional 1""")
     }
   }
 }

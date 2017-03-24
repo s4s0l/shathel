@@ -12,19 +12,13 @@ import java.util.Map;
 /**
  * @author Marcin Wielgus
  */
-//@Value.Immutable
-//@Value.Style(depluralize = true, typeAbstract = "*Contract", typeImmutable = "*")
 public interface SchathelCreationCommonContract {
 
-    @Value.Default
-    default List<ExtensionInterface> extensions() {
-        return Collections.emptyList();
-    }
 
-    @Value.Default
-    default Map<String, String> params() {
-        return Collections.emptyMap();
-    }
+    List<ExtensionInterface> extensions();
+
+
+    Map<String, String> params();
 
     @Value.Default
     default String shathelEnv() {

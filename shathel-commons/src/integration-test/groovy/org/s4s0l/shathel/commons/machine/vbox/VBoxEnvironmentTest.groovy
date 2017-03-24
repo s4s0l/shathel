@@ -19,12 +19,12 @@ class VBoxEnvironmentTest
 
     @Override
     def setupEnvironment() {
-        environmentName = "itg"
+        environmentName = "vbox"
         network = "214.214.214"
     }
 
     def cleanupEnvironment() {
-        def file = new File(getRootDir(), "itg/settings")
+        def file = new File(getRootDir(), "vbox/settings")
         if (file.exists()) {
             def wrapper = new DockerMachineWrapper(file)
             new File(file, "machines").listFiles().each {
@@ -41,7 +41,7 @@ class VBoxEnvironmentTest
 
         Shathel sht = shathel()
         def solution = sht.getSolution(sht.initStorage(root, false))
-        def environment = solution.getEnvironment("itg")
+        def environment = solution.getEnvironment(environmentName)
 
         when:
         if (!environment.isInitialized()) {

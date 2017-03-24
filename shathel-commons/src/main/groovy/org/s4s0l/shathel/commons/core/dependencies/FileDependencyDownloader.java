@@ -22,8 +22,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class FileDependencyDownloader implements DependencyDownloader {
     public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
     public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
+    public static final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_base_dir";
     public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
-    public static final String SHATHEL_FILE_BASE_DIR = "shathel.file.base_dir";
     private final ParameterProvider params;
 
     public FileDependencyDownloader(ParameterProvider params) {
