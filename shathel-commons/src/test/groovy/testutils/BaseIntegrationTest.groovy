@@ -64,7 +64,7 @@ abstract class BaseIntegrationTest extends Specification {
         Parameters parameters = MapParameters.builder()
                 .parameter("shathel.env.${environmentName}.safePassword", "MySecretPassword")
                 .parameter("shathel.env.${environmentName}.dependenciesDir", dependenciesDir.absolutePath)
-                .parameter("shathel.env.${environmentName}.net", network)
+                .parameter("shathel.env.${environmentName}.net", network ?: "1000.1000.1000.1000")
                 .parameter("shathel.file.base_dir", src.getAbsolutePath())
                 .parameter("shathel.solution.name", getClass().getSimpleName())
                 .parameters(additionalParams)

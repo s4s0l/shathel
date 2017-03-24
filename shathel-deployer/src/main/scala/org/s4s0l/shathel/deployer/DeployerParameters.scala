@@ -5,7 +5,7 @@ import java.util
 import java.util.Optional
 
 import org.s4s0l.shathel.commons.Shathel
-import org.s4s0l.shathel.commons.core.Parameters
+import org.s4s0l.shathel.commons.core.{CommonParams, Parameters}
 
 import scala.util.Try
 
@@ -15,16 +15,20 @@ import scala.util.Try
 object DeployerParameters {
   val VALID_PARAMS = List(
     "shathel.env",
-    "shathel.mvn.repoId",
-    "shathel.mvn.repoUrl",
-    "shathel.mvn.settings",
-    "shathel.mvn.securitySetting",
-    "shathel.mvn.localRepo",
-    "shathel.deployer.dir",
-    "shathel.deployer.init",
+    "shathel.dir",
     "shathel.solution.name",
-    //    "shathel.safe.{env}.password",
+    "shathel.solution.file_default_version",
+    "shathel.solution.file_default_group",
+    "shathel.solution.git_default_version",
+    "shathel.solution.git_default_group",
+    "shathel.solution.ivy_default_version",
+    "shathel.solution_ivy_default_group",
+    "shathel.solution.ivy_settings",
+    "shathel.solution.ivy_repo_id",
+    "shathel.solution.ivy_repos",
     "shathel.env.{env}.net",
+    "shathel.env.{env}.init",
+    "shathel.env.{env}.registry",
     "shathel.env.{env}.managers",
     "shathel.env.{env}.forceful",
     "shathel.env.{env}.workers",
@@ -33,7 +37,10 @@ object DeployerParameters {
     "shathel.env.{env}.safeDir",
     "shathel.env.{env}.settingsDir",
     "shathel.env.{env}.enrichedDir",
-    "shathel.env.{env}.tempDir"
+    "shathel.env.{env}.tempDir",
+    "shathel.env.{env}.pull",
+    "shathel.env.{env}.domain",
+    "shathel.env.{env}.safePassword"
   )
 
 
@@ -52,22 +59,20 @@ object DeployerParameters {
   }
 
   val defaults: Map[String, String] = Map(
-    "shathel.deployer.dir" -> ".shathel",
-    "shathel.deployer.init" -> "true",
-    "shathel.env" -> "local"
+    CommonParams.SHATHEL_DIR -> ".shathel",
+    "shathel.env.local.init" -> "true",
+    CommonParams.SHATHEL_ENV -> "local"
   )
 
   class Builder(values: Map[String, String] = Map()) {
 
     def apply(param: (String, Option[String])) = new Builder(values + (param._1 -> param._2.getOrElse(values.getOrElse(param._1, null))));
 
-    def storageFile(f: File): Builder = this ("shathel.deployer.dir" -> Option(f).map(_.getAbsolutePath))
+    def storageFile(f: File): Builder = this (CommonParams.SHATHEL_DIR -> Option(f).map(_.getAbsolutePath))
 
-    def storageInit(f: java.lang.Boolean): Builder = this ("shathel.deployer.init" -> Option(f).map(_.toString))
+    def environment(f: String): Builder = this (CommonParams.SHATHEL_ENV -> Option(f).map(_.toString))
 
-    def environment(f: String): Builder = this ("shathel.env" -> Option(f).map(_.toString))
-
-    def forceful(f: java.lang.Boolean): Builder = this (s"shathel.env.${values.get("shathel.env")}.forceful" -> Option(f).map(_.toString))
+    def forceful(f: java.lang.Boolean): Builder = this (s"shathel.env.${values.get(CommonParams.SHATHEL_ENV)}.forceful" -> Option(f).map(_.toString))
 
     def build(): Map[String, String] = values.filter(e => e._2 != null)
   }
@@ -75,11 +80,9 @@ object DeployerParameters {
   class Provider(provider: () => Parameters) extends Parameters {
 
 
-    def storageFile(): File = new File(mandatoryParam("shathel.deployer.dir"))
+    def storageFile(): File = new File(mandatoryParam(CommonParams.SHATHEL_DIR))
 
-    def storageInit(): Boolean = mandatoryBoolean("shathel.deployer.init")
-
-    def environment(): String = mandatoryParam("shathel.env")
+    def environment(): String = mandatoryParam(CommonParams.SHATHEL_ENV)
 
     override def getParameter(name: String): Optional[String] = provider().getParameter(name);
 

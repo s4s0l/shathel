@@ -26,8 +26,6 @@ object Main {
 }
 
 
-
-
 @SpringBootApplication
 @ComponentScan(Array("org.s4s0l.shathel.deployer.shell.customization"))
 class Main {
@@ -59,6 +57,9 @@ class Main {
 
   @Bean
   def SecretsCommand: SecretsCommand = new SecretsCommand(ParametersCommands, EnvironmentCommands)
+
+  @Bean
+  def LogCommands: LogCommands = new LogCommands
 
   @Bean
   def mapConverter: MapConverter = {

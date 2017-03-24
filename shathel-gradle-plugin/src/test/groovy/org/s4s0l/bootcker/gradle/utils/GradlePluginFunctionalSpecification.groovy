@@ -82,6 +82,8 @@ abstract class GradlePluginFunctionalSpecification extends Specification {
         allArgs.add("-Dbootcker_localrepo=" + getLocalRepo().getAbsolutePath());
         allArgs.add("-Dbootcker_project_version=" + System.getenv("PROJECT_VERSION"));
         allArgs.add("--stacktrace")
+        allArgs.add("--gradle-user-home=${getTestKitDir().absolutePath}")
+        allArgs.add("--project-cache-dir=${getTestKitDir().absolutePath}")
         allArgs.addAll(args.toList())
         return GradleRunner.create()
                 .withProjectDir(projectDirectory.root)
@@ -101,11 +103,7 @@ abstract class GradlePluginFunctionalSpecification extends Specification {
     }
 
     private static File getTestKitDir() {
-        def gradleUserHome = System.getenv('GRADLE_USER_HOME')
-        if (!gradleUserHome) {
-            gradleUserHome = new File(System.getProperty('user.home'), '.gradle').absolutePath
-        }
-        return new File(gradleUserHome, 'testkit')
+        return new File(".", '.cache/testkit')
     }
 
     File getLocalRepo() {

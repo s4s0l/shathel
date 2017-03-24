@@ -14,7 +14,7 @@ class DeployerParameters$Test extends FeatureSpec with GivenWhenThen {
       When("get list of allowed params")
       val params = DeployerParameters.getParams(Option.empty)
       Then("Params contain only non env params")
-      assert(params.size == 9)
+      assert(params.size == 12)
     }
 
     scenario("With env") {
@@ -22,7 +22,7 @@ class DeployerParameters$Test extends FeatureSpec with GivenWhenThen {
       val params = DeployerParameters.getParams(Option("itg"))
       Then("Params contain only non env params")
       assert(params.size == DeployerParameters.VALID_PARAMS.size)
-      assert(params.filter((x)=>x.contains(".itg.")).size == 10)
+      assert(params.filter((x)=>x.contains(".itg.")).size == 15)
       assert(params.filter((x)=>x.contains("{env}")).isEmpty)
     }
   }

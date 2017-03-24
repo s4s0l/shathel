@@ -5,6 +5,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaForkOptions
 import org.s4s0l.shathel.commons.DefaultExtensionContext
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.CommonParams
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.Stack
@@ -20,11 +21,11 @@ class ShathelOperationTask extends DefaultTask {
     Map<String, String> shathelParams = [:]
 
     String getShathelEnvironmentName() {
-        return getCombinedParams().getOrDefault("shathel.env", "local")
+        return getCombinedParams().getOrDefault(CommonParams.SHATHEL_ENV, "local")
     }
 
     File getShathelDir() {
-        return getShathelParameters().getParameter("shathel.deployer.dir")
+        return getShathelParameters().getParameter(CommonParams.SHATHEL_DIR)
                 .map {
             if (new File(it).isAbsolute()) {
                 return new File(it)
@@ -36,7 +37,7 @@ class ShathelOperationTask extends DefaultTask {
 
 
     boolean isShathelInitEnabled() {
-        return getShathelParameters().getParameterAsBoolean("shathel.deployer.init")
+        return getShathelParameters().getParameterAsBoolean("shathel.env.${shathelEnvironmentName}.init")
                 .orElse(true)
     }
 
@@ -113,13 +114,14 @@ class ShathelNotifyingTask extends ShathelOperationTask {
 
         def propsToleaveForOthers = [
                 "shathel.plugin.ip"                                         : ip,
-                "shathel.env"                                               : shathelEnvironmentName,
+                (CommonParams.SHATHEL_ENV)                                  : shathelEnvironmentName,
                 "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
                 "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),
                 "shathel.plugin.current.gav"                                : new StackReference(project.group, project.name, project.version).gav,
                 "shathel.plugin.current"                                    : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
                 "shathel.env.${getShathelEnvironmentName()}.dependenciesDir": getDependenciesDir().absolutePath,
-                "shathel.deployer.dir"                                      : getShathelDir()
+                "shathel.env.${getShathelEnvironmentName()}.init"           : "true",
+                (CommonParams.SHATHEL_DIR)                                  : getShathelDir()
         ]
 
         stack.environment.introspectionProvider.allStacks.stacks.each { stk ->

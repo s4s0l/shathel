@@ -2,7 +2,7 @@ package org.s4s0l.shathel.deployer
 
 import java.util
 
-import org.s4s0l.shathel.commons.core.{MapParameters, ParameterProvider, Parameters}
+import org.s4s0l.shathel.commons.core.{CommonParams, MapParameters, ParameterProvider, Parameters}
 import org.s4s0l.shathel.deployer.shell.customization.MapConverterKeysProvider
 import org.springframework.shell.core.CommandMarker
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
@@ -26,7 +26,7 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
   @CliCommand(value = Array("parameters list"), help = "list currently set parameters")
   def list(@CliOption(key = Array("not-set"), mandatory = false, help = "if true prints not set parameters", specifiedDefaultValue = "false", unspecifiedDefaultValue = "false")
            env: Boolean): String = {
-    DeployerParameters.getParams(getParameter("shathel.env"))
+    DeployerParameters.getParams(getParameter(CommonParams.SHATHEL_ENV))
       .filter((x) => env || getParameter(x).isDefined)
       .map((paramName) => s"${paramName}=${getParameter(paramName).getOrElse("")}")
       .mkString("\n")
@@ -64,7 +64,7 @@ trait ParametersKeyProvider extends MapConverterKeysProvider {
     existingUserData match {
       case pattern(env) => DeployerParameters.getParams(Option(env)).asJava
       case pattern2(env) => DeployerParameters.getParams(Option(env)).asJava
-      case _ => DeployerParameters.getParams(getParameter("shathel.env")).asJava
+      case _ => DeployerParameters.getParams(getParameter(CommonParams.SHATHEL_ENV)).asJava
     }
   }
 

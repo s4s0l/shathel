@@ -18,15 +18,12 @@ class DockerCommands(parametersCommands: ParametersCommands, environmentCommands
                environment: String,
                @CliOption(key = Array("storage-file"), mandatory = false, help = "see storage open command for details")
                file: File,
-               @CliOption(key = Array("storage-init"), mandatory = false, help = "see storage open command for details")
-               initIfAbsent: java.lang.Boolean,
                @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
                map: java.util.Map[String, String]
              ): String = {
     shathel(map, builder()
       .environment(environment)
       .storageFile(file)
-      .storageInit(initIfAbsent)
     )(context => {
       val (storage, _, _) = environmentCommands.getEnvironment(context)
       val file1 = storage.getSettingsDirectory(context, context.environment())
@@ -43,15 +40,12 @@ class DockerCommands(parametersCommands: ParametersCommands, environmentCommands
               environment: String,
               @CliOption(key = Array("storage-file"), mandatory = false, help = "see storage open command for details")
               file: File,
-              @CliOption(key = Array("storage-init"), mandatory = false, help = "see storage open command for details")
-              initIfAbsent: java.lang.Boolean,
               @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
               map: java.util.Map[String, String]
             ): String = {
     shathel(map, builder()
       .environment(environment)
       .storageFile(file)
-      .storageInit(initIfAbsent)
     )(context => {
       val (storage, solution, environment) = environmentCommands.getEnvironment(context)
       val file1 = storage.getSettingsDirectory(context, context.environment())

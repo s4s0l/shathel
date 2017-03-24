@@ -15,6 +15,9 @@ import org.apache.ivy.core.settings.XmlSettingsParser;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.URLResolver;
+import org.apache.ivy.util.AbstractMessageLogger;
+import org.apache.ivy.util.DefaultMessageLogger;
+import org.apache.ivy.util.Message;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver;
@@ -22,6 +25,7 @@ import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.IoUtils;
 import org.s4s0l.shathel.commons.utils.Utils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.HashMap;
@@ -29,18 +33,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author Marcin Wielgus
  */
 public class IvyDownloader implements DependencyDownloader {
-    public static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.ivy.default_version";
-    public static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.ivy.default_group";
+    private static final Logger LOGGER = getLogger(IvyDownloader.class);
+    public static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.solution.ivy_default_version";
+    public static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.solution_ivy_default_group";
+    public static final String SHATHEL_IVY_SETTINGS = "shathel.solution.ivy_settings";
+
+    public static final String SHATHEL_IVY_REPOS_ID = "shathel.solution.ivy_repo_id";
+    public static final String SHATHEL_IVY_REPOS = "shathel.solution.ivy_repos";
     public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
-    public static final String SHATHEL_IVY_REPOS_ID = "shathel.ivy.reposId";
-    public static final String SHATHEL_IVY_REPOS = "shathel.ivy.repos";
     public static final String DEFAULT_REPOS = "http://repo1.maven.org/maven2/,https://dl.bintray.com/sasol-oss/maven/";
     public static final String PATTERN_SUFFIX = "[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]";
-    public static final String SHATHEL_IVY_SETTINGS = "shathel.ivy.settings";
     final Parameters parameters;
 
     public IvyDownloader(Parameters parameters) {
@@ -72,6 +80,9 @@ public class IvyDownloader implements DependencyDownloader {
         String groupId = reference.getGroup();
         String artifactId = reference.getName();
         String version = reference.getVersion();
+
+        //todo: replace it with sth that does not do println...
+        Message.setDefaultLogger(new IvyMessageLogger());
         IvySettings ivySettings = getIvySettings();
 
         //creates an Ivy instance with settings
@@ -177,4 +188,27 @@ public class IvyDownloader implements DependencyDownloader {
     }
 
 
+    private static class IvyMessageLogger extends AbstractMessageLogger {
+        private static final Logger LOGGER = getLogger(IvyMessageLogger.class);
+
+        @Override
+        protected void doProgress() {
+            LOGGER.debug("Ivy is working....");
+        }
+
+        @Override
+        protected void doEndProgress(String msg) {
+            LOGGER.debug("Finished: {}", msg);
+        }
+
+        @Override
+        public void log(String msg, int level) {
+            LOGGER.debug(msg);
+        }
+
+        @Override
+        public void rawlog(String msg, int level) {
+            log(msg, level);
+        }
+    }
 }

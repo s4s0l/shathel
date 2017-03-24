@@ -25,11 +25,11 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
             @CliOption(key = Array(""), mandatory = true, help = "Environment name to use")
             environment: String
           ): String = {
-    shathel(Map[String,String]().asJava, builder())(
+    shathel(Map[String, String]().asJava, builder())(
       context => {
         val storage = storageCommands.getStorage(context)
         val solution = context.shathel.getSolution(storage)
-        if(!solution.getEnvironments().contains(environment)){
+        if (!solution.getEnvironments().contains(environment)) {
           throw new RuntimeException(s"Environment ${environment} not found possible environments are:" +
             s" ${solution.getEnvironments().stream().collect(Collectors.joining(", "))}")
         }
@@ -154,6 +154,10 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
     val solution = context.shathel.getSolution(storage)
 
     val environment = solution.getEnvironment(context.environment())
+    val initEnv = environment.getEnvironmentContext.getEnvironmentDescription.getParameterAsBoolean("init").orElse(false)
+    if (initEnv && !environment.isInitialized) {
+      environment.initialize()
+    }
     (storage, solution, environment)
   }
 }

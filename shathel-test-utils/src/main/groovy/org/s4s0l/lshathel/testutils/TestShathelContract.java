@@ -3,6 +3,7 @@ package org.s4s0l.lshathel.testutils;
 import org.immutables.value.Value;
 import org.s4s0l.shathel.commons.DefaultExtensionContext;
 import org.s4s0l.shathel.commons.Shathel;
+import org.s4s0l.shathel.commons.core.CommonParams;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.Solution;
 import org.s4s0l.shathel.commons.core.Stack;
@@ -28,12 +29,12 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
 
     @Value.Derived
     default File shathelDir() {
-        return new File(parameters().getParameter("shathel.deployer.dir").orElse(".shathel"));
+        return new File(parameters().getParameter(CommonParams.SHATHEL_DIR).orElse(".shathel"));
     }
 
     @Value.Derived
     default boolean isShathelInitEnabled() {
-        return parameters().getParameterAsBoolean("shathel.deployer.init")
+        return parameters().getParameterAsBoolean("shathel.env."+shathelEnv()+".init")
                 .orElse(true);
     }
 

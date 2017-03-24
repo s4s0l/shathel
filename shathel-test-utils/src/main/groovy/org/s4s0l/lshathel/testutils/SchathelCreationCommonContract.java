@@ -1,6 +1,7 @@
 package org.s4s0l.lshathel.testutils;
 
 import org.immutables.value.Value;
+import org.s4s0l.shathel.commons.core.CommonParams;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
@@ -27,7 +28,7 @@ public interface SchathelCreationCommonContract {
 
     @Value.Default
     default String shathelEnv() {
-        return params().getOrDefault("shathel.env", "local");
+        return params().getOrDefault(CommonParams.SHATHEL_ENV, "local");
     }
 
     @Value.Lazy

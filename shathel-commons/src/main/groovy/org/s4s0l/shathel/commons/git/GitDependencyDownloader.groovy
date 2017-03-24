@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory
  */
 class GitDependencyDownloader implements DependencyDownloader {
     public static
-    final String SHATHEL_GIT_DEFAULT_VERSION = "shathel.git.default_version";
+    final String SHATHEL_GIT_DEFAULT_VERSION = "shathel.solution.git_default_version";
     public static
-    final String SHATHEL_GIT_DEFAULT_GROUP = "shathel.git.default_group";
+    final String SHATHEL_GIT_DEFAULT_GROUP = "shathel.solution.git_default_group";
     public static final String DEFAULT_GROUP = "github.com/s4s0l/shathel-stacks"
     private static
     final Logger LOGGER = LoggerFactory.getLogger(GitDependencyDownloader.class);

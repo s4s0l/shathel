@@ -3,6 +3,7 @@ package org.s4s0l.lshathel.testutils
 import org.junit.runners.model.Statement
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
+import org.s4s0l.shathel.commons.core.CommonParams
 import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import spock.lang.Specification
@@ -28,13 +29,13 @@ class TestShathelRuleContractTest extends Specification {
     def "Quick test run"() {
         given:
         System.setProperty("shathel.plugin.ip", "localhost")
-        System.setProperty("shathel.env", "local")
+        System.setProperty(CommonParams.SHATHEL_ENV, "local")
         System.setProperty("shathel.plugin.local.override.mappings", "src/test/resources/TestShathelRuleContractTest/mappings")
         System.setProperty("shathel.plugin.local.override.current", "src/test/resources/TestShathelRuleContractTest/stack")
         System.setProperty("shathel.plugin.current.gav", "org.s4s0l.shathel:introspection:1.0")
         System.setProperty("shathel.plugin.current", LocalOverriderDownloader.CURRENT_PROJECT_LOCATION)
         System.setProperty("shathel.env.local.dependenciesDir", "build/.shathel-dependency-cache")
-        System.setProperty("shathel.deployer.dir", "build/.shathel")
+        System.setProperty(CommonParams.SHATHEL_DIR, "build/.shathel")
         ArgumentCaptor<VerifierContextContract> argument = ArgumentCaptor.forClass(VerifierContextContract.class);
 
         def verifier = Mockito.mock(Verifier)

@@ -14,7 +14,7 @@ import scala.util.Try
 /**
   * @author Marcin Wielgus
   */
-class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMarker with ParametersKeyProvider {
+class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMarker with ParametersKeyProvider with OutputFormatter {
 
 
   def shathel(parametersMap: java.util.Map[String, String], commandOverrides: DeployerParameters.Builder = new DeployerParameters.Builder())(work: (DeployerParameters.ShathelCommandContext) => String): String = {
@@ -32,28 +32,6 @@ class ShathelCommands(parametersCommands: ParametersCommands) extends CommandMar
 
   def builder(): DeployerParameters.Builder = new DeployerParameters.Builder()
 
-
-  def yaml: Yaml = {
-    val options = new DumperOptions()
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
-    new Yaml(options)
-  }
-
-  def response(map: Map[String, Any]): String = {
-    yaml.dump(map.asJava)
-  }
-
-  def response(map: List[String]): String = {
-    yaml.dump(map.asJava)
-  }
-
-  def response(map: java.util.List[String]): String = {
-    yaml.dump(map)
-  }
-
-  def ok(): String = {
-    yaml.dump(Map("status" -> "ok").asJava)
-  }
 
   def getParameter(name: String): Option[String] = parametersCommands.getParameter(name)
 }

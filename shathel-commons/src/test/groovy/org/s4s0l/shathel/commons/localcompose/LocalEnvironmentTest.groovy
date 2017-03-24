@@ -20,7 +20,6 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
     @Override
     def setupEnvironment() {
         environmentName = "composed"
-        network = "224.224.224"
     }
 
     def cleanupEnvironment() {
@@ -34,7 +33,9 @@ class LocalEnvironmentTest extends BaseIntegrationTest {
     def "Run stack in local docker integration test"() {
         given:
         File root = getRootDir()
-        Shathel sht = shathel()
+        Shathel sht = shathel([
+                'shathel.env.composed.type': 'docker-compose'
+        ])
 
         when:
         def storage = sht.initStorage(root, true)

@@ -20,8 +20,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class FileDependencyDownloader implements DependencyDownloader {
-    public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.file.default_version";
-    public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.file.default_group";
+    public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
+    public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
     public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.file.base_dir";
     private final ParameterProvider params;
@@ -68,9 +68,11 @@ public class FileDependencyDownloader implements DependencyDownloader {
         }
         if (search.isPresent()) {
             StackFileModel model = StackFileModel.load(new File(search.get(), "shthl-stack.yml"));
+            StackReference foundStack = new StackReference(model.getGav());
+
             //we found but it has wrong version
-            if (!GavUtils.getVersion(model.getGav()).equals(stackReference.getVersion())) {
-                if (!new StackReference(model.getGav()).getVersion().equals("$version")) {
+            if (!foundStack.getVersion().equals(stackReference.getVersion())) {
+                if (!foundStack.getVersion().equals("$version")) {
                     LOGGER.warn("{} found stack in {}, but in different version, will not pick it up", getClass().getSimpleName(), search.get().getAbsolutePath());
                     search = Optional.empty();
                 }
