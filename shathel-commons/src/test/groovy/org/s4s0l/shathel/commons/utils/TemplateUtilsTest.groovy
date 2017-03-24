@@ -10,7 +10,7 @@ class TemplateUtilsTest extends Specification {
     @Unroll
     def "FillEnvironmentVariables when #text then should give #expected"(text, expected) {
         given:
-        def envs = [VAR:'value']
+        def envs = [VAR: 'value', XX_123: "xxxx"]
         when:
         def filled = TemplateUtils.fillEnvironmentVariables(text, envs)
 
@@ -19,16 +19,18 @@ class TemplateUtilsTest extends Specification {
 
         where:
 
-        text | expected
-        "this is \${VAR}a" | "this is valuea"
-        "this is \${VAR} a" | "this is value a"
-        "this is \${VAR} and \${VAR}" | "this is value and value"
+        text                                     | expected
+        "this is \${VAR}a"                       | "this is valuea"
+        "this is \${VAR} a"                      | "this is value a"
+        "this is \${VAR} and \${VAR}"            | "this is value and value"
         "this is \${VAR} and \${VARX:-default}x" | "this is value and defaultx"
-        "this is \$VAR" | "this is value"
-        "this is novar" | "this is novar"
-        "this is \$\$VAR" | "this is \$\$VAR"
-        "this is \${VAR:-default}" | "this is value"
-        "this is \${VAR2:-default}" | "this is default"
+        "this is \$VAR"                          | "this is value"
+        "this is novar"                          | "this is novar"
+        "this is \$\$VAR"                        | "this is \$\$VAR"
+        "this is \${VAR:-default}"               | "this is value"
+        "this is \${VAR2:-default}"              | "this is default"
+        "this is \${VAR}:\${XX_123}"             | "this is value:xxxx"
+        "this is \${BS}"              | "this is \$BS"
 
     }
 }

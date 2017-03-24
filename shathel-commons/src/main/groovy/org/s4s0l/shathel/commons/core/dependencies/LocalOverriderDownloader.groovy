@@ -1,7 +1,5 @@
-package org.s4s0l.shathel.gradle
+package org.s4s0l.shathel.commons.core.dependencies
 
-import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader
-import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -9,6 +7,7 @@ import org.slf4j.LoggerFactory
  * @author Marcin Wielgus
  */
 class LocalOverriderDownloader implements DependencyDownloader {
+    public static final String CURRENT_PROJECT_LOCATION = "--currentProject--"
     private final File stackMappingsDir
     private final File projectStackDir
 
@@ -21,7 +20,7 @@ class LocalOverriderDownloader implements DependencyDownloader {
 
     @Override
     Optional<File> download(StackLocator locator, File directory, boolean forceful) {
-        if (locator.location.startsWith("--currentProject--")) {
+        if (locator.location.startsWith(CURRENT_PROJECT_LOCATION)) {
             return Optional.of(projectStackDir)
         }
         if (!locator.getReference().isPresent()) {

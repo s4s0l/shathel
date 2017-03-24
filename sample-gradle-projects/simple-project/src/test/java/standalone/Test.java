@@ -21,33 +21,4 @@ public class Test {
     }
 
 
-    void tryAddress(String address, String expectedString) throws Exception {
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        RestAssured.baseURI = address;
-        tryNTimes(60, () -> {
-            // @formatter:off
-            Response S = when()
-                    .get("/");
-            S.then()
-                    .statusCode(200)
-                    .body(equalTo(expectedString));
-            // @formatter:on
-        });
-
-    }
-
-    void tryNTimes(int n, Runnable r) throws Exception {
-        for (int i = 1; i <= n; i++) {
-            try {
-                r.run();
-            } catch (Exception e) {
-                if (i == n) {
-                    throw e;
-                } else {
-                    System.out.println("Will try again...");
-                    Thread.sleep(1000);
-                }
-            }
-        }
-    }
 }

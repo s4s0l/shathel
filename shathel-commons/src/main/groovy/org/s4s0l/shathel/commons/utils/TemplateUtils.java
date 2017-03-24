@@ -39,7 +39,7 @@ public class TemplateUtils {
                 matcher.appendReplacement(sb, envs.get(variable));
             } else {
                 if (matcher.group(2) == null) {
-                    matcher.appendReplacement(sb, "${" + variable + "}");
+                    matcher.appendReplacement(sb, "\\$" + variable + "");
                 } else {
                     matcher.appendReplacement(sb, matcher.group(2).substring(2));
                 }

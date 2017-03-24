@@ -11,6 +11,7 @@ class ShathelExtension {
     Map<String, ShathelDockerTaskSettings> images = [:]
     String sourceRoot = "src/main/shathel"
     List<? extends Task> runAroundTasks = []
+    List<? extends Task> prepareForTasks = []
     Map<String,String> shathelParams = [:]
 
     ShathelExtension(Project project) {

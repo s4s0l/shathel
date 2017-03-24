@@ -1,0 +1,20 @@
+description = "Shathel common libraries"
+ext {
+    displayName = "Shathel Test Utils"
+}
+
+apply from: '../gradle/groovy.gradle'
+apply from: '../gradle/spring.gradle'
+apply from: '../gradle/bintray.gradle'
+apply plugin: 'maven'
+
+repositories {
+    maven { url 'http://dl.bintray.com/gesellix/docker-utils' }
+}
+dependencies {
+    compile project(":shathel-commons")
+    compile 'junit:junit'
+    compile 'org.immutables:value:2.4.6'
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
+    testCompile "ch.qos.logback:logback-classic"
+}

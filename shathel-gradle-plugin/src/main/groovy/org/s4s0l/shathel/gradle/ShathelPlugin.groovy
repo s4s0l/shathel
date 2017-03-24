@@ -78,6 +78,9 @@ class ShathelPlugin implements Plugin<Project> {
             extension.runAroundTasks.each {
                 shathelPrepareTask.runAround(it)
             }
+            extension.prepareForTasks.each {
+                shathelPrepareTask.prepareFor(it)
+            }
             prepareTasks << shathelPrepareTask
         }
         prepareTasks.each {

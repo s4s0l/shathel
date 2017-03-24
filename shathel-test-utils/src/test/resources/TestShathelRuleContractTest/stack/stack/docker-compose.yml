@@ -1,0 +1,12 @@
+version: "3.1"
+services:
+  dummyService:
+    image: tutum/hello-world
+    ports:
+       - 9999:4000
+       - 5000
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        dummy: label

@@ -8,11 +8,9 @@ import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.Stack
-import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
+import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
-import org.s4s0l.shathel.commons.git.GitDependencyDownloader
-import org.s4s0l.shathel.commons.ivy.IvyDownloader
-
+import org.s4s0l.shathel.commons.core.stack.StackReference
 
 /**
  * @author Marcin Wielgus
@@ -62,8 +60,12 @@ class ShathelOperationTask extends DefaultTask {
 
     Map<String, String> getParamsWithDefaults() {
         Map paramsWithDefault = getCombinedParams()
-        fillDefault(paramsWithDefault, "shathel.env.${getShathelEnvironmentName()}.dependenciesDir", new File(project.rootProject.buildDir, "shathel-dependencies").absolutePath)
+        fillDefault(paramsWithDefault, "shathel.env.${getShathelEnvironmentName()}.dependenciesDir", getDependenciesDir().absolutePath)
         return paramsWithDefault
+    }
+
+    File getDependenciesDir() {
+        new File(project.rootProject.buildDir, "shathel-dependencies")
     }
 
     private Map getCombinedParams() {
@@ -94,7 +96,7 @@ class ShathelOperationTask extends DefaultTask {
         if (isShathelInitEnabled() && !environment.isInitialized()) {
             environment.initialize()
         }
-        return solution.openStack(environment, new StackLocator("--currentProject--"))
+        return solution.openStack(environment, new StackLocator(LocalOverriderDownloader.CURRENT_PROJECT_LOCATION))
     }
 
     private Parameters getShathelParameters() {
@@ -103,20 +105,22 @@ class ShathelOperationTask extends DefaultTask {
 
 }
 
-
-class ShathelStartTask extends ShathelOperationTask {
-
-    boolean withOptionalDependencies = false
+class ShathelNotifyingTask extends ShathelOperationTask {
     List<JavaForkOptions> tasksToNotify = []
 
-    @TaskAction
-    void build() {
-        def stack = getShathelCurrentStack()
-        def command = stack.createStartCommand(withOptionalDependencies)
-        stack.run(command)
+    protected void notifyTasks(Stack stack) {
         def ip = stack.environment.getEnvironmentApiFacade().getIpForManagementNode()
 
-        def propsToleaveForOthers = ["shathel.plugin.ip": ip]
+        def propsToleaveForOthers = [
+                "shathel.plugin.ip"                                         : ip,
+                "shathel.env"                                               : shathelEnvironmentName,
+                "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
+                "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),
+                "shathel.plugin.current.gav"                                : new StackReference(project.group, project.name, project.version).gav,
+                "shathel.plugin.current"                                    : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
+                "shathel.env.${getShathelEnvironmentName()}.dependenciesDir": getDependenciesDir().absolutePath,
+                "shathel.deployer.dir"                                      : getShathelDir()
+        ]
 
         stack.environment.introspectionProvider.allStacks.stacks.each { stk ->
             stk.services.each { service ->
@@ -127,13 +131,38 @@ class ShathelStartTask extends ShathelOperationTask {
 
             }
         }
-        tasksToNotify.each { task ->
+        tasksToNotify.findAll { it instanceof JavaForkOptions }.each { task ->
             propsToleaveForOthers.each {
                 task.systemProperties.put(it.key.toString(), it.value.toString())
             }
         }
+    }
+
+    @TaskAction
+    void build() {
+        def stack = getShathelCurrentStack()
+        notifyTasks(stack)
 
     }
+
+}
+
+class ShathelStartTask extends ShathelNotifyingTask {
+
+    boolean withOptionalDependencies = false
+
+
+    @TaskAction
+    @Override
+    void build() {
+        def stack = getShathelCurrentStack()
+        def command = stack.createStartCommand(withOptionalDependencies)
+        stack.run(command)
+        notifyTasks(stack)
+
+    }
+
+
 }
 
 class ShathelStopTask extends ShathelOperationTask {

@@ -85,6 +85,13 @@ class ShathelPrepareTask extends DefaultTask {
         return settings
     }
 
+    def prepareFor(Task task){
+        def startTask = project.task("shathelNotify-${task.name}", dependsOn: this, type: ShathelNotifyingTask) {
+            tasksToNotify = [task]
+        }
+        task.dependsOn startTask
+    }
+
     def runAround(Task task) {
         def startTask = project.task("shathelStart-${task.name}", dependsOn: this, type: ShathelStartTask) {
             tasksToNotify = [task]

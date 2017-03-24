@@ -1,0 +1,4 @@
+version: 1
+shathel-stack:
+  deployName: IntrospectionStack
+  gav: org.s4s0l.shathel:introspection:1.0

@@ -16,7 +16,22 @@ class HttpApis {
         LOGGER.info(x);
     }
 
-    def waitAndGetClient(String address, List<String> expectedStatus = [200,401], String path = "/", int maxAttempts = 30) {
+    void test(String address, List<Integer> expectedStatus = [200,401, 403],String path = "/"){
+        def portainer = new RESTClient(address)
+        portainer.handler[Status.FAILURE] = portainer.handler.get(Status.SUCCESS)
+        portainer.handler["$expectedStatus"] = portainer.handler.get(Status.SUCCESS)
+        def ok = expectedStatus
+        HttpResponseDecorator result = portainer.get(
+                path: path
+        )
+        if (!ok.contains(result.status)) {
+            throw new Exception("Non ${ok} resp, got ${result.status}")
+        } else {
+            log "$address ready."
+        }
+    }
+
+    def waitAndGetClient(String address, List<Integer> expectedStatus = [200,401], String path = "/", int maxAttempts = 30) {
         def portainer = new RESTClient(address)
         portainer.handler[Status.FAILURE] = portainer.handler.get(Status.SUCCESS)
         portainer.handler["$expectedStatus"] = portainer.handler.get(Status.SUCCESS)

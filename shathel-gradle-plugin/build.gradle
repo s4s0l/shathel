@@ -8,7 +8,7 @@ apply from: '../gradle/groovy.gradle'
 apply from: '../gradle/spring.gradle'
 apply from: '../gradle/bintray.gradle'
 apply from: '../gradle/plugin.gradle'
-
+apply from: '../gradle/integration.gradle'
 
 
 dependencies {
@@ -22,4 +22,7 @@ dependencies {
 tasks.withType(Test) {
     dependsOn project(":shathel-commons").install
 }
+
+
+integrationTest.dependsOn project(":shathel-test-utils").getTasksByName("install", false)
 

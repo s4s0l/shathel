@@ -10,3 +10,4 @@ dependencyManagement {
     }
 }
 
+ext['guava.version'] = '21.0'
