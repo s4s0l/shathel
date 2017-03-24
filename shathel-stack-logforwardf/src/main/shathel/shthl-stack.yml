@@ -1,6 +1,0 @@
-version: 1
-shathel-stack:
-  gav: org.s4s0l.shathel:shathel-stack-logforwardf:$version
-  deployName: logforwardf
-  dependencies:
-      org.s4s0l.shathel:shathel-stack-logstore:$version:

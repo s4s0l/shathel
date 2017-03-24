@@ -39,8 +39,8 @@ public class DefaultExtensionContext {
                 .extension(new DefaultGlobalEnricherProvider())
                 .extension(new GroovyExecutorProvider())
                 .extension(new IvyDownloader(parameterProvider))
+                .extension(new GitDependencyDownloader(parameterProvider))
                 .extension(new FileDependencyDownloader(parameterProvider))
-                .extension(new GitDependencyDownloader())
                 ;
 
         for (ExtensionInterface extraExtension : extraExtensions) {

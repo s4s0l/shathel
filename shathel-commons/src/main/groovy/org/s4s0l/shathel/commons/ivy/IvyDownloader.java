@@ -21,6 +21,7 @@ import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.IoUtils;
+import org.s4s0l.shathel.commons.utils.Utils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
  * @author Marcin Wielgus
  */
 public class IvyDownloader implements DependencyDownloader {
+    public static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.ivy.default_version";
+    public static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.ivy.default_group";
+    public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
     public static final String SHATHEL_IVY_REPOS_ID = "shathel.ivy.reposId";
     public static final String SHATHEL_IVY_REPOS = "shathel.ivy.repos";
     public static final String DEFAULT_REPOS = "http://repo1.maven.org/maven2/,https://dl.bintray.com/sasol-oss/maven/";
@@ -41,15 +45,6 @@ public class IvyDownloader implements DependencyDownloader {
 
     public IvyDownloader(Parameters parameters) {
         this.parameters = parameters;
-    }
-
-    public static String getShathelVersion() {
-        Package pkg = IvyDownloader.class.getPackage();
-        String version = null;
-        if (pkg != null) {
-            version = pkg.getImplementationVersion();
-        }
-        return (version != null ? version : "Unknown Version");
     }
 
 
@@ -176,7 +171,9 @@ public class IvyDownloader implements DependencyDownloader {
     }
 
     private Optional<StackReference> getReference(StackLocator locator) {
-        return new ReferenceResolver(parameters).resolve(locator);
+        String group = parameters.getParameter(SHATHEL_IVY_DEFAULT_GROUP).orElse(DEFAULT_GROUP);
+        String version = parameters.getParameter(SHATHEL_IVY_DEFAULT_VERSION).orElseGet(() -> Utils.getShathelVersion());
+        return new ReferenceResolver(group, version).resolve(locator);
     }
 
 

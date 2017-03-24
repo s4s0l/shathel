@@ -1,6 +1,0 @@
-apply plugin: org.s4s0l.shathel.gradle.ShathelPackagerPlugin
-ext {
-    displayName = "Shathel Stack:Core"
-}
-apply from: '../gradle/bintray.gradle'
-apply plugin: 'maven'

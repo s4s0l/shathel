@@ -7,15 +7,22 @@ import org.s4s0l.shathel.commons.core.model.SolutionFileModel;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.IoUtils;
+import org.s4s0l.shathel.commons.utils.Utils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author Marcin Wielgus
  */
 public class FileDependencyDownloader implements DependencyDownloader {
+    public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.file.default_version";
+    public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.file.default_group";
+    public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.file.base_dir";
     private final ParameterProvider params;
 
@@ -33,8 +40,14 @@ public class FileDependencyDownloader implements DependencyDownloader {
         return search;
     }
 
+    private Optional<StackReference> getReference(StackLocator locator) {
+        String group = params.getParameter(SHATHEL_FILE_DEFAULT_GROUP).orElse(DEFAULT_GROUP);
+        String version = params.getParameter(SHATHEL_FILE_DEFAULT_VERSION).orElseGet(() -> Utils.getShathelVersion());
+        return new ReferenceResolver(group, version).resolve(locator);
+    }
+
     private Optional<File> search(StackLocator locator, File directory, boolean forceful) {
-        Optional<StackReference> reference = new ReferenceResolver(params).resolve(locator);
+        Optional<StackReference> reference = getReference(locator);
         if (reference.isPresent()) {
             Optional<File> file = searchAsReference(reference.get());
             if (!file.isPresent()) {
@@ -57,11 +70,16 @@ public class FileDependencyDownloader implements DependencyDownloader {
             StackFileModel model = StackFileModel.load(new File(search.get(), "shthl-stack.yml"));
             //we found but it has wrong version
             if (!GavUtils.getVersion(model.getGav()).equals(stackReference.getVersion())) {
-                search = Optional.empty();
+                if (!new StackReference(model.getGav()).getVersion().equals("$version")) {
+                    LOGGER.warn("{} found stack in {}, but in different version, will not pick it up", getClass().getSimpleName(), search.get().getAbsolutePath());
+                    search = Optional.empty();
+                }
             }
         }
         return search;
     }
+
+    private static final Logger LOGGER = getLogger(FileDependencyDownloader.class);
 
     private Optional<File> searchAsLocalMavenRepo(StackReference stackReference, File destination, boolean forceful) {
         String path = stackReference.getGroup().replace(".", "/");

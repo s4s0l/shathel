@@ -9,33 +9,24 @@ import org.s4s0l.shathel.commons.ivy.IvyDownloader
  * @author Marcin Wielgus
  */
 class ReferenceResolver {
-    public static
-    final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.ivy.default_version"
-    public static
-    final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.ivy.default_group"
-    public static final String DEFAULT_GROUP = "org.s4s0l.shathel"
-    private final ParameterProvider params;
 
-    ReferenceResolver(ParameterProvider params) {
-        this.params = params
+
+    private final String defaultGroup;
+    private final String defaultVersion;
+
+    ReferenceResolver(String defaultGroup, String defaultVersion) {
+        this.defaultGroup = defaultGroup
+        this.defaultVersion = defaultVersion
     }
 
 
-    static String getShathelVersion() {
-        Package pkg = IvyDownloader.class.getPackage();
-        String version = null;
-        if (pkg != null) {
-            version = pkg.getImplementationVersion();
-        }
-        return (version != null ? version : "Unknown Version");
-    }
 
     String getDefaultVersion() {
-        params.getParameter(SHATHEL_IVY_DEFAULT_VERSION).orElse(shathelVersion)
+        return defaultVersion
     }
 
     String getDefaultGroup() {
-        params.getParameter(SHATHEL_IVY_DEFAULT_GROUP).orElse(DEFAULT_GROUP)
+        return defaultGroup
     }
 
     Optional<StackReference> resolve(StackLocator locator) {
