@@ -1,0 +1,18 @@
+---
+- name: Check if swarm is initiated on node
+  shell: "docker info | grep 'Swarm: active'"
+  register: machine_swarm_inited_marker
+  failed_when: "machine_swarm_inited_marker.rc != 1 and machine_swarm_inited_marker.rc != 0"
+- name: Initialize swarm on first node.
+  command: docker swarm init --advertise-addr {{private_ip}}
+  when: machine_swarm_inited_marker.rc != 0 and private_ip == head_private_ip
+- name: Fetch Manager token.
+  command: docker swarm join-token -q {{ (current_is_manager) | ternary('manager','worker') }}
+  register: machine_swarm_token
+  delegate_to: "{{head_node}}"
+  when: machine_swarm_inited_marker.rc != 0 and private_ip != head_private_ip
+- name: Join swarm
+  command: docker swarm join --token {{machine_swarm_token.stdout}} --advertise-addr {{private_ip}} {{head_private_ip}}:2377
+  when: machine_swarm_inited_marker.rc != 0 and private_ip != head_private_ip
+
+

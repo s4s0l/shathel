@@ -9,3 +9,5 @@ shathel-deployer/src/test/resources/localRepo/org/springframework/
 .cache
 shathel-deployer/src/test/resources/localRepo/org/s4s0l/shathel/gradle/sample/simple-project/1.2.3-SNAPSHOT/resolver-status.properties
 shathel-deployer/src/test/resources/localRepo/org/s4s0l/shathel/gradle/sample2/simple-project2/DEVELOPER-SNAPSHOT/resolver-status.properties
+private.tfvars
+sandbox/terraform-aws/private

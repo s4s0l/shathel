@@ -2,7 +2,7 @@
 set -e
 gradle :shathel-deployer:install
 
-export SHATHEL_FILE_BASE_DIR=$(pwd)/../shathel-stacks
+export SHATHEL_SOLUTION_FILE_BASE_DIR=$(pwd)/../shathel-stacks
 export SHATHEL_DIR=$(pwd)/build/playground
 export SHATHEL_ENV=local
 export SHATHEL_ENV_ITG_FORCEFUL=true
