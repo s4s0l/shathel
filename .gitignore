@@ -11,3 +11,4 @@ shathel-deployer/src/test/resources/localRepo/org/s4s0l/shathel/gradle/sample/si
 shathel-deployer/src/test/resources/localRepo/org/s4s0l/shathel/gradle/sample2/simple-project2/DEVELOPER-SNAPSHOT/resolver-status.properties
 private.tfvars
 sandbox/terraform-aws/private
+sandbox/terraform-do/private

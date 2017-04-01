@@ -1,0 +1,36 @@
+---
+- hosts: ["{{shathel_manager_hosts}}","{{shathel_worker_hosts}}"]
+  become: yes
+  pre_tasks:
+    - name: Ansible Dir present
+      file:
+        path: /shathel-ansible
+        state: directory
+  tasks:
+      - name: Common Facts
+        set_fact:
+          head_node: "{{ groups[shathel_manager_hosts][0] }}"
+          head_private_ip: "{{ hostvars[groups[shathel_manager_hosts][0]][shathel_node_private_ip] }}"
+          private_ip: "{{hostvars[inventory_hostname][shathel_node_private_ip]}}"
+          public_ip: "{{hostvars[inventory_hostname][shathel_node_public_ip]}}"
+          current_is_manager: "{{inventory_hostname in groups[shathel_manager_hosts]}}"
+      - name: Manager Facts
+        set_fact:
+          current_index: "{{ groups[shathel_manager_hosts].index(inventory_hostname) }}"
+          current_name: "{{shathel_solution}}-manager-{{groups[shathel_manager_hosts].index(inventory_hostname)}}"
+          current_tag: "manager"
+        when:  current_is_manager
+      - name: Worker Facts
+        set_fact:
+            current_index: "{{ groups[shathel_worker_hosts].index(inventory_hostname) }}"
+            current_name: "{{shathel_solution}}-worker-{{groups[shathel_worker_hosts].index(inventory_hostname)}}"
+            current_tag: "worker"
+        when:  not current_is_manager
+
+      - name: Verifying node info
+        debug: msg="name={{current_name}}, manager={{current_is_manager}}, tag={{current_tag}}, head_ip={{head_private_ip}}, publicIp={{ public_ip }}, private_ip={{ private_ip }}"
+
+      - include: tools.yml
+      - include: firewall.yml
+      - include: initialize-machine.yml
+      - include: initialize-swarm.yml

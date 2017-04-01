@@ -1,0 +1,41 @@
+# taken from https://nathanleclaire.com/blog/2015/11/10/using-ansible-with-docker-machine-to-bootstrap-host-nodes/
+---
+- name: Reset UFW firewall
+  ufw:
+    state=reset
+
+- name: Allow SSH access on instance
+  ufw: >
+    rule=allow
+    name=OpenSSH
+
+- name: Open Docker daemon, HTTP(S), and Swarm ports
+  ufw: >
+    rule=allow
+    port={{ item }}
+    proto=tcp
+  with_items:
+    - 80     # Default HTTP port
+    - 443    # Default HTTPS port
+    - 2375   # Docker daemon API port todo: unnececary?
+    - 2376   # Docker daemon API port
+    - 2377
+    - 7946
+    - 4789
+
+- name: Open VXLAN and Serf UDP ports
+  ufw: >
+    rule=allow
+    port={{ item }}
+    proto=udp
+  with_items:
+    - 7946 # Serf
+    - 4789 # VXLAN
+
+- name: Set to deny incoming requests by default
+  ufw: >
+    default=deny
+
+- name: Turn on UFW
+  ufw: >
+    state=enabled
