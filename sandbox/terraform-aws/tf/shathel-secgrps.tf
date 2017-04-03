@@ -25,8 +25,8 @@ resource "aws_security_group" "shathel_common" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-common"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-common"
   }
 }
 
@@ -50,8 +50,8 @@ resource "aws_security_group" "shathel_www" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-www"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-www"
   }
 }
 
@@ -72,8 +72,8 @@ resource "aws_security_group" "shathel_internal" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-internal"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-internal"
   }
 }
 
@@ -89,8 +89,8 @@ resource "aws_security_group" "shathel_docker" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-docker"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-docker"
   }
 }
 
@@ -141,7 +141,7 @@ resource "aws_security_group" "shathel_swarm" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-swarm"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-swarm"
   }
 }

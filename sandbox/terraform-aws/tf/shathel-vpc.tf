@@ -3,8 +3,8 @@ resource "aws_vpc" "shathel" {
   enable_dns_hostnames = true
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}"
   }
 }
 //default group allows all
@@ -29,8 +29,8 @@ resource "aws_default_security_group" "shathel" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}"
   }
 }
 
@@ -41,8 +41,8 @@ resource "aws_subnet" "shathel" {
   cidr_block = "${var.avzone_cidr[element(var.avzones,count.index )]}"
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-sn-${element(var.avzones,count.index )}"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-sn-${element(var.avzones,count.index )}"
   }
 }
 
@@ -50,8 +50,8 @@ resource "aws_internet_gateway" "shathel" {
   vpc_id = "${aws_vpc.shathel.id}"
   tags {
     Shathel = "true"
-    Name = "${var.solution_name}"
-    ShathelSolution = "${var.solution_name}"
+    Name = "${var.shathel_solution_name}"
+    ShathelSolution = "${var.shathel_solution_name}"
   }
 }
 
@@ -64,8 +64,8 @@ resource "aws_default_route_table" "shathel" {
 
   tags {
     Shathel = "true"
-    Name = "${var.solution_name}"
-    ShathelSolution = "${var.solution_name}"
+    Name = "${var.shathel_solution_name}"
+    ShathelSolution = "${var.shathel_solution_name}"
   }
 }
 

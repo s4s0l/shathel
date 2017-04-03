@@ -1,5 +1,5 @@
 resource "aws_instance" "shathel_manager" {
-  count = "${var.manager_count}"
+  count = "${var.shathel_manager_count}"
   ami = "${var.ami}"
   instance_type = "${var.instance_type}"
   key_name = "${aws_key_pair.shathel.key_name}"
@@ -27,8 +27,8 @@ resource "aws_instance" "shathel_manager" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-manager-${count.index}"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-manager-${count.index}"
     Role = "manager"
   }
 }
@@ -42,7 +42,7 @@ resource "aws_eip" "shathel_manager_ip" {
 
 
 resource "aws_instance" "shathel_worker" {
-  count = "${var.worker_count}"
+  count = "${var.shathel_worker_count}"
   ami = "${var.ami}"
   instance_type = "${var.instance_type}"
   key_name = "${aws_key_pair.shathel.key_name}"
@@ -70,8 +70,8 @@ resource "aws_instance" "shathel_worker" {
   }
   tags {
     Shathel = "true"
-    ShathelSolution = "${var.solution_name}"
-    Name = "${var.solution_name}-worker-${count.index}"
+    ShathelSolution = "${var.shathel_solution_name}"
+    Name = "${var.shathel_solution_name}-worker-${count.index}"
     Role = "worker"
   }
 }

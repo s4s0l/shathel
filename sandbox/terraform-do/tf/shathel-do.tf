@@ -3,7 +3,7 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_ssh_key" "shathel" {
-  name       = "${var.solution_name}-key"
+  name       = "${var.shathel_solution_name}-key"
   public_key = "${file(var.key_public)}"
 }
 
@@ -12,7 +12,7 @@ resource "digitalocean_tag" "shathel_tag" {
 }
 
 resource "digitalocean_tag" "shathel_solution" {
-  name = "shathel-${var.solution_name}"
+  name = "shathel-${var.shathel_solution_name}"
 }
 
 resource "digitalocean_tag" "shathel_worker" {

@@ -9,7 +9,7 @@ variable "cloudflare_domain" {
 }
 variable "cloudflare_subdomain" {
 }
-variable "solution_name" {
+variable "shathel_solution_name" {
 }
 variable "key_public" {
   default = "./private/id_rsa.pub"
@@ -17,10 +17,10 @@ variable "key_public" {
 variable "key_private" {
   default = "./private/id_rsa"
 }
-variable manager_count {
+variable shathel_manager_count {
   default = "2"
 }
-variable worker_count {
+variable shathel_worker_count {
   default = "1"
 }
 

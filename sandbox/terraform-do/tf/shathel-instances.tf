@@ -1,8 +1,8 @@
 resource "digitalocean_droplet" "shathel_manager" {
-  count = "${var.manager_count}"
+  count = "${var.shathel_manager_count}"
   image = "${var.do_image}"
   region = "${var.do_region}"
-  name = "${var.solution_name}-manager-${count.index}"
+  name = "${var.shathel_solution_name}-manager-${count.index}"
   size = "${var.do_size}"
   backups = "${var.do_backups}"
   ssh_keys = [
@@ -29,10 +29,10 @@ resource "digitalocean_droplet" "shathel_manager" {
 }
 
 resource "digitalocean_droplet" "shathel_worker" {
-  count = "${var.worker_count}"
+  count = "${var.shathel_worker_count}"
   image = "${var.do_image}"
   region = "${var.do_region}"
-  name = "${var.solution_name}-worker-${count.index}"
+  name = "${var.shathel_solution_name}-worker-${count.index}"
   size = "${var.do_size}"
   backups = "${var.do_backups}"
   ssh_keys = [

@@ -1,0 +1,25 @@
+# taken from https://nathanleclaire.com/blog/2015/11/10/using-ansible-with-docker-machine-to-bootstrap-host-nodes/
+---
+- name: Install desired packages
+  apt: >
+          package={{ item }}
+          state=present
+          update_cache=yes
+  with_items:
+          - htop
+          - tree
+          - jq
+          - fail2ban
+          - vim
+          - mosh
+          - ufw
+- name: Set memory limit in GRUB
+  lineinfile: >
+    dest=/etc/default/grub
+    regexp=^GRUB_CMDLINE_LINUX_DEFAULT
+    line='GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory swapaccount=1"'
+- name: Load new GRUB config
+  command: update-grub
+
+
+#TODO above needs restart

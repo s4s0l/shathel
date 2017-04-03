@@ -42,13 +42,13 @@ variable "avzone_cidr" {
     "us-east-1e" = "10.0.64.0/20"
   }
 }
-variable "solution_name" {
+variable "shathel_solution_name" {
 }
-variable manager_count {
+variable shathel_manager_count {
   default = "2"
 }
 
-variable worker_count {
+variable shathel_worker_count {
   default = "1"
 }
 

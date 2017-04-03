@@ -1,0 +1,96 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Managers = ENV['SHATHEL_MANAGER_COUNT'].to_i
+Workers = ENV['SHATHEL_WORKER_COUNT'].to_i
+Solution = ENV['SHATHEL_SOLUTION_NAME']
+Ansible = ENV['SHATHEL_ANSIBLE_FILE']
+KeysLocation = ENV['SHATHEL_SSH_KEYS_LOCATION']
+PackageVersion = ENV['SHATHEL_VAGRANT_PACKAGE_VERSION']
+ShathelBoxOutDir= ENV['SHATHEL_VAGRANT_PERSISTENT_DIR']
+
+
+
+ShathelBoxFile= 'shathel.box'
+ShathelBoxOutPath = "#{Pathname.new(ShathelBoxOutDir).realpath.to_s}/#{ShathelBoxFile}_#{PackageVersion}"
+ShathelBoxSrcDir = './packer'
+
+
+
+if ARGV[0] == "up" and not File.exist?(ShathelBoxOutPath)
+  Dir.chdir(ShathelBoxSrcDir){
+    if not system("vagrant up")
+      fail "Shathel tmp box up failed"
+    end
+    if not system("vagrant package --output #{ShathelBoxOutPath}")
+      fail "Shathel tmp box package failed"
+    end
+    if not system("vagrant destroy -f")
+      fail "Shathel tmp box destroy failed"
+    end
+  }
+end
+
+
+if File.exist?(Ansible)
+  File.delete(Ansible)
+end
+AnsibleFile = File.open(Ansible, 'a')
+
+
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "#{ShathelBoxFile}_#{PackageVersion}"
+  config.vm.box_url = "file://#{ShathelBoxOutPath}"
+  config.ssh.username = "ubuntu"
+  config.vm.box_check_update = true
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  AnsibleFile.puts "[shathel_manager_hosts]"
+  (1..Managers).each { |i|
+    ip_num = "192.168.99.#{i+1}"
+    m_name = "#{Solution}-manager-#{i}"
+    AnsibleFile.puts "#{ip_num} private_ip=#{ip_num} public_ip=#{ip_num} shathel_name=#{m_name}"
+    config.vm.define m_name do |manager|
+      manager.vm.network "private_network", ip: ip_num
+      manager.vm.provider "virtualbox" do |v|
+        v.name = m_name
+      end
+    end
+  }
+  AnsibleFile.puts "[shathel_worker_hosts]"
+  (1..Workers).each { |i|
+    ip_num = "192.168.99.#{i+1 + Managers}"
+    m_name = "#{Solution}-worker-#{i}"
+    AnsibleFile.puts "#{ip_num} private_ip=#{ip_num} public_ip=#{ip_num} shathel_name=#{m_name}"
+    config.vm.define m_name do |manager|
+      manager.vm.network "private_network", ip: ip_num
+      manager.vm.provider "virtualbox" do |v|
+        v.name = m_name
+      end
+    end
+  }
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    vb.memory = "1024"
+    # vb.linked_clone = true
+  end
+
+
+  config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{KeysLocation}/id_rsa.pub").first.strip
+    box_user_name = config.ssh.username
+    s.inline = <<-SHELL
+      whoami
+      if [ ! -f /home/#{box_user_name}/.ssh/authorized_keys_addedx ]; then
+        echo #{ssh_pub_key} >> /home/#{box_user_name}/.ssh/authorized_keys
+        touch /home/#{box_user_name}/.ssh/authorized_keys_addedx
+      fi
+      ! (docker info | grep WARNING)
+    SHELL
+  end
+
+
+end
