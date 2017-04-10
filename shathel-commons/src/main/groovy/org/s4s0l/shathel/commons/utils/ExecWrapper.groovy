@@ -79,7 +79,7 @@ class ExecWrapper {
         return builder.start()
     }
 
-    public static class ExecWrapperException extends RuntimeException {
+    static class ExecWrapperException extends RuntimeException {
         private final String output;
 
         String getOutput() {

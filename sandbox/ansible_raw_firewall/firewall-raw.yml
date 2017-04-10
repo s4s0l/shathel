@@ -1,0 +1,64 @@
+- iptables_raw:
+      name: shathel-chain-nat
+      table: nat
+      keep_unmanaged: no
+      rules: |
+        -N DOCKER-INGRESS
+        -N DOCKER
+        -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER-INGRESS
+        -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
+        -A OUTPUT -m addrtype --dst-type LOCAL -j DOCKER-INGRESS
+        -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
+        -A POSTROUTING -o docker_gwbridge -m addrtype --src-type LOCAL -j MASQUERADE
+        -A POSTROUTING -s 172.18.0.0/16 ! -o docker_gwbridge -j MASQUERADE
+        -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+        -A DOCKER -i docker_gwbridge -j RETURN
+        -A DOCKER -i docker0 -j RETURN
+        -A DOCKER-INGRESS -p tcp -m tcp --dport 443 -j DNAT --to-destination 172.18.0.2:443
+        -A DOCKER-INGRESS -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.18.0.2:80
+        -A DOCKER-INGRESS -j RETURN
+
+- iptables_raw:
+      name: shathel-chain-filter
+      keep_unmanaged: no
+      table: filter
+      rules: |
+        -N SHATHEL_FORWARD
+        -A SHATHEL_FORWARD -i enp0s8 -p tcp --dport 80 -j ACCEPT
+        -A SHATHEL_FORWARD -i enp0s8 -p tcp --dport 443 -j ACCEPT
+        -A SHATHEL_FORWARD -i enp0s8 -j DROP
+        -A SHATHEL_FORWARD -j RETURN
+        -A FORWARD -j SHATHEL_FORWARD
+        -N SHATHEL_INPUT
+        -A SHATHEL_INPUT -i enp0s8 -p tcp --dport 22 -j ACCEPT
+        -A SHATHEL_INPUT -i enp0s8 -j DROP
+        -A SHATHEL_INPUT -j RETURN
+        -A INPUT -j SHATHEL_INPUT
+
+        -N f2b-sshd
+        -N DOCKER-INGRESS
+        -N DOCKER-ISOLATION
+        -N DOCKER
+        -A INPUT -p tcp -m multiport --dports 22 -j f2b-sshd
+        -A FORWARD -j DOCKER-INGRESS
+        -A FORWARD -j DOCKER-ISOLATION
+        -A FORWARD -o docker_gwbridge -j DOCKER
+        -A FORWARD -o docker_gwbridge -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+        -A FORWARD -i docker_gwbridge ! -o docker_gwbridge -j ACCEPT
+        -A FORWARD -o docker0 -j DOCKER
+        -A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+        -A FORWARD -i docker0 ! -o docker0 -j ACCEPT
+        -A FORWARD -i docker0 -o docker0 -j ACCEPT
+        -A FORWARD -i docker_gwbridge -o docker_gwbridge -j DROP
+        -A DOCKER-INGRESS -p tcp -m tcp --dport 443 -j ACCEPT
+        -A DOCKER-INGRESS -p tcp -m state --state RELATED,ESTABLISHED -m tcp --sport 443 -j ACCEPT
+        -A DOCKER-INGRESS -p tcp -m tcp --dport 80 -j ACCEPT
+        -A DOCKER-INGRESS -p tcp -m state --state RELATED,ESTABLISHED -m tcp --sport 80 -j ACCEPT
+        -A DOCKER-INGRESS -j RETURN
+        -A DOCKER-ISOLATION -i docker0 -o docker_gwbridge -j DROP
+        -A DOCKER-ISOLATION -i docker_gwbridge -o docker0 -j DROP
+        -A DOCKER-ISOLATION -j RETURN
+        -A f2b-sshd -j RETURN
+
+
+
