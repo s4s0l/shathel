@@ -5,6 +5,7 @@ import org.s4s0l.shathel.commons.machine.vbox.NetworkSettings;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public interface SwarmNodeCreator {
     /**
      * @param machineName        name of machine

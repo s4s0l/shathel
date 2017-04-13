@@ -1,10 +1,16 @@
-package org.s4s0l.shathel.commons.scripts
+package org.s4s0l.shathel.commons.scripts.groovy
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.scripts.NamedExecutable
+import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.slf4j.LoggerFactory
 
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class GroovyExecutable implements NamedExecutable {
     private final TypedScript script;
 

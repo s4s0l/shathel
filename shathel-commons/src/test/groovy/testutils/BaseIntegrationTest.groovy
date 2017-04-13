@@ -5,9 +5,8 @@ import org.s4s0l.shathel.commons.DefaultExtensionContext
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
-import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
+import org.s4s0l.shathel.commons.core.dependencies.FileStackDependencyDownloader
 import org.s4s0l.shathel.commons.core.environment.Environment
-import org.s4s0l.shathel.commons.utils.IoUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -65,7 +64,7 @@ abstract class BaseIntegrationTest extends Specification {
                 .parameter("shathel.env.${environmentName}.safePassword", "MySecretPassword")
                 .parameter("shathel.env.${environmentName}.dependenciesDir", dependenciesDir.absolutePath)
                 .parameter("shathel.env.${environmentName}.net", network ?: "1000.1000.1000.1000")
-                .parameter(FileDependencyDownloader.SHATHEL_FILE_BASE_DIR, src.getAbsolutePath())
+                .parameter(FileStackDependencyDownloader.SHATHEL_FILE_BASE_DIR, src.getAbsolutePath())
                 .parameter("shathel.solution.name", getClass().getSimpleName())
                 .parameters(additionalParams)
                 .build().hiddenBySystemProperties()
@@ -79,7 +78,7 @@ abstract class BaseIntegrationTest extends Specification {
 
 
     boolean waitForService(Environment e, String serviceName) {
-        def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
+        def node = e.getEnvironmentApiFacade().getManagerNodeWrapper()
         int i = 0;
         while (i < 25 && node.serviceRunningRatio(serviceName) < 0.9999f) {
             Thread.sleep(1000)
@@ -89,13 +88,13 @@ abstract class BaseIntegrationTest extends Specification {
     }
 
     String execInAnyTask(Environment e, String serviceName, String command) {
-        def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
+        def node = e.getEnvironmentApiFacade().getManagerNodeWrapper()
         def id = node.serviceContainers(serviceName)[0]
         node.containerExec(id, command)
     }
 
     List<String> execInAllTasks(Environment e, String serviceName, String command) {
-        def node = e.getEnvironmentApiFacade().getDockerForManagementNode()
+        def node = e.getEnvironmentApiFacade().getManagerNodeWrapper()
         node.serviceContainers(serviceName).collect {
             node.containerExec(it, command)
         }

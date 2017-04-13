@@ -10,6 +10,7 @@ import spock.lang.Specification
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxMachineSettingsImporterExporterTest extends Specification {
 
     def setupSpec() {

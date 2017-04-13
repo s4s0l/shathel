@@ -110,10 +110,7 @@ class ShathelNotifyingTask extends ShathelOperationTask {
     List<JavaForkOptions> tasksToNotify = []
 
     protected void notifyTasks(Stack stack) {
-        def ip = stack.environment.getEnvironmentApiFacade().getIpForManagementNode()
-
-        def propsToleaveForOthers = [
-                "shathel.plugin.ip"                                         : ip,
+         def propsToleaveForOthers = [
                 (CommonParams.SHATHEL_ENV)                                  : shathelEnvironmentName,
                 "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
                 "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),

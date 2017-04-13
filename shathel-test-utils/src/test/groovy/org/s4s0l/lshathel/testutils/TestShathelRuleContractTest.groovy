@@ -28,9 +28,8 @@ class TestShathelRuleContractTest extends Specification {
 
     def "Quick test run"() {
         given:
-        System.setProperty("shathel.plugin.ip", "localhost")
         System.setProperty(CommonParams.SHATHEL_ENV, "local")
-        System.setProperty("shathel.plugin.local.override.mappings", "src/test/resources/TestShathelRuleContractTest/mappings")
+        System.setProperty("g", "src/test/resources/TestShathelRuleContractTest/mappings")
         System.setProperty("shathel.plugin.local.override.current", "src/test/resources/TestShathelRuleContractTest/stack")
         System.setProperty("shathel.plugin.current.gav", "org.s4s0l.shathel:introspection:1.0")
         System.setProperty("shathel.plugin.current", LocalOverriderDownloader.CURRENT_PROJECT_LOCATION)
@@ -50,8 +49,8 @@ class TestShathelRuleContractTest extends Specification {
         Mockito.verify(verifier).verify(argument.capture())
 
         then:
-        argument.getValue().ip() == "localhost"
-        argument.getValue().fill("http://\${IP}:\${DUMMYSERVICE_4000}") == "http://localhost:9999"
-        argument.getValue().fill("http://\${IP}:\${INTROSPECTIONSTACK_DUMMYSERVICE_4000}") == "http://localhost:9999"
+
+        argument.getValue().fill("http://\${DUMMYSERVICE_4000}") == "http://127.0.0.1:9999"
+        argument.getValue().fill("http://\${INTROSPECTIONSTACK_DUMMYSERVICE_4000}") == "http://127.0.0.1:9999"
     }
 }

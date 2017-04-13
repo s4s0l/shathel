@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
@@ -51,7 +52,28 @@ public class SolutionDescription {
 
     }
 
-    Map<String,String> getEnvs(){
+    public Map<String,String> getAsEnvironmentVariables(){
+        Map<String, String> ret = new HashMap<>(getEnvs());
+        ret.put(Parameters.parameterNameToEnvName("shathel.solution.name"), getName());
+        parameters.entrySet()
+                .forEach(x ->
+                        ret.put(
+                                Parameters.parameterNameToEnvName("shathel.solution." + x.getKey()),
+                                getParameter(x.getKey()).orElse(null)));
+        String thisEnvPrefix = "shathel.solution.";
+        overrides.getAllParameters().stream()
+                .filter(it -> it.startsWith(thisEnvPrefix))
+                .map(it -> it.substring(thisEnvPrefix.length()))
+//                .filter(it -> !ret.containsKey(Parameters.parameterNameToEnvName("shathel.solution." + it)))
+                .forEach(it -> ret.put(
+                        Parameters.parameterNameToEnvName("shathel.solution." + it),
+                        getParameter(it).orElse(null)));
+
+        return ret.entrySet().stream().filter(it -> it.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public Map<String,String> getEnvs(){
         return model.getEnvs();
     }
 }

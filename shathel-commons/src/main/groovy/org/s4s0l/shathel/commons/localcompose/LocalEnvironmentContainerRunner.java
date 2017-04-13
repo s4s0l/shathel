@@ -15,6 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class LocalEnvironmentContainerRunner implements EnvironmentContainerRunner {
     private static final Logger LOGGER = getLogger(LocalEnvironmentContainerRunner.class);
 

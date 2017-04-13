@@ -5,11 +5,12 @@ import org.s4s0l.shathel.commons.scripts.TypedScript;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
  */
-public class ScriptDefinition implements TypedScript {
+public class StackScriptDefinition implements TypedScript {
     private final StackDescription origin;
     private final String category;
     private final String name;
@@ -21,7 +22,12 @@ public class ScriptDefinition implements TypedScript {
         return getType() + ":" + origin.getReference().getGav() + "/" + getName();
     }
 
-    public ScriptDefinition(StackDescription origin, String category, String name, String inline, String type) {
+    @Override
+    public File getBaseDirectory() {
+        return new File(origin.getStackResources().getStackDirectory(), category);
+    }
+
+    public StackScriptDefinition(StackDescription origin, String category, String name, String inline, String type) {
         this.origin = origin;
         this.category = category;
         this.name = name;
@@ -47,14 +53,18 @@ public class ScriptDefinition implements TypedScript {
         String script;
         try {
             script = inline != null ? inline :
-                    ResourceGroovyMethods.getText(getEnricherFile());
+                    ResourceGroovyMethods.getText(getScriptFileLocation().get());
         } catch (IOException e) {
             throw new RuntimeException("Unable to find Enricher script", e);
         }
         return script;
     }
 
-    private File getEnricherFile() {
-        return new File(origin.getStackResources().getStackDirectory(), category + "/" + getName() + "." + getType());
+    @Override
+    public Optional<File> getScriptFileLocation() {
+        if (inline != null) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(getBaseDirectory(), getName() + "." + getType()));
     }
 }

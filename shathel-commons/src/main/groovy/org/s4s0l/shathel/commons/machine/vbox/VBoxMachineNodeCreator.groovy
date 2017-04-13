@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxMachineNodeCreator implements SwarmNodeCreator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VBoxMachineNodeCreator.class);

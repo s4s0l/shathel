@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
+import org.s4s0l.shathel.commons.core.environment.ShathelNode;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.slf4j.Logger;
@@ -66,14 +67,14 @@ public class SwarmMountingEnricher extends EnricherExecutable {
         }
     }
 
-    private void prepareMounts(List<String> nodeNames, File fromDirectory, String toRemotePath) {
+    private void prepareMounts(List<ShathelNode> nodeNames, File fromDirectory, String toRemotePath) {
         //ALL nodes must be running!!!!
         Path basePath = Paths.get(fromDirectory.getAbsolutePath());
 
         LOGGER.debug("Moving {} to {} on remotes", fromDirectory.getAbsolutePath(), toRemotePath);
-        for (String nodeName : nodeNames) {
+        for (ShathelNode sn : nodeNames) {
             Iterator<File> fileIterator = FileUtils.iterateFilesAndDirs(fromDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-
+            String nodeName = sn.getNodeName();
             swarmClusterWrapper.sudo(nodeName, "mkdir -p " + toRemotePath);
             swarmClusterWrapper.sudo(nodeName, "chown -R " + swarmClusterWrapper.getNonRootUser() + " " + toRemotePath);
             while (fileIterator.hasNext()) {

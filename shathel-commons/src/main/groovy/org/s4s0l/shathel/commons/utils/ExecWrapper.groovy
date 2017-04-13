@@ -17,7 +17,7 @@ class ExecWrapper {
     }
 
     int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String args) {
-        executeForExitValue(dir, env, logOutput, args.split(' '))
+        executeForExitValue(dir, env, logOutput, args.split('[\\n\\s]+'))
     }
 
     int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String... args) {
@@ -37,8 +37,29 @@ class ExecWrapper {
         return process.exitValue()
     }
 
-    String executeForOutput(File dir = new File("."), Map<String, String> env = [:], String args) {
-        executeForOutput(null, dir, env, args.split(' '))
+
+    String executeForOutput(File dir, String args) {
+        executeForOutput(null, dir, [:], args.trim().split('[\\n\\s]+'))
+    }
+
+    String executeForOutput(File dir, GString args) {
+        executeForOutput(null, dir, [:], args.trim().split('[\\n\\s]+'))
+    }
+
+    String executeForOutput(File dir, Map<String, String> env, String args) {
+        executeForOutput(null, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    String executeForOutput(File dir, Map<String, String> env, GString args) {
+        executeForOutput(null, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    String executeForOutput(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], String args) {
+        executeForOutput(input, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    String executeForOutput(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], GString args) {
+        executeForOutput(input, dir, env, args.trim().split('[\\n\\s]+'))
     }
 
     String executeForOutput(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], String... args) {
@@ -65,17 +86,16 @@ class ExecWrapper {
     }
 
     private List<?> fix(String... args) {
-        def flatten = ([] << command.split("\\s") << args).flatten().findAll {
-            "" != it.trim()
-        }
-        flatten
+        ([] << command.split("[\\n\\s]") << args).flatten()
     }
 
     private Process createProcess(List<String> command, File dir, Map<String, String> env = [:]) {
         ProcessBuilder builder = new ProcessBuilder(command)
                 .directory(dir)
                 .redirectErrorStream(true)
-        builder.environment() << environment << env
+        builder.environment() << (environment << env).collectEntries {
+            [(it.key.toString()): it.value.toString()]
+        }
         return builder.start()
     }
 

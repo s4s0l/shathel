@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.localcompose;
+package org.s4s0l.shathel.commons.localswarm;
 
 import org.apache.commons.io.FileUtils;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
@@ -45,9 +45,8 @@ public class LocalMountingEnricher extends EnricherExecutable {
 
                 provisioners.add("prepare-mount-dir:" + directoryToCopyTo.getAbsolutePath(), context -> {
                     try {
-
                         if (directoryToCopyTo.exists()) {
-                            params.getApiFacade().getDockerForManagementNode().containerCreate(
+                            params.getApiFacade().getManagerNodeWrapper().containerCreate(
                                     "--rm -v " + directoryToCopyTo.getParentFile().getAbsolutePath() + ":/dir alpine rm -fR /dir/" + directoryToCopyTo.getName());
                         }
                         FileUtils.copyDirectory(directoryToCopyFrom, directoryToCopyTo);

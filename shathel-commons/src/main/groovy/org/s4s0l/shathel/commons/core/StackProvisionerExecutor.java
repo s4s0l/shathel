@@ -96,7 +96,7 @@ public class StackProvisionerExecutor {
                 LOGGER,
                 new HttpApis(),
                 stackCommand.getEnvironment(),
-                executableApiFacade.getNodeNames()
+                executableApiFacade.getNodes()
         );
         LOGGER.info("Provisioning with: {}.", executable.getName());
         executable.execute(params.toMap());

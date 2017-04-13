@@ -49,7 +49,7 @@ class DockerCommands(parametersCommands: ParametersCommands, environmentCommands
     )(context => {
       val (storage, solution, environment) = environmentCommands.getEnvironment(context)
       val file1 = storage.getSettingsDirectory(context, context.environment())
-      environment.getEnvironmentApiFacade.getDockerForManagementNode.getExec.executeForOutput(command)
+      environment.getEnvironmentApiFacade.getManagerNodeWrapper.getExec.executeForOutput(command)
 
     })
   }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
     private final EnvironmentContext environmentContext;
     private final DockerMachineCachingWrapper dockerMachineWrapper;
@@ -93,7 +94,6 @@ class MachineSwarmClusterWrapper implements SwarmClusterWrapper {
         return "docker"
     }
 
-    @Override
     void setKernelParam(String param) {
         getNodeNames().each { node ->
             getWrapper().sudo(node, "sysctl -w $param")

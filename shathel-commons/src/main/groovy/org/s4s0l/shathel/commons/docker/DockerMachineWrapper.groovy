@@ -139,7 +139,7 @@ class DockerMachineWrapper {
             def dockerWrapper = running ? new DockerWrapper(new ExecWrapper(LOGGER, 'docker', envs)) : null
             def info = running ? new DockerInfoWrapper(dockerWrapper.daemonInfo(), it.name) : null
             [(it.name): new DockerMachineNode(
-                     it.name,
+                    it.name,
                     it.driver,
                     it.state,
                     it.url,

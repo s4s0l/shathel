@@ -11,7 +11,7 @@ import java.util.regex.Matcher
  */
 class VBoxManageWrapper {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(DockerComposeWrapper.class);
+    final Logger LOGGER = LoggerFactory.getLogger(VBoxManageWrapper.class);
 
     final ExecWrapper exec = new ExecWrapper(LOGGER, 'VBoxManage')
 

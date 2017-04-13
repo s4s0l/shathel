@@ -4,7 +4,7 @@
   pre_tasks:
     - name: Ansible Dir present
       file:
-        path: /shathel-ansible
+        path: /shathel-vagrant
         state: directory
   tasks:
       - name: Common Facts

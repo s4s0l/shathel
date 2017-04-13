@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
-class LocalOverriderDownloader implements DependencyDownloader {
+class LocalOverriderDownloader implements StackDependencyDownloader {
     public static final String CURRENT_PROJECT_LOCATION = "--currentProject--"
     private final File stackMappingsDir
     private final File projectStackDir

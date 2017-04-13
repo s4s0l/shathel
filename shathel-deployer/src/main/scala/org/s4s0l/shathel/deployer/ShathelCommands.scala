@@ -1,8 +1,8 @@
 package org.s4s0l.shathel.deployer
 
-import org.s4s0l.shathel.commons.core.dependencies.FileDependencyDownloader
+import org.s4s0l.shathel.commons.core.dependencies.FileStackDependencyDownloader
 import org.s4s0l.shathel.commons.core.{MapParameters, Parameters}
-import org.s4s0l.shathel.commons.git.GitDependencyDownloader
+import org.s4s0l.shathel.commons.git.GitStackDependencyDownloader
 import org.s4s0l.shathel.commons.utils.ExtensionInterface
 import org.s4s0l.shathel.commons.{DefaultExtensionContext, Shathel}
 import org.springframework.shell.core.CommandMarker

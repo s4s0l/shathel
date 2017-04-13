@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.machine.vbox
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class NetworkSettings {
     private final String network;
 

@@ -16,6 +16,7 @@ import java.util.Optional;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class SwarmBuildingEnricher extends EnricherExecutable {
     private final Optional<String> repository;
 
@@ -30,7 +31,7 @@ public class SwarmBuildingEnricher extends EnricherExecutable {
         StackDescription stack = paramz.getStack();
         EnricherExecutableParams.Provisioners provisioners = paramz.getProvisioners();
         Map<String, String> environment = paramz.getEnvironment();
-        DockerWrapper dockerForManagementNode = apiFacade.getDockerForManagementNode();
+        DockerWrapper dockerForManagementNode = apiFacade.getManagerNodeWrapper();
         model.mapBuilds((service, params) -> {
             String dockerfile = TemplateUtils.fillEnvironmentVariables((String) params.get("dockerfile"), environment);
             String context = TemplateUtils.fillEnvironmentVariables((String) params.get("context"), environment);

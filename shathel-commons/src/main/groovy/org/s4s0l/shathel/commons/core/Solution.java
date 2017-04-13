@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.commons.core;
 
-import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloaderRegistry;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;

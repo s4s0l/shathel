@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.localcompose;
+package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;

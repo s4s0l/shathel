@@ -1,8 +1,8 @@
 ---
 - name: Check if docker machine provisioning is needed on node
-  stat: path=/shathel-ansible/machine_provisioned_marker
+  stat: path=/shathel-vagrant/machine_provisioned_marker
   register: machine_provisioned_marker
-- name: Provision with generic docker machine driver - on First because ansible,dmachine suck, and i am lazy as fuck.
+- name: Provision with generic docker machine driver - on First because vagrant,dmachine suck, and i am lazy as fuck.
   delegate_to: 127.0.0.1
   command: >
       docker-machine -s {{shathel_docker_machine_storage}} create --driver generic
@@ -24,6 +24,6 @@
   when: machine_provisioned_marker.stat.exists != true and private_ip != head_private_ip
 - name: Leaving Provision Marker
   file:
-    path: /shathel-ansible/machine_provisioned_marker
+    path: /shathel-vagrant/machine_provisioned_marker
     state: touch
   when: machine_provisioned_marker.stat.exists != true

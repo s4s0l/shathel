@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class SwarmClusterCreator {
 
     private final String clusterName

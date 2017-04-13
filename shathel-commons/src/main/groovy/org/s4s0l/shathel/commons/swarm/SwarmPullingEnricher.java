@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.swarm;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.core.environment.ShathelNode;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.slf4j.Logger;
 
@@ -31,7 +32,7 @@ public class SwarmPullingEnricher extends EnricherExecutable {
         if (pull) {
             model.mapImages((image) -> {
                 provisioners.add("pull-image:" + image, executionContext -> {
-                    for (String nodeName : executionContext.getCurrentNodes()) {
+                    for (ShathelNode nodeName : executionContext.getCurrentNodes()) {
                         swarmClusterWrapper.getDocker(nodeName).pull(image);
                     }
                 });

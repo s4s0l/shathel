@@ -10,6 +10,7 @@ import java.nio.file.attribute.PosixFilePermission
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class MachineSettingsImporterExporter implements SettingsImporterExporter{
 
     private static final List<String> ignoredElements = ["Logs"]

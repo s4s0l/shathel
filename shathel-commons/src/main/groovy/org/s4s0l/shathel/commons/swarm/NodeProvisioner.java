@@ -7,6 +7,7 @@ import java.io.File;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public interface NodeProvisioner {
 
     boolean createMachines(File workDir, EnvironmentContext environmentContext);

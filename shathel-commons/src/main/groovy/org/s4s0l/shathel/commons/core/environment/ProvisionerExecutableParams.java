@@ -16,7 +16,7 @@ public class ProvisionerExecutableParams {
     private final Logger logger;
     private final HttpApis http;
     private final Map<String, String> environment;
-    private final List<String> currentNodes;
+    private final List<ShathelNode> currentNodes;
 
     public ProvisionerExecutableParams(Map<String, Object> map) {
         this(
@@ -27,7 +27,7 @@ public class ProvisionerExecutableParams {
                 (Logger) map.get("log"),
                 (HttpApis) map.get("http"),
                 (Map<String, String>) map.get("env"),
-                (List<String>) map.get("currentNodes")
+                (List<ShathelNode>) map.get("currentNodes")
 
         );
     }
@@ -51,7 +51,7 @@ public class ProvisionerExecutableParams {
                                        StackCommand command, File dstStackDir,
                                        Logger logger, HttpApis http,
                                        Map<String, String> environment,
-                                       List<String> currentNodes) {
+                                       List<ShathelNode> currentNodes) {
         this.environmentContext = environmentContext;
         this.apiFacade = apiFacade;
         this.command = command;
@@ -90,7 +90,7 @@ public class ProvisionerExecutableParams {
         return environment;
     }
 
-    public List<String> getCurrentNodes() {
+    public List<ShathelNode> getCurrentNodes() {
         return currentNodes;
     }
 }

@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
+import org.s4s0l.shathel.commons.core.environment.ShathelNode;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.slf4j.Logger;
 
@@ -28,9 +29,9 @@ public class SwarmMountingPermissionsEnricher extends EnricherExecutable {
                 String localPart = split[0].replace("/shathel-data", swarmClusterWrapper.getDataDirectory());
                 LOGGER.debug("Changing path {} to be owned by 1000", localPart);
                 provisioners.add("prepare-mount-dir:" + localPart, context -> {
-                    for (String nodeName : context.getCurrentNodes()) {
-                        swarmClusterWrapper.sudo(nodeName, "mkdir -p " + localPart);
-                        swarmClusterWrapper.sudo(nodeName, "chown -R 1000 " + localPart);
+                    for (ShathelNode nodeName : context.getCurrentNodes()) {
+                        swarmClusterWrapper.sudo(nodeName.getNodeName(), "mkdir -p " + localPart);
+                        swarmClusterWrapper.sudo(nodeName.getNodeName(), "chown -R 1000 " + localPart);
                     }
                 });
                 return localPart + ":" + split[1];

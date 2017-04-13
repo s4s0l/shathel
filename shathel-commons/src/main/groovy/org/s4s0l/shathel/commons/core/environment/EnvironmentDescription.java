@@ -55,6 +55,7 @@ public class EnvironmentDescription implements ParameterProvider {
 
     public Map<String, String> getAsEnvironmentVariables() {
         Map<String, String> ret = new HashMap<>();
+
         parameters.entrySet()
                 .forEach(x ->
                         ret.put(
@@ -64,15 +65,33 @@ public class EnvironmentDescription implements ParameterProvider {
         overrides.getAllParameters().stream()
                 .filter(it -> it.startsWith(thisEnvPrefix))
                 .map(it -> it.substring(thisEnvPrefix.length()))
-                .filter(it -> !ret.containsKey(Parameters.parameterNameToEnvName("shathel.env." + it)))
+//                .filter(it -> !ret.containsKey(Parameters.parameterNameToEnvName("shathel.env." + it)))
                 .forEach(it -> ret.put(
                         Parameters.parameterNameToEnvName("shathel.env." + it),
                         getParameter(it).orElse(null)));
+
+
+        addCalculatedEnvs(ret);
 
         return ret.entrySet().stream().filter(it -> it.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
+    }
+
+    public void addCalculatedEnvs(Map<String, String> ret) {
+        int size = getNodesCount();
+        int quorum = (int) Math.floor(size / 2) + 1;
+
+        ret.put("SHATHEL_ENV_SIZE", "" + size);
+        ret.put("SHATHEL_ENV_QUORUM", "" + quorum);
+
+        int msize = getManagersCount();
+        int mquorum = (int) Math.floor(msize / 2) + 1;
+
+        ret.put("SHATHEL_ENV_MGM_SIZE", "" + msize);
+        ret.put("SHATHEL_ENV_MGM_QUORUM", "" + mquorum);
+        ret.put("SHATHEL_ENV_DOMAIN", getParameter("domain").orElse("localhost"));
     }
 
 }

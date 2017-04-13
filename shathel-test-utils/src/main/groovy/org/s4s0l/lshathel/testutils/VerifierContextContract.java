@@ -22,20 +22,19 @@ public interface VerifierContextContract {
 
     ExecutableApiFacade api();
 
-    String ip();
-
     @Value.Derived
     default Map<String, String> variables() {
         List<StackIntrospection> allStacks = introspectionProvider().getAllStacks().getStacks();
         Map<String, String> ret = new HashMap<>();
-        ret.put("IP", ip());
+
         for (StackIntrospection allStack : allStacks) {
             for (StackIntrospection.Service service : allStack.getServices()) {
                 String servicePrefix = service.getServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_";
                 String fullNamePrefix = service.getFullServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_";
                 for (Map.Entry<Integer, Integer> entry : service.getPortMapping().entrySet()) {
-                    ret.put(servicePrefix + entry.getKey(), "" + entry.getValue());
-                    ret.put(fullNamePrefix + entry.getKey(), "" + entry.getValue());
+                    String tunneledPort = api().openPublishedPort(entry.getValue());
+                    ret.put(servicePrefix + entry.getKey(), tunneledPort);
+                    ret.put(fullNamePrefix + entry.getKey(), tunneledPort);
                 }
             }
         }

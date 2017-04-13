@@ -1,11 +1,14 @@
 package org.s4s0l.shathel.commons.core.environment;
 
+import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.SolutionDescription;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Marcin Wielgus
@@ -29,8 +32,6 @@ public class EnvironmentContext {
     public ExtensionContext getExtensionContext() {
         return extensionContext;
     }
-
-
 
     public SafeStorage getSafeStorage() {
         return safeStorage;
@@ -68,5 +69,13 @@ public class EnvironmentContext {
         return storage.getDependencyCacheDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
     }
 
+
+    public Map<String, String> getAsEnvironmentVariables() {
+        Map<String, String> ret = new HashMap<>();
+        ret.putAll(getSolutionDescription().getAsEnvironmentVariables());
+        ret.putAll(getEnvironmentDescription().getAsEnvironmentVariables());
+        ret.put(Parameters.parameterNameToEnvName("shathel.env.solution.name"), getContextName());
+        return ret;
+    }
 
 }

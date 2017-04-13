@@ -7,6 +7,7 @@ import java.io.File;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class SwarmNodeProvisioner implements NodeProvisioner {
     public SwarmNodeProvisioner(SwarmClusterWrapper clusterWrapper, SwarmNodeCreator swarmNodeCreator) {
         this.clusterWrapper = clusterWrapper;

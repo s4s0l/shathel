@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.swarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade;
+import org.s4s0l.shathel.commons.core.environment.ShathelNode;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.secrets.SecretManager;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public interface SwarmClusterWrapper extends ExecutableApiFacade {
 
 
@@ -38,8 +40,37 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
 
     Map<String, Node> getAllNodes();
 
+    @Override
+    default List<ShathelNode> getNodes() {
+        return getAllNodes().values().stream()
+                .map(it -> toShathelNode(it))
+                .collect(Collectors.toList());
+    }
+
+    default ShathelNode toShathelNode(Node it) {
+        return new ShathelNode(it.name, it.ip, it.ip, it.getSwarmInfo().isManager() ? "manager" : "worker");
+    }
 
     @Override
+    default DockerWrapper getDocker(ShathelNode nodeName) {
+        return getDocker(nodeName.getNodeName());
+    }
+
+    @Override
+    default Map<String, String> getDockerEnvs(ShathelNode nodeName) {
+        return getNode(nodeName.getNodeName()).envs;
+    }
+
+    @Override
+    default String openPublishedPort(int port) {
+        return getManagerNode().getPublicIp() + ":" + port;
+    }
+
+    @Override
+    default ShathelNode getManagerNode() {
+        return getManager().map(it -> toShathelNode(it)).get();
+    }
+
     default String getIp(String nodeName) {
         return getNode(nodeName).ip;
     }
@@ -48,7 +79,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
         return getNode(nodeName).docker;
     }
 
-    @Override
+
     default List<String> getNodeNames() {
         return getAllNodes().keySet().stream().collect(Collectors.toList());
     }
@@ -57,31 +88,31 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
         return getAllNodes().get(nodeName);
     }
 
-    @Override
+
     default Map<String, String> getDockerEnvs(String nodeName) {
         return getNode(nodeName).envs;
     }
 
-    @Override
+
     default String getNameForManagementNode() {
         return getManager()
                 .map(x -> x.getName())
                 .orElseThrow(() -> new RuntimeException("Unable to find reachable swarm manager"));
     }
 
-    @Override
+
     default String getIpForManagementNode() {
         return getIp(getNameForManagementNode());
     }
 
-    @Override
+
     default DockerWrapper getDockerForManagementNode() {
         return getDocker(getNameForManagementNode());
     }
 
     @Override
     default SecretManager getSecretManager() {
-        return new SecretManager(getEnvironmentContext().getEnvironmentDescription(), getClientForManagementNode());
+        return new SecretManager(getEnvironmentContext().getEnvironmentDescription(), getManagerNodeClient());
     }
 
     default Optional<Node> getManager() {
@@ -96,7 +127,7 @@ public interface SwarmClusterWrapper extends ExecutableApiFacade {
 
     default Optional<String> getRegistry() {
         return Optional.ofNullable(getEnvironmentContext().getEnvironmentDescription().getParameter("registry").orElseGet(() ->
-                getNodeLabels(getNameForManagementNode()).getOrDefault("shathel.node.registry", null)));
+                getNodeLabels(getManagerNode()).getOrDefault("shathel.node.registry", null)));
     }
 
     default boolean isInitialized(int managersCount, int workersCount) {

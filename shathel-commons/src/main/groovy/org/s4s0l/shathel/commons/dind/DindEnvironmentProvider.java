@@ -10,6 +10,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmNodeProvisioner;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class DindEnvironmentProvider implements EnvironmentProvider {
 
 

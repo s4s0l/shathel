@@ -1,20 +1,23 @@
 package org.s4s0l.shathel.commons.localswarm;
 
 import org.apache.commons.lang.StringUtils;
-import org.s4s0l.shathel.commons.core.environment.*;
+import org.s4s0l.shathel.commons.core.environment.Environment;
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner;
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
+import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
-import org.s4s0l.shathel.commons.localcompose.LocalExecutableApiFacade;
-import org.s4s0l.shathel.commons.localcompose.LocalMountingEnricher;
-import org.s4s0l.shathel.commons.localcompose.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
-import org.s4s0l.shathel.commons.secrets.SecretManager;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
+import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.swarm.SwarmBuildingEnricher;
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner;
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -108,7 +111,7 @@ public class LocalSwarmEnvironment implements Environment {
     }
 
     @Override
-    public ExecutableApiFacade getEnvironmentApiFacade() {
+    public LocalSwarmApiFacade getEnvironmentApiFacade() {
         return new LocalSwarmApiFacade(getDockerWrapper(), context);
     }
 

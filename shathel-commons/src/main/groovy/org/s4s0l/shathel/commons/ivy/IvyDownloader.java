@@ -16,10 +16,9 @@ import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.URLResolver;
 import org.apache.ivy.util.AbstractMessageLogger;
-import org.apache.ivy.util.DefaultMessageLogger;
 import org.apache.ivy.util.Message;
 import org.s4s0l.shathel.commons.core.Parameters;
-import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloader;
+import org.s4s0l.shathel.commons.core.dependencies.StackDependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
@@ -38,7 +37,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
-public class IvyDownloader implements DependencyDownloader {
+public class IvyDownloader implements StackDependencyDownloader {
     private static final Logger LOGGER = getLogger(IvyDownloader.class);
     public static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.solution.ivy_default_version";
     public static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.solution_ivy_default_group";
@@ -81,7 +80,6 @@ public class IvyDownloader implements DependencyDownloader {
         String artifactId = reference.getName();
         String version = reference.getVersion();
 
-        //todo: replace it with sth that does not do println...
         Message.setDefaultLogger(new IvyMessageLogger());
         IvySettings ivySettings = getIvySettings();
 

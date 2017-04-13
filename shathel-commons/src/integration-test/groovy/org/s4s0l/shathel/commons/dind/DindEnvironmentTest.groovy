@@ -13,6 +13,7 @@ import testutils.BaseIntegrationTest
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class DindEnvironmentTest extends BaseIntegrationTest {
     @Override
     def setupEnvironment() {

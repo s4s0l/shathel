@@ -6,14 +6,14 @@ shathel-stack:
     sample:
       inline: |
         assert context.extensionContext != null
-        assert api.nodeNames.size() > 0
+        assert api.nodes.size() > 0
         assert command.description.name == 'shathel-core-stack'
         new File(dir, "pre-provision").text = "Done"
   post-provisioners:
     sample:
       inline: |
         assert context.extensionContext != null
-        assert api.nodeNames.size() > 0
+        assert api.nodes.size() > 0
         assert command.description.name == 'shathel-core-stack'
         new File(dir, "post-provision").text = "Done"
   enrichers:

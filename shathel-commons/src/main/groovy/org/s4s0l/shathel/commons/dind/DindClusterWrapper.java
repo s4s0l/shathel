@@ -21,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator {
     private static final Logger LOGGER = getLogger(DindClusterWrapper.class);
 
@@ -126,7 +127,6 @@ public class DindClusterWrapper implements SwarmClusterWrapper, SwarmNodeCreator
     }
 
 
-    @Override
     public void setKernelParam(String param) {
         LOGGER.warn("!Set parameter like: sudo sysctl -w " + param + " or set it in file /etc/sysctl.conf");
     }

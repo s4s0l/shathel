@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.core.stack;
 /**
  * @author Marcin Wielgus
  */
-public class StackEnricherDefinition extends ScriptDefinition {
+public class StackEnricherDefinition extends StackScriptDefinition {
 
     public boolean isApplicableTo(StackDescription forStack) {
         if (getOrigin().equals(forStack)) {

@@ -11,6 +11,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmNodeProvisioner
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxMachineEnvironmentProvider implements EnvironmentProvider {
     private final Parameters params;
 

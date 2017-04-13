@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class LocalEnvironmentProvider implements EnvironmentProvider {
 
 

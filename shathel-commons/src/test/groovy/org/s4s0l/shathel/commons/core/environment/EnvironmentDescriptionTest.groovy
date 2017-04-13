@@ -19,9 +19,14 @@ class EnvironmentDescriptionTest extends Specification {
 
         then:
         variabbles == [
-                'SHATHEL_ENV_FILE'   : 'file',
-                'SHATHEL_ENV_SYSPROP': 'sysprop',
-                'SHATHEL_ENV_ENVPROP': 'envprop',
+                'SHATHEL_ENV_FILE'      : 'file',
+                'SHATHEL_ENV_SYSPROP'   : 'sysprop',
+                'SHATHEL_ENV_ENVPROP'   : 'envprop',
+                'SHATHEL_ENV_SIZE'      : '1',
+                'SHATHEL_ENV_QUORUM'    : '1',
+                'SHATHEL_ENV_MGM_SIZE'  : '1',
+                'SHATHEL_ENV_MGM_QUORUM': '1',
+                'SHATHEL_ENV_DOMAIN'    : 'localhost',
         ]
     }
 }

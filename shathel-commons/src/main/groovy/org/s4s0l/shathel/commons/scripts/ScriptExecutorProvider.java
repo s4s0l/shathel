@@ -10,12 +10,12 @@ import java.util.Optional;
  */
 public interface ScriptExecutorProvider extends ExtensionInterface {
 
-    Optional<NamedExecutable> findExecutor(TypedScript typedScript);
+    Optional<NamedExecutable> findExecutable(ExtensionContext cntext,TypedScript typedScript);
 
 
     static Optional<NamedExecutable> findExecutor(ExtensionContext cntext, TypedScript typedScript) {
         return cntext.lookupAll(ScriptExecutorProvider.class)
-                .map(it -> it.findExecutor(typedScript))
+                .map(it -> it.findExecutable(cntext,typedScript))
                 .filter(it -> it.isPresent())
                 .findFirst().orElse(Optional.empty());
     }

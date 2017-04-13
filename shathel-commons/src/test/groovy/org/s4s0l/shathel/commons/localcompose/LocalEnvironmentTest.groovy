@@ -15,6 +15,7 @@ import testutils.BaseIntegrationTest
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class LocalEnvironmentTest extends BaseIntegrationTest {
 
     @Override

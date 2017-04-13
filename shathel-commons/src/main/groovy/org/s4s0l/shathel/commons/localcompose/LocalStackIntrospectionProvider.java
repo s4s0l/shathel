@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class LocalStackIntrospectionProvider implements StackIntrospectionProvider {
 
     protected List<Map<String, String>> getByFilter(String filter) {

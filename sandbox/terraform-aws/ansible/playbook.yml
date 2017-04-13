@@ -4,7 +4,7 @@
   pre_tasks:
     - name: Ansible Dir present
       file:
-        path: /shathel-ansible
+        path: /shathel-vagrant
         state: directory
 #    - name: Update apt cache if needed.
 #      apt: update_cache=yes cache_valid_time=3600
@@ -31,7 +31,7 @@
   pre_tasks:
     - name: Ansible Dir present
       file:
-        path: /shathel-ansible
+        path: /shathel-vagrant
         state: directory
 #    - name: Update apt cache if needed.
 #      apt: update_cache=yes cache_valid_time=3600

@@ -1,4 +1,4 @@
-# taken from https://nathanleclaire.com/blog/2015/11/10/using-ansible-with-docker-machine-to-bootstrap-host-nodes/
+# taken from https://nathanleclaire.com/blog/2015/11/10/using-vagrant-with-docker-machine-to-bootstrap-host-nodes/
 ---
 - name: Install desired packages
   apt: >

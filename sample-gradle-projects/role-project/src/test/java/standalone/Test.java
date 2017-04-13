@@ -20,13 +20,13 @@ public class Test {
 
     @ClassRule
     public static TestShathelRuleContract shathel = TestShathelRule.builder()
-            .addVerifier(TestShathelRuleContract.waitForHttp("http://${IP}:${MYSERVICE_8080}",
+            .addVerifier(TestShathelRuleContract.waitForHttp("http://${MYSERVICE_8080}",
                     Arrays.asList(200)))
             .build();
 
     @org.junit.Test
     public void checkIfComposedProjectAStarted() throws Exception {
-        tryAddress(shathel.fill("http://${IP}:${MYSERVICE_8080}"), "Hello World!");
+        tryAddress(shathel.fill("http://${MYSERVICE_8080}"), "Hello World!");
     }
 
 

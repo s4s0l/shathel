@@ -2,7 +2,6 @@ package org.s4s0l.shathel.commons.core.dependencies;
 
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -16,8 +15,8 @@ public class DependencyDownloaderRegistry {
     }
 
 
-    public Stream<DependencyDownloader> getDownloaders() {
-        return extensionContext.lookupAll(DependencyDownloader.class);
+    public Stream<StackDependencyDownloader> getDownloaders() {
+        return extensionContext.lookupAll(StackDependencyDownloader.class);
     }
 
 }

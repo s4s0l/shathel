@@ -46,11 +46,7 @@ public interface TestShathelRuleContract extends SchathelCreationCommonContract,
     }
 
 
-    @Value.Derived
-    default String ip() {
-        return parameters().getParameter("shathel.plugin.ip").orElseGet(() ->
-                testShathel().environment().getEnvironmentApiFacade().getIpForManagementNode());
-    }
+
 
     @Value.Derived
     default File mappingsDirectory() {
@@ -96,7 +92,6 @@ public interface TestShathelRuleContract extends SchathelCreationCommonContract,
     @Value.Lazy
     default VerifierContextContract verifierContext() {
         return VerifierContext.builder()
-                .ip(ip())
                 .api(testShathel().environment().getEnvironmentApiFacade())
                 .introspectionProvider(testShathel().environment().getIntrospectionProvider())
                 .build();

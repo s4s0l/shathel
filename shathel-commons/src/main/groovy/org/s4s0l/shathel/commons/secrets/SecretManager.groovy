@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.secrets
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.ParameterProvider
 import org.s4s0l.shathel.commons.docker.DockerClientWrapper
 import org.slf4j.Logger
@@ -8,17 +10,21 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+
 class SecretManager {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(SecretManager.class);
-    private final ParameterProvider parameters;
-    private final DockerClientWrapper dockerWrapper;
+    final Logger LOGGER = LoggerFactory.getLogger(SecretManager.class)
+    private final ParameterProvider parameters
+    private final DockerClientWrapper dockerWrapper
+
 
     SecretManager(ParameterProvider parameters, DockerClientWrapper dockerWrapper) {
-        this.parameters = parameters;
-        this.dockerWrapper = dockerWrapper;
+        this.parameters = parameters
+        this.dockerWrapper = dockerWrapper
     }
 
+    @TypeChecked
+    @CompileStatic
     boolean secretExists(String secretName) {
         return !getAllSecrets(secretName).isEmpty()
     }
@@ -27,6 +33,8 @@ class SecretManager {
         return getAllSecrets(secretName)[0].Spec.Name
     }
 
+    @TypeChecked
+    @CompileStatic
     String secretInitialName(String secretName) {
         secretName + "_1"
     }
@@ -37,6 +45,8 @@ class SecretManager {
      * @param defaultValue file from which to get default value
      * @return current secret name
      */
+    @TypeChecked
+    @CompileStatic
     String secretCreate(String secretName, File defaultValue) {
         List secretsMatching = getAllSecrets(secretName)
         if (!secretsMatching.isEmpty()) {
@@ -48,6 +58,8 @@ class SecretManager {
         return value
     }
 
+    @TypeChecked
+    @CompileStatic
     String secretUpdate(String secretName, File defaultValue) {
         def finalName = secretAddNewVersion(secretName, defaultValue)
         secretUpdateForServices(secretName)
@@ -158,6 +170,7 @@ class SecretManager {
             }
         }
     }
+
 
     private byte[] getValue(String secretName, File defaultValue) {
         return parameters.getParameter(secretName.toLowerCase() + "_secret_path")

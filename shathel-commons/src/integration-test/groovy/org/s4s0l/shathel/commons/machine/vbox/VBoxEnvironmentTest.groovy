@@ -8,12 +8,14 @@ import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.utils.IoUtils
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxEnvironmentTest
         extends BaseIntegrationTest {
 
@@ -35,6 +37,7 @@ class VBoxEnvironmentTest
         true
     }
 
+    @IgnoreIf({ Boolean.valueOf(env['IGNORE_MACHINE_TESTS']) })
     def "Run stack in vbox integration test"() {
         given:
         File root = getRootDir()

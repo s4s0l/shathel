@@ -13,6 +13,11 @@
 * shathel.solution.file_base_dir
 * shathel.solution.git_default_version
 * shathel.solution.git_default_group
+* shathel.solution.file_env_default_version
+* shathel.solution.file_env_default_group
+* shathel.solution.file_env_base_dir
+* shathel.solution.git_env_default_version
+* shathel.solution.git_env_default_group
 * shathel.solution.ivy_default_version
 * shathel.solution_ivy_default_group
 * shathel.solution.ivy_settings

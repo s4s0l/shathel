@@ -2,13 +2,20 @@ package org.s4s0l.shathel.commons.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * tweaked https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/
@@ -91,7 +98,7 @@ public class IoUtils {
      * http://stackoverflow.com/a/32052016
      *
      * @param sourceDirPath path to dir
-     * @param zipFilePath path to zip file
+     * @param zipFilePath   path to zip file
      */
     public static void zipIt(File sourceDirPath, File zipFilePath) {
         Path p = null;
@@ -120,8 +127,8 @@ public class IoUtils {
                             ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
                             try {
                                 zs.putNextEntry(zipEntry);
-                                try(FileInputStream x= new FileInputStream(path.toFile())) {
-                                    IOUtils.copyLarge(x,zs);
+                                try (FileInputStream x = new FileInputStream(path.toFile())) {
+                                    IOUtils.copyLarge(x, zs);
                                 }
                                 zs.closeEntry();
                             } catch (Exception e) {
@@ -133,5 +140,53 @@ public class IoUtils {
             throw new RuntimeException(e);
         }
     }
+
+    private static final Logger LOGGER = getLogger(IoUtils.class);
+
+    public static void waitForFile(File f, int maxSeconds, RuntimeException e) {
+        for (int i = 0; i < maxSeconds; i++) {
+            if (f.exists()) {
+                return;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                LOGGER.warn("Interrupted while delaying file presence check", ex);
+            }
+        }
+        throw e;
+
+    }
+
+    public static void waitForSocket(String host, int port, int maxSeconds, RuntimeException e) {
+        for (int i = 0; i < maxSeconds; i++) {
+            final Socket sock = new Socket();
+            final int timeOut = (int) TimeUnit.SECONDS.toMillis(maxSeconds); // 5 sec wait period
+            try {
+                sock.connect(new InetSocketAddress(host, port), timeOut);
+                return;
+            } catch (IOException e1) {
+                LOGGER.trace("Exception during waiting for socket - should happen", e1);
+            } finally {
+                if (sock.isConnected()) {
+                    try {
+                        sock.close();
+                    } catch (IOException e1) {
+                        LOGGER.warn("Closing socket failed", e1);
+                    }
+                }
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                LOGGER.warn("Interrupted while delaying file presence check", ex);
+            }
+        }
+        throw e;
+
+    }
+
+
+
 
 }

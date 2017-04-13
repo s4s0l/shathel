@@ -15,7 +15,7 @@ public class Test {
 
     @org.junit.Test
     public void checkIfComposedProjectAStarted() throws Exception {
-        Assert.assertNotNull(System.getProperty("shathel.plugin.ip"));
+        Assert.assertNotNull(System.getProperty("shathel.plugin.current"));
         Assert.assertEquals(System.getProperty("shathel.plugin.simple-project.project1a.8080"), "8080");
         Assert.assertEquals(System.getProperty("shathel.plugin.simple-project.project1b.9090"), "9091");
     }

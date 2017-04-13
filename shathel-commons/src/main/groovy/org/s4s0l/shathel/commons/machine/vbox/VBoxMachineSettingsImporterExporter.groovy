@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxMachineSettingsImporterExporter extends MachineSettingsImporterExporter {
     private final DockerMachineWrapper machineWrapper;
 

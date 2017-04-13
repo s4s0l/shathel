@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.scripts
 
+import org.s4s0l.shathel.commons.scripts.groovy.GroovyExecutable
 import spock.lang.Specification
 
 /**

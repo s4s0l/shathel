@@ -9,7 +9,7 @@ import spock.lang.Specification
 /**
  * @author Marcin Wielgus
  */
-class GitDependencyDownloaderTest extends Specification {
+class GitStackDependencyDownloaderTest extends Specification {
 
 
     def setupSpec() {
@@ -19,10 +19,10 @@ class GitDependencyDownloaderTest extends Specification {
     def "download dependency"() {
         given:
         def params = MapParameters.builder()
-                .parameter(GitDependencyDownloader.SHATHEL_GIT_DEFAULT_VERSION, "0.0.2")
-                .parameter(GitDependencyDownloader.SHATHEL_GIT_DEFAULT_GROUP, "github.com/s4s0l/shathel-sample-stacks")
+                .parameter(GitStackDependencyDownloader.SHATHEL_GIT_DEFAULT_VERSION, "0.0.2")
+                .parameter(GitStackDependencyDownloader.SHATHEL_GIT_DEFAULT_GROUP, "github.com/s4s0l/shathel-sample-stacks")
                 .build()
-        GitDependencyDownloader gdd = new GitDependencyDownloader(params)
+        GitStackDependencyDownloader gdd = new GitStackDependencyDownloader(params)
 
         when:
         def stack = new StackLocator(new StackReference("git@github.com/s4s0l/shathel-sample-stacks:shathel-sample-stacks:a173704738d1d1d0e49901db43103795749a53a0"))
@@ -46,7 +46,7 @@ shathel-stack:
 
         then:
         download2.get().exists()
-        download2.get().getAbsolutePath().contains("0.0.1")
+        download2.get().getAbsolutePath().contains("0_0_1")
         new File(download2.get(), "shthl-stack.yml").text == """version: 1
 shathel-stack:
   gav: git@github.com/s4s0l/shathel-sample-stacks:child-stack:0.0.1
@@ -62,7 +62,7 @@ shathel-stack:
 
         then:
         download3.get().exists()
-        download3.get().getAbsolutePath().contains("a173704738d1d1d0e49901db43103795749a53a0@master")
+        download3.get().getAbsolutePath().contains("a173704738d1d1d0e49901db43103795749a53a0")
         new File(download3.get(), "shthl-stack.yml").text == """version: 1
 shathel-stack:
   gav: git@github.com/s4s0l/shathel-sample-stacks:shathel-sample-stacks:a173704738d1d1d0e49901db43103795749a53a0@master
@@ -83,7 +83,7 @@ shathel-stack:
 
         then:
         download5.get().exists()
-        download5.get().getAbsolutePath().contains("0.0.2")
+        download5.get().getAbsolutePath().contains("0_0_2")
         new File(download5.get(), "shthl-stack.yml").text == """version: 1
 shathel-stack:
   gav: git@github.com/s4s0l/shathel-sample-stacks:child-stack:0.0.2

@@ -40,11 +40,11 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         protected void execute(EnricherExecutableParams params) {
             ComposeFileModel model = params.getModel();
             StackDescription stack = params.getStack();
-            addLabels(model,"org.shathel.stack.gav", stack.getGav());
-            addLabels(model,"org.shathel.stack.deployName", stack.getDeployName());
-            addLabels(model,"org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
-            addLabels(model,"org.shathel.stack.marker", "true");
-            addLabels(model,"org.shathel.deployer.version", versionInfo());
+            addLabels(model, "org.shathel.stack.gav", stack.getGav());
+            addLabels(model, "org.shathel.stack.deployName", stack.getDeployName());
+            addLabels(model, "org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
+            addLabels(model, "org.shathel.stack.marker", "true");
+            addLabels(model, "org.shathel.deployer.version", versionInfo());
             List<StackDependency> dependencies = stack.getDependencies();
             int i = 0;
             for (StackDependency dependency : dependencies) {
@@ -75,23 +75,9 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
     private static class VariablesEnricher extends EnricherExecutable {
         @Override
         protected void execute(EnricherExecutableParams params) {
-            EnvironmentContext environmentContext = params.getEnvironmentContext();
-            int size = environmentContext.getEnvironmentDescription().getNodesCount();
-            int quorum = (int) Math.floor(size / 2) + 1;
-
             Map<String, String> environment = params.getEnvironment();
-            environment.put("SHATHEL_ENV_SIZE", "" + size);
-            environment.put("SHATHEL_ENV_QUORUM", "" + quorum);
-
-            int msize = environmentContext.getEnvironmentDescription().getManagersCount();
-            int mquorum = (int) Math.floor(msize / 2) + 1;
-
-            environment.put("SHATHEL_ENV_MGM_SIZE", "" + msize);
-            environment.put("SHATHEL_ENV_MGM_QUORUM", "" + mquorum);
-            environment.put("SHATHEL_ENV_DOMAIN", environmentContext.getEnvironmentDescription().getParameter("domain").orElse("localhost"));
-            environment.putAll(params.getEnvironmentContext().getSolutionDescription().getEnvs());
             environment.putAll(params.getStack().getEnvs());
-            environment.putAll(environmentContext.getEnvironmentDescription().getAsEnvironmentVariables());
+            environment.putAll(params.getEnvironmentContext().getAsEnvironmentVariables());
             environment.putAll(System.getenv());
         }
     }

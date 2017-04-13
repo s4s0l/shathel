@@ -16,6 +16,7 @@ import spock.lang.Specification
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class SwarmClusterCreatorTest extends Specification {
     def setupSpec() {
         new DockerMachineWrapper(settingsDir()).with {

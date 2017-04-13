@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * @author Marcin Wielgus
  */
-public interface DependencyDownloader extends ExtensionInterface {
+public interface StackDependencyDownloader extends ExtensionInterface {
 
     Optional<File> download(StackLocator reference, File directory, boolean forceful);
 }

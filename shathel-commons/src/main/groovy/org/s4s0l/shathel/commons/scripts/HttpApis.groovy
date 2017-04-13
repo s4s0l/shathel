@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.scripts
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
 import groovyx.net.http.Status
@@ -9,21 +11,23 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class HttpApis {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpApis.class)
 
     def log(String x) {
-        LOGGER.info(x);
+        LOGGER.info(x)
     }
 
-    void test(String address, List<Integer> expectedStatus = [200,401, 403],String path = "/"){
+    void test(String address, List<Integer> expectedStatus = [200, 401, 403], String path = "/") {
         def portainer = new RESTClient(address)
         portainer.handler[Status.FAILURE] = portainer.handler.get(Status.SUCCESS)
         portainer.handler["$expectedStatus"] = portainer.handler.get(Status.SUCCESS)
         def ok = expectedStatus
         HttpResponseDecorator result = portainer.get(
                 path: path
-        )
+        ) as HttpResponseDecorator
         if (!ok.contains(result.status)) {
             throw new Exception("Non ${ok} resp, got ${result.status}")
         } else {
@@ -31,7 +35,7 @@ class HttpApis {
         }
     }
 
-    def waitAndGetClient(String address, List<Integer> expectedStatus = [200,401], String path = "/", int maxAttempts = 30) {
+    def waitAndGetClient(String address, List<Integer> expectedStatus = [200, 401], String path = "/", int maxAttempts = 30) {
         def portainer = new RESTClient(address)
         portainer.handler[Status.FAILURE] = portainer.handler.get(Status.SUCCESS)
         portainer.handler["$expectedStatus"] = portainer.handler.get(Status.SUCCESS)
@@ -42,12 +46,12 @@ class HttpApis {
             try {
                 HttpResponseDecorator result = portainer.get(
                         path: path
-                )
+                ) as HttpResponseDecorator
                 if (!ok.contains(result.status)) {
                     throw new Exception("Non ${ok} resp, got ${result.status}")
                 } else {
                     log "$address ready."
-                    break;
+                    break
                 }
             } catch (Exception e) {
                 log "$address not ready...(${e.getMessage()})"
@@ -58,6 +62,6 @@ class HttpApis {
                 }
             }
         }
-        return portainer;
+        return portainer
     }
 }

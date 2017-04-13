@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class DockerComposeWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(DockerComposeWrapper.class);

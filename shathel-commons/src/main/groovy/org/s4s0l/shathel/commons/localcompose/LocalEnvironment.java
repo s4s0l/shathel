@@ -3,6 +3,8 @@ package org.s4s0l.shathel.commons.localcompose;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerComposeWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
+import org.s4s0l.shathel.commons.localswarm.LocalMountingEnricher;
+import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.slf4j.Logger;
 
@@ -14,6 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class LocalEnvironment implements Environment {
 
     private final EnvironmentContext context;

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
  */
 class DockerWrapper {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(DockerComposeWrapper.class);
+    final Logger LOGGER = LoggerFactory.getLogger(DockerWrapper.class);
 
     final ExecWrapper exec;
 
@@ -383,8 +383,8 @@ class DockerWrapper {
         return "" != exec.executeForOutput("ps -a -q -f name=${containerName}").trim()
     }
 
-    void containerCreate(String s) {
-        exec.executeForOutput("run $s")
+    String containerCreate(String s) {
+        exec.executeForOutput("run $s").readLines().last()
     }
 
     void buildAndTag(File file, String dockerfile, Map<String, String> args, String tag) {

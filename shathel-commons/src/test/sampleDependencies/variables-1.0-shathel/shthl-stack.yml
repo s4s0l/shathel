@@ -4,3 +4,4 @@ shathel-stack:
       MANDATORY_PARAM: This is just mandatory
   gav: org.s4s0l.shathel:variables:1.0
 
+#TODO: verify variables are present in enricher and provisioner

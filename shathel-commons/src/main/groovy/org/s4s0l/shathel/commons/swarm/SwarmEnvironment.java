@@ -4,7 +4,6 @@ import groovy.lang.Tuple;
 import org.s4s0l.shathel.commons.core.SettingsImporterExporter;
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper;
-import org.s4s0l.shathel.commons.localcompose.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
 import org.slf4j.Logger;
@@ -22,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 public class SwarmEnvironment implements Environment {
     private static final Logger LOGGER = getLogger(SwarmEnvironment.class);
     private final EnvironmentContext environmentContext;
@@ -184,7 +184,7 @@ public class SwarmEnvironment implements Environment {
         return Arrays.asList(
                 new SwarmMountingPermissionsEnricher(swarmClusterWrapper),
                 new SwarmMountingEnricher(swarmClusterWrapper),
-                new SwarmBuildingEnricher(getEnvironmentApiFacade().getRegistry()),
+                new SwarmBuildingEnricher(swarmClusterWrapper.getRegistry()),
                 new SwarmPullingEnricher(swarmClusterWrapper),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator()

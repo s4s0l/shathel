@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.secrets
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams
 import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable
@@ -8,23 +10,25 @@ import org.s4s0l.shathel.commons.scripts.NamedExecutable
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class SecretsEnricher extends EnricherExecutable {
 
     @Override
     protected void execute(EnricherExecutableParams params) {
-        def apiFacade = params.getApiFacade();
+        def apiFacade = params.getApiFacade()
         def model = params.model
         def stack = params.stack
         def manager = apiFacade.getSecretManager()
-        def provisioners = params.getProvisioners();
+        def provisioners = params.getProvisioners()
         model.mapSecrets {
-            secret ->
+            Map<String,String> secret ->
                 if (secret.name.startsWith("shathel_")) {
                     if (secret.file != null) {
                         //this means secret is defined here so we rule it
                         if (manager.secretExists(secret.name)) {
                             //it exists so we externalize it with current name
-                            def currentName = manager.secretCurrentName(secret.name);
+                            def currentName = manager.secretCurrentName(secret.name)
                             return [name: currentName, external: true]
                         } else {
                             //does not exist will be created in pre provisioning

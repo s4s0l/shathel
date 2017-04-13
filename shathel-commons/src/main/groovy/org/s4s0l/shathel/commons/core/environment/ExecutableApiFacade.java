@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.docker.DockerClientWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.secrets.SecretManager;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,11 +14,9 @@ import java.util.Optional;
  */
 public interface ExecutableApiFacade {
 
-    List<String> getNodeNames();
+    List<ShathelNode> getNodes();
 
-    String getIp(String nodeName);
-
-    DockerWrapper getDocker(String nodeName);
+    DockerWrapper getDocker(ShathelNode nodeName);
 
     /**
      * returns DOCKER_* environment variables used to talk with
@@ -26,28 +25,36 @@ public interface ExecutableApiFacade {
      * @param nodeName node name
      * @return see above
      */
-    Map<String, String> getDockerEnvs(String nodeName);
+    Map<String, String> getDockerEnvs(ShathelNode nodeName);
 
 
+    /**
+     * returns host:port under which given port in ingress network will be available
+     *
+     * @param port the port number
+     * @return string of host:port to use to connect to given port on private node network ip
+     */
+    String openPublishedPort(int port);
 
-    DockerWrapper getDockerForManagementNode();
-
-    String getIpForManagementNode();
-
-    String getNameForManagementNode();
-
-    void setKernelParam(String param);
-
-    Optional<String> getRegistry();
+    /**
+     * Returns available manager node
+     *
+     * @return first found manager node
+     */
+    ShathelNode getManagerNode();
 
     SecretManager getSecretManager();
 
-    default Map<String, String> getNodeLabels(String nodeName){
-        return getDockerForManagementNode().swarmNodeGetLabels(nodeName);
+    default Map<String, String> getNodeLabels(ShathelNode node) {
+        return getManagerNodeWrapper().swarmNodeGetLabels(node.getNodeName());
     }
 
-    default DockerClientWrapper getClientForManagementNode() {
-        String nameForManagementNode = getNameForManagementNode();
+    default DockerWrapper getManagerNodeWrapper() {
+        return getDocker(getManagerNode());
+    }
+
+    default DockerClientWrapper getManagerNodeClient() {
+        ShathelNode nameForManagementNode = getManagerNode();
         Map<String, String> dockerEnvs = getDockerEnvs(nameForManagementNode);
         return new DockerClientWrapper(dockerEnvs);
     }
