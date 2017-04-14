@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.remoteswarm;
 
+import org.s4s0l.shathel.commons.scripts.ExecutableResults;
+
 import java.util.Map;
 
 /**
@@ -7,11 +9,11 @@ import java.util.Map;
  */
 public interface RemoteEnvironmentProcessor {
 
-    default Map<String, String> process(ProcessorCommand command, Map<String, String> envs) {
+    default ExecutableResults process(ProcessorCommand command, Map<String, String> envs) {
         return process(command.toString(), envs);
     }
 
-    Map<String, String> process(String command, Map<String, String> envs);
+    ExecutableResults process(String command, Map<String, String> envs);
 
 }
 

@@ -18,6 +18,8 @@ import org.s4s0l.shathel.commons.remoteswarm.downloader.GitEnvironmentPackageDow
 import org.s4s0l.shathel.commons.remoteswarm.provider.RemoteEnvironmentProvider;
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleExecutorProvider;
 import org.s4s0l.shathel.commons.scripts.groovy.GroovyExecutorProvider;
+import org.s4s0l.shathel.commons.scripts.packer.PackerExecutorProvider;
+import org.s4s0l.shathel.commons.scripts.terraform.TerraformExecutorProvider;
 import org.s4s0l.shathel.commons.scripts.vaagrant.VagrantExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
@@ -53,6 +55,8 @@ public class DefaultExtensionContext {
                 .extension(new GroovyExecutorProvider())
                 .extension(new AnsibleExecutorProvider())
                 .extension(new VagrantExecutorProvider())
+                .extension(new TerraformExecutorProvider())
+                .extension(new PackerExecutorProvider())
                 .extension(new IvyDownloader(parameterProvider))
                 .extension(new GitStackDependencyDownloader(parameterProvider))
                 .extension(new FileStackDependencyDownloader(parameterProvider));

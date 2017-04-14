@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.scripts.groovy
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.scripts.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.slf4j.LoggerFactory
@@ -28,6 +29,9 @@ class GroovyExecutable implements NamedExecutable {
     }
 
     void execute(String scriptFile, Map<String, Object> variables) {
+        if (variables.get("result") == null) {
+            variables.put("result", new ExecutableResults())
+        }
         GroovyShell shell = new GroovyShell()
         def scrpt = shell.parse(scriptFile)
         Binding binding = new Binding()

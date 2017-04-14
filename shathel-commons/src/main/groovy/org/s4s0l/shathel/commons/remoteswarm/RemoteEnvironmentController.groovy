@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.docker.DockerInfoWrapper
+import org.s4s0l.shathel.commons.scripts.ExecutableResults
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -33,7 +34,8 @@ class RemoteEnvironmentController {
         int wCount = processorContext.getEnvironmentDescription().workersCount
         def nodes = apiFacade.nodes
         return mCount == nodes.collect { it.role == "manager" }.size() &&
-                wCount == nodes.collect { it.role == "worker" }.size()
+                wCount == nodes.collect { it.role == "worker" }.size() &&
+                inited()
     }
 
     void initialize() {
@@ -42,31 +44,31 @@ class RemoteEnvironmentController {
 
         Map<String, String> envs = createEnvs()
 
-        envs = getImageScript().process(ProcessorCommand.APPLY, envs)
-        envs = getInfrastructureScript().process(ProcessorCommand.APPLY, envs)
+        ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
+        res = getInfrastructureScript().process(ProcessorCommand.APPLY, envs)
         accessManager.generateCertificates()
-        envs = getSetupScript().process(ProcessorCommand.APPLY, envs)
-        envs = getSwarmScript().process(ProcessorCommand.APPLY, envs)
+        res = getSetupScript().process(ProcessorCommand.APPLY, envs)
+        res = getSwarmScript().process(ProcessorCommand.APPLY, envs)
 
     }
 
     private RemoteEnvironmentProcessor getImageScript() {
-        def imageScript = processors.create( processorContext.description.imagePreparationScript)
+        def imageScript = processors.create(processorContext.description.imagePreparationScript)
         imageScript
     }
 
     private RemoteEnvironmentProcessor getInfrastructureScript() {
-        def script = processors.create( processorContext.description.infrastructureScript)
+        def script = processors.create(processorContext.description.infrastructureScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSetupScript() {
-        def script = processors.create( processorContext.description.setupScript)
+        def script = processors.create(processorContext.description.setupScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSwarmScript() {
-        def script = processors.create( processorContext.description.swarmScript)
+        def script = processors.create(processorContext.description.swarmScript)
         script
     }
 
@@ -91,9 +93,12 @@ class RemoteEnvironmentController {
         infrastructureScript.process(ProcessorCommand.START, createEnvs())
     }
 
+    boolean inited() {
+        infrastructureScript.process(ProcessorCommand.INITED, createEnvs()).status
+    }
+
     boolean isStarted() {
-        def orDefault = infrastructureScript.process(ProcessorCommand.STARTED, createEnvs()).getOrDefault("RESULT", "true")
-        return Boolean.parseBoolean(orDefault)
+        infrastructureScript.process(ProcessorCommand.STARTED, createEnvs()).status
     }
 
     void verify() {

@@ -3,9 +3,11 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
+import org.s4s0l.shathel.commons.scripts.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider
 import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext
+import org.s4s0l.shathel.commons.scripts.terraform.TerraformScriptContext
 import org.s4s0l.shathel.commons.utils.ExtensionContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,11 +37,12 @@ class RemoteEnvironmentProcessorsFactory implements RemoteEnvironmentCallbackPro
         def ansibleScriptContext = new AnsibleScriptContext(packageContext.remoteUser,
                 new File(packageContext.keysDirectory, "id_rsa"),
                 packageContext.ansibleInventoryFile)
-
+        def terraformScriptContext = new TerraformScriptContext(new File(packageContext.settingsDirectory, "terraform.state"))
         return {
             String command, Map<String, String> envs ->
-                Map<String, String> mutableEnvs = new HashMap<>(envs)
+                Map<String, String> mutableEnvs = envs
                 Map<String, Object> context = [
+                        "result"      : new ExecutableResults(),
                         "log"         : LOGGER,
                         "context"     : packageContext,
                         "api"         : facade,
@@ -48,23 +51,18 @@ class RemoteEnvironmentProcessorsFactory implements RemoteEnvironmentCallbackPro
                         "env"         : mutableEnvs,
                         "command"     : command,
                         "ansible"     : ansibleScriptContext,
+                        "terraform"   : terraformScriptContext,
                         "processor"   : this,
                 ]
                 executor.execute(context)
-                return mutableEnvs
+                return context["result"] as ExecutableResults
         } as RemoteEnvironmentProcessor
 
     }
 
     @Override
-    Map<String, String> vagrant(String command, String script, Map<String, String> env) {
-        def processor = create(new RemoteEnvironmentScript("vagrant", script, packageContext.gav, packageContext.packageRootDirectory))
-        return processor.process(command, env)
-    }
-
-    @Override
-    Map<String, String> ansible(String command, String script, Map<String, String> env) {
-        def processor = create(new RemoteEnvironmentScript("ansible", script, packageContext.gav, packageContext.packageRootDirectory))
+    ExecutableResults run(String name, String command, String script, Map<String, String> env) {
+        def processor = create(new RemoteEnvironmentScript(name, script, packageContext.gav, packageContext.packageRootDirectory))
         return processor.process(command, env)
     }
 }

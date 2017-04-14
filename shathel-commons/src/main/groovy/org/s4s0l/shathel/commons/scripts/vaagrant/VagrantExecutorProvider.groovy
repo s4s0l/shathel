@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.scripts.vaagrant
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.bin.BinaryManager
 import org.s4s0l.shathel.commons.bin.BinaryManagerExtensionManager
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
@@ -12,6 +14,8 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class VagrantExecutorProvider implements ScriptExecutorProvider {
     @Override
     Optional<NamedExecutable> findExecutable(ExtensionContext cntext, TypedScript typedScript) {

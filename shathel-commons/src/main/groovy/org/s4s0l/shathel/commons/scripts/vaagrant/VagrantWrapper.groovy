@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.scripts.vaagrant
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.utils.ExecWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -7,6 +9,8 @@ import org.slf4j.LoggerFactory
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class VagrantWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(VagrantWrapper.class);
@@ -23,7 +27,7 @@ class VagrantWrapper {
         while (x.find()) {
             def match = x.group() =~ /([^\s]+)\s+([^\n\(]+) \([^\s]+\)/
             match.find()
-            statuses << [(match.group(1)): match.group(2)]
+            statuses.putAll([(match.group(1)): match.group(2)])
         }
         return statuses
     }

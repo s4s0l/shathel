@@ -1,11 +1,16 @@
 package org.s4s0l.shathel.commons.scripts.ansible
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.scripts.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
 
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class AnsibleExecutable implements NamedExecutable {
     private final TypedScript script
     private final AnsibleWrapper ansible
@@ -22,19 +27,23 @@ class AnsibleExecutable implements NamedExecutable {
 
     @Override
     void execute(Map<String, Object> context) {
+        if (context.get("result") == null) {
+            context.put("result", new ExecutableResults())
+        }
         Map<String, String> env = (Map<String, String>) context.get("env")
-        env << [
+        env.putAll([
                 "ANSIBLE_HOST_KEY_CHECKING": "False",
                 "ANSIBLE_NOCOWS"           : "1",
-        ]
+        ])
         AnsibleScriptContext ansibleScriptContext = (AnsibleScriptContext) context.get("ansible")
-        ansible.play(script.getBaseDirectory(),
+        def out = ansible.play(script.getBaseDirectory(),
                 ansibleScriptContext.getUser(),
                 ansibleScriptContext.getSshKey(),
                 ansibleScriptContext.getInventoryFile(),
                 env,
                 script.getScriptFileLocation().get()
         )
+        (context.get("result") as ExecutableResults).output = out
     }
 
 }

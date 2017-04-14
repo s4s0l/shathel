@@ -1,13 +1,13 @@
-package org.s4s0l.shathel.commons.scripts.ansible
+package org.s4s0l.shathel.commons.scripts.terraform
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
-import org.s4s0l.shathel.commons.bin.BinaryManager
 import org.s4s0l.shathel.commons.bin.BinaryManagerExtensionManager
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider
 import org.s4s0l.shathel.commons.scripts.TypedScript
-import org.s4s0l.shathel.commons.scripts.groovy.GroovyExecutable
+import org.s4s0l.shathel.commons.scripts.vaagrant.VagrantExecutable
+import org.s4s0l.shathel.commons.scripts.vaagrant.VagrantWrapper
 import org.s4s0l.shathel.commons.utils.ExtensionContext
 
 /**
@@ -15,15 +15,15 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext
  */
 @TypeChecked
 @CompileStatic
-class AnsibleExecutorProvider implements ScriptExecutorProvider {
+class TerraformExecutorProvider implements ScriptExecutorProvider {
     @Override
     Optional<NamedExecutable> findExecutable(ExtensionContext cntext, TypedScript typedScript) {
-        if ("ansible".equals(typedScript.getType())) {
+        if ("terraform".equals(typedScript.getType())) {
             def one = cntext.lookupOne(BinaryManagerExtensionManager)
             def locate = one.orElseThrow {
                 new RuntimeException("Binaries manager missing")
-            }.getManager(cntext).locate("ansible-playbook")
-            return Optional.<NamedExecutable> of(new AnsibleExecutable(typedScript, new AnsibleWrapper(locate)))
+            }.getManager(cntext).locate("terraform")
+            return Optional.<NamedExecutable> of(new TerraformExecutable(typedScript, new TerraformWrapper(locate)))
         } else {
             return Optional.empty()
         }

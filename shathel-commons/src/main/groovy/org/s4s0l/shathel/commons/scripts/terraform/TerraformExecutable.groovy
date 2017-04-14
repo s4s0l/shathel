@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.scripts.vaagrant
+package org.s4s0l.shathel.commons.scripts.terraform
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
@@ -8,19 +8,20 @@ import org.s4s0l.shathel.commons.scripts.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext
+import org.s4s0l.shathel.commons.scripts.vaagrant.VagrantWrapper
 
 /**
  * @author Marcin Wielgus
  */
 @TypeChecked
 @CompileStatic
-class VagrantExecutable implements NamedExecutable {
+class TerraformExecutable implements NamedExecutable {
     private final TypedScript script
-    private final VagrantWrapper vagrant
+    private final TerraformWrapper terraform
 
-    VagrantExecutable(TypedScript script, VagrantWrapper vagrant) {
+    TerraformExecutable(TypedScript script, TerraformWrapper terraform) {
         this.script = script
-        this.vagrant = vagrant
+        this.terraform = terraform
     }
 
     @Override
@@ -35,40 +36,32 @@ class VagrantExecutable implements NamedExecutable {
         }
         ExecutableResults results = context.get("result") as ExecutableResults
         Optional<ProcessorCommand> command = ProcessorCommand.toCommand(context.get("command") as String ?: ProcessorCommand.APPLY.toString())
-        RemoteEnvironmentPackageContext econtext = (RemoteEnvironmentPackageContext) context.get("context")
         File workingDir = script.scriptFileLocation.get().getParentFile()
         Map<String, String> env = (Map<String, String>) context.get("env")
-        env.putAll([
-                "VAGRANT_DOTFILE_PATH": econtext.settingsDirectory.absolutePath,
-                "VAGRANT_VAGRANTFILE" : script.scriptFileLocation.get().getName()
-        ])
+        TerraformScriptContext tsc = (TerraformScriptContext) context.get("terraform")
 
         if (command.isPresent()) {
 
             switch (command.get()) {
                 case ProcessorCommand.APPLY:
-                    results.output = vagrant.up(workingDir, env)
+                    results.output = terraform.apply(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
+                    Map<String, String> outVars = terraform.output(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
+                    env.putAll(outVars)
                     break
                 case ProcessorCommand.STOP:
-                    results.output = vagrant.halt(workingDir, env)
                     break
                 case ProcessorCommand.DESTROY:
-                    results.output = vagrant.destroy(workingDir, env)
+                    results.output = terraform.destroy(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
                     break
                 case ProcessorCommand.START:
-                    results.output = vagrant.up(workingDir, env)
                     break
                 case ProcessorCommand.STARTED:
-                    def status = vagrant.status(workingDir, env)
-                    results.output = status
-                    results.status = status.find { it.value != "running" } == null
+                    Map<String, Integer> x = terraform.plan(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
+                    results.status = x.get("allChanges") == 0
                     break
                 case ProcessorCommand.INITED:
-                    def status = vagrant.status(workingDir, env)
-                    results.output = status
-                    results.status = status.find {
-                        it.value == "not created"
-                    } == null
+                    Map<String, Integer> x = terraform.plan(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
+                    results.status = x.get("allChanges") == 0
                     break
 
             }
@@ -76,7 +69,13 @@ class VagrantExecutable implements NamedExecutable {
             if (context.get("command") == null) {
                 throw new RuntimeException("No command found for vagrant")
             }
-            results.output = vagrant.run(workingDir, env, (String) context.get("command"))
+            if (context.get("command") == "output") {
+                Map<String, String> outVars = terraform.output(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env)
+                env.putAll(outVars)
+            } else {
+                results.output = terraform.run(workingDir, tsc.stateFile, script.scriptFileLocation.get(), env,context.get("command") as String)
+            }
+
         }
 
 
