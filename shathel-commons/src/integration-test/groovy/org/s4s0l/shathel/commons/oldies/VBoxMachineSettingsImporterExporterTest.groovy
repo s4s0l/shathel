@@ -1,9 +1,10 @@
-package org.s4s0l.shathel.commons.machine.vbox
+package org.s4s0l.shathel.commons.oldies
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.docker.VBoxManageWrapper
 import org.s4s0l.shathel.commons.machine.MachineSettingsImporterExporter
+import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineSettingsImporterExporter
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 

@@ -9,6 +9,7 @@ import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,11 +18,14 @@ import java.util.Optional;
  * @author Marcin Wielgus
  */
 public class Stack {
+    private final ExtensionContext extensionContext;
     private final StackLocator stackReference;
     private final DependencyManager dependencyManager;
     private final Environment environment;
 
-    public Stack(StackLocator stackReference, DependencyManager dependencyManager, Environment environment) {
+    public Stack(ExtensionContext extensionContext, StackLocator stackReference,
+                 DependencyManager dependencyManager, Environment environment) {
+        this.extensionContext = extensionContext;
         this.stackReference = stackReference;
         this.dependencyManager = dependencyManager;
         this.environment = environment;
@@ -52,11 +56,11 @@ public class Stack {
     }
 
     private StackEnricherExecutor getEnricherExecutor(boolean withOptional) {
-        return new StackEnricherExecutor(getStackContext(withOptional), withOptional);
+        return new StackEnricherExecutor(extensionContext, getStackContext(withOptional), withOptional);
     }
 
     public void run(StackOperations schedule) {
-        new StackProvisionerExecutor(environment.getEnvironmentContext(),
+        new StackProvisionerExecutor(extensionContext, environment.getEnvironmentContext(),
                 environment.getEnvironmentApiFacade(),
                 environment.getContainerRunner()).execute(schedule);
     }

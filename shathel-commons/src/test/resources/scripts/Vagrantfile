@@ -1,0 +1,6 @@
+Vagrant.configure("2") do |config|
+  config.vm.provider "docker" do |d|
+    d.image = "tutum/hello-world"
+    d.name = ENV['DOCKER_NAME']
+  end
+end

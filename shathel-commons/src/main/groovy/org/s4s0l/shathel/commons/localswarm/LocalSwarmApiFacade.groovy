@@ -9,8 +9,6 @@ import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.secrets.SecretManager
 import org.slf4j.Logger
 
-import java.util.stream.Collectors
-
 import static org.slf4j.LoggerFactory.getLogger
 
 /**

@@ -1,0 +1,5 @@
+[shathel_manager_hosts]
+192.168.99.2 private_ip=42.42.42.2 public_ip=192.168.99.2 shathel_name=shtl-test-manager-1
+192.168.99.3 private_ip=42.42.42.3 public_ip=192.168.99.3 shathel_name=shtl-test-manager-2
+[shathel_worker_hosts]
+192.168.99.4 private_ip=42.42.42.4 public_ip=192.168.99.4 shathel_name=shtl-test-worker-1

@@ -1,7 +1,5 @@
 package org.s4s0l.shathel.commons.scripts.ansible
 
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
 
@@ -25,6 +23,10 @@ class AnsibleExecutable implements NamedExecutable {
     @Override
     void execute(Map<String, Object> context) {
         Map<String, String> env = (Map<String, String>) context.get("env")
+        env << [
+                "ANSIBLE_HOST_KEY_CHECKING": "False",
+                "ANSIBLE_NOCOWS"           : "1",
+        ]
         AnsibleScriptContext ansibleScriptContext = (AnsibleScriptContext) context.get("ansible")
         ansible.play(script.getBaseDirectory(),
                 ansibleScriptContext.getUser(),

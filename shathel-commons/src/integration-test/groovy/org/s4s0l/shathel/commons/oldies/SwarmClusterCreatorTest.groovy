@@ -1,11 +1,12 @@
-package org.s4s0l.shathel.commons.machine.vbox
+package org.s4s0l.shathel.commons.oldies
 
 import org.apache.commons.io.FileUtils
 import org.mockito.Mockito
 import org.s4s0l.shathel.commons.core.MapParameters
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContextImpl
 import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription
 import org.s4s0l.shathel.commons.core.storage.Storage
+import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineNodeCreator
 import org.s4s0l.shathel.commons.swarm.SwarmClusterCreator
 import org.s4s0l.shathel.commons.docker.DockerMachineWrapper
 import org.s4s0l.shathel.commons.machine.MachineSwarmClusterWrapper
@@ -52,7 +53,7 @@ class SwarmClusterCreatorTest extends Specification {
         Mockito.when(storage.getTemptDirectory(Mockito.any(), Mockito.anyString())).thenReturn(tempDir())
 
         EnvironmentDescription desc = new EnvironmentDescription(MapParameters.builder().build(), "xxx", "vbox", [:])
-        def context = new EnvironmentContext(new ExtensionContext(), desc, null, null, storage);
+        def context = new EnvironmentContextImpl(new ExtensionContext(), desc, null, null, storage);
         def wrapper = new MachineSwarmClusterWrapper(context)
         SwarmClusterCreator c = new SwarmClusterCreator(
                 wrapper,

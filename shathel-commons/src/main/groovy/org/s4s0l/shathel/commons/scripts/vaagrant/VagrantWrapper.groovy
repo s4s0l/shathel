@@ -16,8 +16,39 @@ class VagrantWrapper {
         exec = new ExecWrapper(LOGGER, command, [:])
     }
 
+    Map<String, String> status(File workingDir, Map<String, String> envs) {
+        String ret = exec.executeForOutput(null, workingDir, envs, "status")
+        Map<String, String> statuses = [:]
+        def x = ret =~ /(?m)^[^\s]+\s+[^\n\(]+ \([^\s]+\)$/
+        while (x.find()) {
+            def match = x.group() =~ /([^\s]+)\s+([^\n\(]+) \([^\s]+\)/
+            match.find()
+            statuses << [(match.group(1)): match.group(2)]
+        }
+        return statuses
+    }
+
+    String run(File workingDir, Map<String, String> envs, String commands) {
+        return exec.executeForOutput(null, workingDir, envs, commands)
+    }
 
     String up(File workingDir, Map<String, String> envs) {
         return exec.executeForOutput(null, workingDir, envs, "up")
+    }
+
+    String halt(File workingDir, Map<String, String> envs) {
+        return exec.executeForOutput(null, workingDir, envs, "halt")
+    }
+
+    String suspend(File workingDir, Map<String, String> envs) {
+        return exec.executeForOutput(null, workingDir, envs, "suspend")
+    }
+
+    String resume(File workingDir, Map<String, String> envs) {
+        return exec.executeForOutput(null, workingDir, envs, "resume")
+    }
+
+    String destroy(File workingDir, Map<String, String> envs) {
+        return exec.executeForOutput(null, workingDir, envs, "destroy -f")
     }
 }

@@ -107,7 +107,7 @@ class RemoteEnvironment implements Environment {
 
     @Override
     EnvironmentContext getEnvironmentContext() {
-        return packageContext.environmentContext
+        return packageContext
     }
 
     @Override

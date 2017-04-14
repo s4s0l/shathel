@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.core.stack.StackProvisionerDefinition;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.scripts.HttpApis;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.IoUtils;
 import org.slf4j.Logger;
 
@@ -19,12 +20,16 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class StackProvisionerExecutor {
-
+    private final ExtensionContext extensionContext;
     private final EnvironmentContext environmentContext;
     private final ExecutableApiFacade executableApiFacade;
     private final EnvironmentContainerRunner runner;
 
-    public StackProvisionerExecutor(EnvironmentContext environmentContext, ExecutableApiFacade executableApiFacade, EnvironmentContainerRunner runner) {
+    public StackProvisionerExecutor(ExtensionContext extensionContext,
+                                    EnvironmentContext environmentContext,
+                                    ExecutableApiFacade executableApiFacade,
+                                    EnvironmentContainerRunner runner) {
+        this.extensionContext = extensionContext;
         this.environmentContext = environmentContext;
         this.executableApiFacade = executableApiFacade;
         this.runner = runner;
@@ -79,7 +84,7 @@ public class StackProvisionerExecutor {
     private void executeProvisioners(File dstStackDir, StackCommand stackCommand, List<StackProvisionerDefinition> postProvisioners) {
         for (StackProvisionerDefinition postProvisioner : postProvisioners) {
             NamedExecutable executable = ScriptExecutorProvider
-                    .findExecutor(environmentContext.getExtensionContext(), postProvisioner)
+                    .findExecutor(extensionContext, postProvisioner)
                     .orElseThrow(() -> new RuntimeException("No executable fouind for " + postProvisioner));
             execute(dstStackDir, executable, stackCommand);
         }

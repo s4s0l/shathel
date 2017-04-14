@@ -1,0 +1,10 @@
+---
+- hosts: 127.0.0.1
+  become: no
+  tasks:
+    - debug: msg="{{ groups['shathel_manager_hosts'] }}"
+    - debug: msg="{{ groups['shathel_worker_hosts'] }}"
+    - file:
+         path: "{{target_dir}}"
+         state: directory
+    - copy: content="{{ groups['shathel_worker_hosts'] }}" dest="{{target_dir}}/out.txt"

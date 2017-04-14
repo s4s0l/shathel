@@ -27,7 +27,7 @@ class BinaryManagerExtension implements BinaryManagerExtensionManager {
     }
 
     private File getBaseDir() {
-        def file = new File(parameterProvider.getParameter(CommonParams.SHATHEL_DIR), "bin")
+        def file = new File(parameterProvider.getParameter(CommonParams.SHATHEL_DIR).orElse(".shathel"), "bin")
         file.mkdirs()
         return file
     }

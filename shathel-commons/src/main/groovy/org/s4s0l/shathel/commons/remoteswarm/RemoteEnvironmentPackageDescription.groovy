@@ -20,8 +20,12 @@ class RemoteEnvironmentPackageDescription {
         this.envPackageRootDirectory = envPackageRootDirectory
     }
 
+    String getGav() {
+        envPackageFileModel.getGav()
+    }
+
     String getVersion() {
-        return new StackReference(envPackageFileModel.getGav()).getVersion()
+        return new StackReference(gav).getVersion()
     }
 
     Map<String, String> getMandatoryEnvs() {
@@ -55,5 +59,9 @@ class RemoteEnvironmentPackageDescription {
 
     RemoteEnvironmentScript getSwarmScript() {
         return toScript(envPackageFileModel.swarmScript)
+    }
+
+    String getEnvPackageImage() {
+        return "shathel-env-${version}"
     }
 }

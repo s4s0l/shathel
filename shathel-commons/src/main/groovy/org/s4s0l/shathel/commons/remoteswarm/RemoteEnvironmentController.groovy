@@ -6,7 +6,6 @@ import org.s4s0l.shathel.commons.docker.DockerInfoWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.util.function.Predicate
 import java.util.stream.Collectors
 
 /**
@@ -52,22 +51,22 @@ class RemoteEnvironmentController {
     }
 
     private RemoteEnvironmentProcessor getImageScript() {
-        def imageScript = processors.create(processorContext, processorContext.packageDescription.imagePreparationScript)
+        def imageScript = processors.create( processorContext.description.imagePreparationScript)
         imageScript
     }
 
     private RemoteEnvironmentProcessor getInfrastructureScript() {
-        def script = processors.create(processorContext, processorContext.packageDescription.infrastructureScript)
+        def script = processors.create( processorContext.description.infrastructureScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSetupScript() {
-        def script = processors.create(processorContext, processorContext.packageDescription.setupScript)
+        def script = processors.create( processorContext.description.setupScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSwarmScript() {
-        def script = processors.create(processorContext, processorContext.packageDescription.swarmScript)
+        def script = processors.create( processorContext.description.swarmScript)
         script
     }
 
@@ -77,7 +76,7 @@ class RemoteEnvironmentController {
 
     private void verifyMandarotyParams() {
         def variables = processorContext.asEnvironmentVariables
-        def mandatory = processorContext.packageDescription.mandatoryEnvs
+        def mandatory = processorContext.description.mandatoryEnvs
         def missingMessage = mandatory.findAll {
             variables.get(it.key) == null
         }.collect {

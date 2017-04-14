@@ -7,73 +7,23 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 /**
  * @author Marcin Wielgus
  */
+
 @TypeChecked
 @CompileStatic
-class RemoteEnvironmentPackageContext {
+interface RemoteEnvironmentPackageContext extends EnvironmentContext {
+    String getRemoteUser()
 
-    @Delegate
-    private final EnvironmentContext environmentContext
-    private final RemoteEnvironmentPackageDescription description
+    RemoteEnvironmentPackageDescription getDescription()
 
-    RemoteEnvironmentPackageContext(EnvironmentContext environmentContext, RemoteEnvironmentPackageDescription description) {
-        this.environmentContext = environmentContext
-        this.description = description
-    }
+    File getKeysDirectory()
 
-    EnvironmentContext getEnvironmentContext() {
-        return environmentContext
-    }
+    File getCertsDirectory()
 
-    RemoteEnvironmentPackageDescription getPackageDescription() {
-        return description
-    }
+    File getAnsibleInventoryFile()
 
-    String getEnvPackageVersion() {
-        return description.version
-    }
+    File getKnownHostsFile()
 
-    String getEnvPackageImage() {
-        return "shathel-env-${envPackageVersion}"
-    }
+    File getPackageRootDirectory()
 
-    private File ensureExists(File f) {
-        f.mkdirs()
-        return f
-    }
-
-    File getKeysDirectory() {
-        return ensureExists(new File(settingsDirectory, "keys"))
-    }
-
-    File getCertsDirectory() {
-        return ensureExists(new File(settingsDirectory, "certs"))
-    }
-
-    File getAnsibleInventoryFile() {
-        return new File(settingsDirectory, "vagrant-inventory")
-    }
-
-    File getKnownHostsFile() {
-        return new File(settingsDirectory, "known-hosts")
-    }
-
-    File getPackageRootDirectory() {
-        return description.packageRootDirectory
-    }
-
-    Map<String, String> getProcessorVariables() {
-        Map<String, String> ret = [
-                "SHATHEL_ENVPACKAGE_VERSION"          : envPackageVersion,
-                "SHATHEL_ENVPACKAGE_SETTINGS_DIR"     : settingsDirectory.absolutePath,
-                "SHATHEL_ENVPACKAGE_IMAGE_NAME"       : envPackageImage,
-                "SHATHEL_ENVPACKAGE_KEY_DIR"          : keysDirectory.absolutePath,
-                "SHATHEL_ENVPACKAGE_TMP_DIR"          : tempDirectory.absolutePath,
-                "SHATHEL_ENVPACKAGE_WORKING_DIR"      : packageRootDirectory.absolutePath,
-                "SHATHEL_ENVPACKAGE_ANSIBLE_INVENTORY": ansibleInventoryFile.absolutePath,
-                "SHATHEL_ENVPACKAGE_USER"             : description.remoteUser,
-                "SHATHEL_ENVPACKAGE_CERTS_DIR"        : certsDirectory.absolutePath,
-        ]
-        ret.putAll(environmentContext.asEnvironmentVariables)
-        return ret
-    }
+    String getGav()
 }

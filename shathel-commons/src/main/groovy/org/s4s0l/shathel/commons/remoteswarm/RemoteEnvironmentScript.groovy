@@ -1,10 +1,14 @@
 package org.s4s0l.shathel.commons.remoteswarm
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.scripts.TypedScript
 
 /**
  * @author Marcin Wielgus
  */
+@TypeChecked
+@CompileStatic
 class RemoteEnvironmentScript implements TypedScript {
 
     final String type
@@ -26,7 +30,7 @@ class RemoteEnvironmentScript implements TypedScript {
 
     @Override
     String getScriptContents() {
-        throw new UnsupportedOperationException("Not yet")
+        getScriptFileLocation().get().text
     }
 
     @Override
@@ -41,6 +45,6 @@ class RemoteEnvironmentScript implements TypedScript {
 
     @Override
     Optional<File> getScriptFileLocation() {
-        return new File(baseDirectory, name)
+        return Optional.of(new File(baseDirectory, name))
     }
 }

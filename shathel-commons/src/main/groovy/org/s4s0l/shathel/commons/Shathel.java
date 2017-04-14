@@ -37,6 +37,7 @@ public class Shathel {
         return fileStorage;
     }
 
+
     public Storage initStorage(File f, boolean failIfExists) {
         try {
             FileStorage fileStorage = createFileStorage(f);

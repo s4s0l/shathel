@@ -50,7 +50,7 @@ public class Solution {
                 extensionContext.lookupOne(SafeStorageProvider.class).get().getSafeStorage(safeDirectory, name));
 
 
-        EnvironmentContext environmentContext = new EnvironmentContext(extensionContext, environmentDescription, solutionDescription,
+        EnvironmentContext environmentContext = new EnvironmentContextImpl(environmentDescription, solutionDescription,
                 safeStorage, storage);
 
         return environmentProvider.getEnvironment(environmentContext);
@@ -68,7 +68,7 @@ public class Solution {
     public Stack openStack(Environment e, StackLocator reference) {
         e.verify();
         DependencyManager dependencyManager = getDependencyManager(e);
-        return new Stack(reference, dependencyManager, e);
+        return new Stack(extensionContext, reference, dependencyManager, e);
     }
 
     private DependencyManager getDependencyManager(Environment e) {

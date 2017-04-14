@@ -1,0 +1,8 @@
+---
+- hosts: 127.0.0.1
+  become: no
+  tasks:
+    - file:
+         path: "{{target_dir}}"
+         state: directory
+    - copy: content="hello" dest="{{target_dir}}/groovy_callback_ansible_out.txt"

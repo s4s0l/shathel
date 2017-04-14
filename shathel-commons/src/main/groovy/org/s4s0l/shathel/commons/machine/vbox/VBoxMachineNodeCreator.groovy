@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory
 @Deprecated
 class VBoxMachineNodeCreator implements SwarmNodeCreator{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VBoxMachineNodeCreator.class);
-    private final DockerMachineWrapper wrapper;
-    private final EnvironmentContext environmentContext;
+    private static final Logger LOGGER = LoggerFactory.getLogger(VBoxMachineNodeCreator.class)
+    private final DockerMachineWrapper wrapper
+    private final EnvironmentContext environmentContext
 
     VBoxMachineNodeCreator(DockerMachineWrapper wrapper, EnvironmentContext environmentContext) {
         this.wrapper = wrapper
@@ -34,11 +34,11 @@ class VBoxMachineNodeCreator implements SwarmNodeCreator{
  * @return
  */
     SwarmNodeCreator.CreationResult staticIp( File tmpDir, String machineName, NetworkSettings ns, int ipNum) {
-        boolean modified = false;
+        boolean modified = false
         wrapper.sudo(machineName, "touch /var/lib/boot2docker/bootsync.sh")
         String sudo = wrapper.sudo(machineName, "cat /var/lib/boot2docker/bootsync.sh")
         if (sudo.contains("#SHATHELIP_START")) {
-            return new SwarmNodeCreator.CreationResult((sudo =~ /#IP=([0-9\.]+)#/)[0][1], false);
+            return new SwarmNodeCreator.CreationResult((sudo =~ /#IP=([0-9\.]+)#/)[0][1], false)
         }
         def address = ns.getAddress(ipNum)
         LOGGER.info "Fixing ip address for ${machineName} to be ${address}"
@@ -49,14 +49,14 @@ class VBoxMachineNodeCreator implements SwarmNodeCreator{
         ifconfig eth1 ${address} netmask ${ns.getMask()} broadcast ${ns.getBcast()} up
         #SHATELIP_END
         """
-        def file = new File(tmpDir, "fix");
+        def file = new File(tmpDir, "fix")
         try {
             file.text = fixationCommand
             wrapper.copy(file.absolutePath, "$machineName:/tmp/fixation")
             wrapper.sudo(machineName, "cp -f /tmp/fixation /var/lib/boot2docker/bootsync.sh")
             wrapper.restart(machineName)
             wrapper.regenerateCerts(machineName)
-            modified = true;
+            modified = true
             wrapper.restart(machineName)
         } finally {
             file.delete()

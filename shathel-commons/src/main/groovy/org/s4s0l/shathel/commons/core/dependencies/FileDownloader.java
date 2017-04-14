@@ -16,7 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
-public class FileDownloader  {
+public class FileDownloader {
     public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
 
     protected Optional<File> verifyFile(File locationFile) {
@@ -63,7 +63,9 @@ public class FileDownloader  {
             if (!file.isPresent()) {
                 file = searchAsLocalMavenRepo(reference.get(), directory, forceful);
             }
-            return file;
+            if (file.isPresent()) {
+                return file;
+            }
         }
         return searchAsFile(new File(locator.getLocation()));
     }

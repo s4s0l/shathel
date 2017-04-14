@@ -32,7 +32,7 @@ class ShathelOperationTask extends DefaultTask {
             } else {
                 return new File(project.projectDir, it)
             }
-        }.orElse(new File(project.buildDir, "shathel"))
+        }.orElse(new File(project.buildDir, ".shathel"))
     }
 
 

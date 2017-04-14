@@ -1,81 +1,32 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.SolutionDescription;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
-import org.s4s0l.shathel.commons.core.storage.Storage;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Marcin Wielgus
  */
-public class EnvironmentContext {
-    private final ExtensionContext extensionContext;
-    private final EnvironmentDescription environmentDescription;
-    private final SolutionDescription solutionDescription;
-    private final SafeStorage safeStorage;
-    private final Storage storage;
+public interface EnvironmentContext {
+    SafeStorage getSafeStorage();
 
-    public EnvironmentContext(ExtensionContext extensionContext, EnvironmentDescription environmentDescription,
-                              SolutionDescription solutionDescription, SafeStorage safeStorage, Storage storage) {
-        this.extensionContext = extensionContext;
-        this.environmentDescription = environmentDescription;
-        this.solutionDescription = solutionDescription;
-        this.safeStorage = safeStorage;
-        this.storage = storage;
-    }
+    EnvironmentDescription getEnvironmentDescription();
 
-    public ExtensionContext getExtensionContext() {
-        return extensionContext;
-    }
+    SolutionDescription getSolutionDescription();
 
-    public SafeStorage getSafeStorage() {
-        return safeStorage;
-    }
+    File getSettingsDirectory();
 
-    public EnvironmentDescription getEnvironmentDescription() {
-        return environmentDescription;
-    }
+    File getDataDirectory();
 
-    public SolutionDescription getSolutionDescription() {
-        return solutionDescription;
-    }
+    File getTempDirectory();
 
-    public File getSettingsDirectory() {
-        return storage.getSettingsDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
-    }
+    File getEnrichedDirectory();
 
-    public File getDataDirectory() {
-        return storage.getDataDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
-    }
+    String getContextName();
 
-    public File getTempDirectory() {
-        return storage.getTemptDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
-    }
+    File getDependencyCacheDirectory();
 
-    public File getEnrichedDirectory() {
-        return storage.getEnrichedDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
-    }
-
-    public String getContextName() {
-        return getSolutionDescription().getName() + "-" + getEnvironmentDescription().getName();
-    }
-
-    public File getDependencyCacheDirectory() {
-        return storage.getDependencyCacheDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
-    }
-
-
-    public Map<String, String> getAsEnvironmentVariables() {
-        Map<String, String> ret = new HashMap<>();
-        ret.putAll(getSolutionDescription().getAsEnvironmentVariables());
-        ret.putAll(getEnvironmentDescription().getAsEnvironmentVariables());
-        ret.put(Parameters.parameterNameToEnvName("shathel.env.solution.name"), getContextName());
-        return ret;
-    }
-
+    Map<String, String> getAsEnvironmentVariables();
 }

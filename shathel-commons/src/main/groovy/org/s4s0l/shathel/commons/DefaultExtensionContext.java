@@ -16,7 +16,9 @@ import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineEnvironmentProvider;
 import org.s4s0l.shathel.commons.remoteswarm.downloader.FileEnvironmentPackageDownloader;
 import org.s4s0l.shathel.commons.remoteswarm.downloader.GitEnvironmentPackageDownloader;
 import org.s4s0l.shathel.commons.remoteswarm.provider.RemoteEnvironmentProvider;
+import org.s4s0l.shathel.commons.scripts.ansible.AnsibleExecutorProvider;
 import org.s4s0l.shathel.commons.scripts.groovy.GroovyExecutorProvider;
+import org.s4s0l.shathel.commons.scripts.vaagrant.VagrantExecutorProvider;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
@@ -43,12 +45,14 @@ public class DefaultExtensionContext {
                 .extension(new RemoteEnvironmentProvider())
                 .extension(new BinaryManagerExtension(parameterProvider))
                 .extension(new DindEnvironmentProvider())
-                .extension(new FileEnvironmentPackageDownloader(parameterProvider))
                 .extension(new GitEnvironmentPackageDownloader(parameterProvider))
+                .extension(new FileEnvironmentPackageDownloader(parameterProvider))
                 .extensions(DefaultBinaryLocators.getDefaultLocators())
                 .extension(new DefaultSafeStorageProvider(parameterProvider))
                 .extension(new DefaultGlobalEnricherProvider())
                 .extension(new GroovyExecutorProvider())
+                .extension(new AnsibleExecutorProvider())
+                .extension(new VagrantExecutorProvider())
                 .extension(new IvyDownloader(parameterProvider))
                 .extension(new GitStackDependencyDownloader(parameterProvider))
                 .extension(new FileStackDependencyDownloader(parameterProvider));

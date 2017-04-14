@@ -24,11 +24,13 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class StackEnricherExecutor {
+    private final ExtensionContext extensionContext;
     private final Stack.StackContext stack;
     private final boolean withOptional;
     private static final Logger LOGGER = getLogger(StackEnricherExecutor.class);
 
-    public StackEnricherExecutor(Stack.StackContext stack, boolean withOptional) {
+    public StackEnricherExecutor(ExtensionContext extensionContext, Stack.StackContext stack, boolean withOptional) {
+        this.extensionContext = extensionContext;
         this.stack = stack;
         this.withOptional = withOptional;
     }
@@ -74,7 +76,7 @@ public class StackEnricherExecutor {
     }
 
     private ExtensionContext getExtensionContext() {
-        return stack.getEnvironment().getEnvironmentContext().getExtensionContext();
+        return extensionContext;
     }
 
     private List<NamedExecutable> execute(Optional<NamedExecutable> executor,

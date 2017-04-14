@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.dind
+package org.s4s0l.shathel.commons.oldies
 
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.Shathel
