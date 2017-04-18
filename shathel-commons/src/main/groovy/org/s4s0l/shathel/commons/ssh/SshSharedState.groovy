@@ -41,12 +41,23 @@ class SshSharedState implements Closeable {
         }
     }
 
+    Collection<Integer> getOpenedPorts() {
+        return openedSockets.values()
+    }
+
     synchronized void open() {
         if (isOpened()) {
             return
         }
+        if(controlSocket.exists()){
+            throw new RuntimeException("Control socket ${controlSocket.absolutePath} already exists! Close connection manually please.")
+        }
         openProcess = new Thread({
             try {
+                Runtime.addShutdownHook {
+                    LOGGER.info("Shutdown hook triggered - assuring ssh tunnel is closed, ${host}:${port} via control socket: ${controlSocket}")
+                    close()
+                }
                 sshWrapper.openConnection(user, host, port, key, controlSocket)
             } catch (Exception e) {
                 LOGGER.error("ssh connection open failed", e)
@@ -56,6 +67,7 @@ class SshSharedState implements Closeable {
         })
         openProcess.start()
         IoUtils.waitForFile(controlSocket, 10, new RuntimeException("Unable to open ssh connection, check logs"))
+        Thread.sleep(1000)//todo find a better way
         opened = true
     }
 
@@ -63,14 +75,14 @@ class SshSharedState implements Closeable {
         opened
     }
 
-    synchronized int tunnelSocket(String target, AtomicInteger currentPortHolder) {
+    synchronized int tunnelSocket(String target, int localPortToUse) {
         if (openedSockets.get(target) != null) {
             return openedSockets.get(target).intValue()
         }
         if (!isOpened()) {
             open()
         }
-        def nextPortToUse = currentPortHolder.incrementAndGet()
+        def nextPortToUse = localPortToUse
         sshWrapper.tunnelConnection(user, host, port, key, controlSocket, "127.0.0.1:${nextPortToUse}:${target}")
         openedSockets.put(target, nextPortToUse)
         return nextPortToUse
@@ -85,6 +97,7 @@ class SshSharedState implements Closeable {
     @Override
     synchronized void close() throws IOException {
         if (isOpened()) {
+            LOGGER.info("Closing ssh connection to ${host}:${port} via control socket: ${controlSocket}")
             sshWrapper.closeConnection(host, port, controlSocket)
         }
         openedSockets.clear()

@@ -38,6 +38,35 @@ class SshTunelManagerImplTest extends Specification {
         "curl -s http://127.0.0.1:${port}".execute().waitFor() == 0
 
         cleanup:
+
+        tunelManager?.closeAll()
+        new DockerWrapper().containerRemove("TestSshTunelServer")
+
+    }
+
+
+    def "Multiple Ssh tunnel managers share state"() {
+        given:
+        getRootDir().mkdirs()
+        def knownHosts = new File(getRootDir(), "known")
+        knownHosts.delete()
+        SshKeys keys = new SshKeyProvider(getRootDir(), "someone@somewhere").keys
+        def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
+        def tunelManager2 = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
+
+        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
+        Thread.sleep(5000)
+
+        when:
+        def port = tunelManager.openTunnel(keys.privateKey, "localhost:2224", "github.com:80")
+        def port2 = tunelManager2.openTunnel(keys.privateKey, "localhost:2224", "github.com:80")
+
+
+        then:
+        "curl -s http://127.0.0.1:${port}".execute().waitFor() == 0
+        port == port2
+
+        cleanup:
         tunelManager.closeAll()
         new DockerWrapper().containerRemove("TestSshTunelServer")
 

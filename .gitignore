@@ -14,3 +14,4 @@ private.tfvars
 sandbox/terraform-aws/private
 sandbox/terraform-do/private
 sandbox/vagrant/private
+/private.properties

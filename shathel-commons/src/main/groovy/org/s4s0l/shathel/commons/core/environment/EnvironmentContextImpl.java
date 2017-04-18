@@ -63,7 +63,7 @@ public class EnvironmentContextImpl implements EnvironmentContext {
 
     @Override
     public String getContextName() {
-        return getSolutionDescription().getName() + "-" + getEnvironmentDescription().getName();
+        return (getSolutionDescription().getName() + "-" + getEnvironmentDescription().getName()).toLowerCase();
     }
 
     @Override

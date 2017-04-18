@@ -24,5 +24,7 @@ interface SshTunelManager {
 
     void closeAll()
 
+    void afterEnvironmentDestroyed()
+
 
 }

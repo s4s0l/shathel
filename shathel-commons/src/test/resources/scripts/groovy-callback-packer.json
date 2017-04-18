@@ -1,0 +1,13 @@
+{
+  "builders": [
+    {
+      "type": "docker",
+      "image": "{{user `packer_env_variable`}}",
+      "commit": true
+    }
+  ],
+  "variables": {
+    "packer_env_variable": ""
+
+  }
+}

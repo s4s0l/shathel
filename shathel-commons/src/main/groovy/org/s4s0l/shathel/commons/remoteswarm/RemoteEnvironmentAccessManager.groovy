@@ -11,7 +11,11 @@ import org.s4s0l.shathel.commons.core.environment.ShathelNode
 @CompileStatic
 interface RemoteEnvironmentAccessManager {
 
-    void generateCertificates()
+    void checkPreConditions()
+
+    void afterEnvironmentDestroyed()
+
+    void generateNodeCertificates()
 
     List<ShathelNode> getNodes()
 

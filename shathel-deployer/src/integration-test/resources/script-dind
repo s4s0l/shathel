@@ -1,7 +1,0 @@
-parameters add --params shathel.file.base_dir=$ROOT/build/localrepo
-parameters add --params shathel.deployer.dir=$ROOT/shathel-deployer/build/TempSolution
-environment init --params shathel.env=dev
-stack start --name shathel-stack-core --inspect 0
-stack start --name shathel-stack-portainer --inspect 0
-
-

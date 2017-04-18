@@ -47,7 +47,7 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
 
     @Override
     File getAnsibleInventoryFile() {
-        return new File(settingsDirectory, "vagrant-inventory")
+        return new File(settingsDirectory, "ansible-inventory")
     }
 
     @Override

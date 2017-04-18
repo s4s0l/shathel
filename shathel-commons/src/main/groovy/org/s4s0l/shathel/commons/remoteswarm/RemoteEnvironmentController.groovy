@@ -30,23 +30,24 @@ class RemoteEnvironmentController {
     }
 
     boolean isInitialized() {
+        accessManager.checkPreConditions()
         int mCount = processorContext.getEnvironmentDescription().managersCount
         int wCount = processorContext.getEnvironmentDescription().workersCount
         def nodes = apiFacade.nodes
-        return mCount == nodes.collect { it.role == "manager" }.size() &&
-                wCount == nodes.collect { it.role == "worker" }.size() &&
+        return mCount == nodes.findAll { it.role == "manager" }.size() &&
+                wCount == nodes.findAll { it.role == "worker" }.size() &&
                 inited()
     }
 
     void initialize() {
-
+        accessManager.checkPreConditions()
         verifyMandarotyParams()
 
         Map<String, String> envs = createEnvs()
 
         ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
         res = getInfrastructureScript().process(ProcessorCommand.APPLY, envs)
-        accessManager.generateCertificates()
+        accessManager.generateNodeCertificates()
         res = getSetupScript().process(ProcessorCommand.APPLY, envs)
         res = getSwarmScript().process(ProcessorCommand.APPLY, envs)
 
@@ -90,18 +91,26 @@ class RemoteEnvironmentController {
     }
 
     void start() {
+        accessManager.checkPreConditions()
         infrastructureScript.process(ProcessorCommand.START, createEnvs())
     }
 
     boolean inited() {
-        infrastructureScript.process(ProcessorCommand.INITED, createEnvs()).status
+        accessManager.checkPreConditions()
+        Map<String, String> envs = createEnvs()
+        ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
+        return getInfrastructureScript().process(ProcessorCommand.INITED, envs).status
     }
 
     boolean isStarted() {
-        infrastructureScript.process(ProcessorCommand.STARTED, createEnvs()).status
+        accessManager.checkPreConditions()
+        Map<String, String> envs = createEnvs()
+        ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
+        return getInfrastructureScript().process(ProcessorCommand.STARTED, envs).status
     }
 
     void verify() {
+        accessManager.checkPreConditions()
         def nodes = apiFacade.nodes
 
         List<DockerInfoWrapper> machines = nodes.collect {
@@ -120,7 +129,7 @@ class RemoteEnvironmentController {
 
         //all must belong to same cluster and have same managers visibility
         List<Tuple> collect = machines.stream()
-                .map { DockerInfoWrapper x -> new Tuple([x.isSwarmActive(), x.getRemoteManagers()]) }
+                .map { DockerInfoWrapper x -> new Tuple([x.isSwarmActive(), x.getRemoteManagers()] as Object[]) }
                 .distinct().collect(Collectors.toList())
 
         if (collect.size() != 1 ||
@@ -130,10 +139,14 @@ class RemoteEnvironmentController {
     }
 
     void destroy() {
+        accessManager.checkPreConditions()
         infrastructureScript.process(ProcessorCommand.DESTROY, createEnvs())
+        accessManager.afterEnvironmentDestroyed()
+
     }
 
     void stop() {
+        accessManager.checkPreConditions()
         infrastructureScript.process(ProcessorCommand.STOP, createEnvs())
     }
 }

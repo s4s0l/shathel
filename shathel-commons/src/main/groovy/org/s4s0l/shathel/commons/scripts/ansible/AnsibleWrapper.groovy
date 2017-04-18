@@ -21,16 +21,14 @@ class AnsibleWrapper {
     }
 
     String play(File workingDir, String user, File privateKey, File inventoryFile,
-                Map<String, String> envs, File playbook) {
-        def ansibleExtraVars = envs.collect {
-            "${it.key.toLowerCase()}=${it.value}"
-        }.join(" ")
+                Map<String, String> envs,File extraVars,  File playbook) {
+
         return exec.executeForOutput(null, workingDir, envs,
                 "-u", user,
-                "--timeout=160",
+                "--timeout=180",
                 "--private-key=${privateKey.absolutePath}".toString(),
                 "--inventory-file=${inventoryFile.absolutePath}".toString(),
-                "--extra-vars", ansibleExtraVars.toString(),
+                "--extra-vars", "@${extraVars.absolutePath}",
                 "${playbook.absolutePath}".toString())
     }
 }

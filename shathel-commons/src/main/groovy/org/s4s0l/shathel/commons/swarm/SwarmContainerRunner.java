@@ -19,7 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class SwarmContainerRunner implements EnvironmentContainerRunner, EnvironmentContainerRunnerContext {
-    public static final int RUNNING_CHECK_TRIES = 100;
+    public static final int RUNNING_CHECK_TRIES = 120;
     public static final int RUNNING_CHECK_INTERVAL_SECS = 1;
     private static final Logger LOGGER = getLogger(SwarmContainerRunner.class);
 

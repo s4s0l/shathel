@@ -1,0 +1,290 @@
+{
+    "version": 3,
+    "terraform_version": "0.9.3",
+    "serial": 5,
+    "lineage": "ba5f1265-78d6-458e-90cd-b56fafaf9ebf",
+    "modules": [
+        {
+            "path": [
+                "root"
+            ],
+            "outputs": {
+                "shathel_terraform_manager_objects": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "digitalocean_droplet.shathel_manager"
+                },
+                "shathel_terraform_name_attribute": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "name"
+                },
+                "shathel_terraform_private_ip_attribute": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "ipv4_address_private"
+                },
+                "shathel_terraform_public_ip_attribute": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "ipv4_address"
+                },
+                "shathel_terraform_worker_objects": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "digitalocean_droplet.shathel_worker"
+                }
+            },
+            "resources": {
+                "cloudflare_record.shathel.0": {
+                    "type": "cloudflare_record",
+                    "depends_on": [
+                        "digitalocean_droplet.shathel_manager",
+                        "digitalocean_droplet.shathel_manager.*"
+                    ],
+                    "primary": {
+                        "id": "854e9d9035900396eb675306b5eb1a8a",
+                        "attributes": {
+                            "domain": "s4s0l.pl",
+                            "hostname": "integration-test.s4s0l.pl",
+                            "id": "854e9d9035900396eb675306b5eb1a8a",
+                            "name": "integration-test.s4s0l.pl",
+                            "priority": "0",
+                            "proxied": "false",
+                            "ttl": "1",
+                            "type": "A",
+                            "value": "192.241.159.112",
+                            "zone_id": "921eee13833ea9fe04c9b7697a1fa320"
+                        },
+                        "meta": {
+                            "schema_version": "1"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "cloudflare_record.shathel.1": {
+                    "type": "cloudflare_record",
+                    "depends_on": [
+                        "digitalocean_droplet.shathel_manager",
+                        "digitalocean_droplet.shathel_manager.*"
+                    ],
+                    "primary": {
+                        "id": "719b3dcb99a0e142867a2e19bd8bee26",
+                        "attributes": {
+                            "domain": "s4s0l.pl",
+                            "hostname": "integration-test.s4s0l.pl",
+                            "id": "719b3dcb99a0e142867a2e19bd8bee26",
+                            "name": "integration-test.s4s0l.pl",
+                            "priority": "0",
+                            "proxied": "false",
+                            "ttl": "1",
+                            "type": "A",
+                            "value": "159.203.188.59",
+                            "zone_id": "921eee13833ea9fe04c9b7697a1fa320"
+                        },
+                        "meta": {
+                            "schema_version": "1"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_droplet.shathel_manager.0": {
+                    "type": "digitalocean_droplet",
+                    "depends_on": [
+                        "digitalocean_ssh_key.shathel",
+                        "digitalocean_tag.shathel_manager",
+                        "digitalocean_tag.shathel_solution",
+                        "digitalocean_tag.shathel_tag"
+                    ],
+                    "primary": {
+                        "id": "46149693",
+                        "attributes": {
+                            "backups": "false",
+                            "disk": "30",
+                            "id": "46149693",
+                            "image": "24254373",
+                            "ipv4_address": "192.241.159.112",
+                            "ipv4_address_private": "10.136.37.200",
+                            "locked": "false",
+                            "name": "remoteenvironmentdotest-do-manager-0",
+                            "private_networking": "true",
+                            "region": "nyc1",
+                            "resize_disk": "true",
+                            "size": "1gb",
+                            "ssh_keys.#": "1",
+                            "ssh_keys.0": "8266493",
+                            "status": "active",
+                            "tags.#": "3",
+                            "tags.0": "shathel-manager",
+                            "tags.1": "shathel",
+                            "tags.2": "shathel-remoteenvironmentdotest-do",
+                            "vcpus": "1"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_droplet.shathel_manager.1": {
+                    "type": "digitalocean_droplet",
+                    "depends_on": [
+                        "digitalocean_ssh_key.shathel",
+                        "digitalocean_tag.shathel_manager",
+                        "digitalocean_tag.shathel_solution",
+                        "digitalocean_tag.shathel_tag"
+                    ],
+                    "primary": {
+                        "id": "46149694",
+                        "attributes": {
+                            "backups": "false",
+                            "disk": "30",
+                            "id": "46149694",
+                            "image": "24254373",
+                            "ipv4_address": "159.203.188.59",
+                            "ipv4_address_private": "10.136.50.53",
+                            "locked": "false",
+                            "name": "remoteenvironmentdotest-do-manager-1",
+                            "private_networking": "true",
+                            "region": "nyc1",
+                            "resize_disk": "true",
+                            "size": "1gb",
+                            "ssh_keys.#": "1",
+                            "ssh_keys.0": "8266493",
+                            "status": "active",
+                            "tags.#": "3",
+                            "tags.0": "shathel-manager",
+                            "tags.1": "shathel",
+                            "tags.2": "shathel-remoteenvironmentdotest-do",
+                            "vcpus": "1"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_droplet.shathel_worker": {
+                    "type": "digitalocean_droplet",
+                    "depends_on": [
+                        "digitalocean_ssh_key.shathel",
+                        "digitalocean_tag.shathel_solution",
+                        "digitalocean_tag.shathel_tag",
+                        "digitalocean_tag.shathel_worker"
+                    ],
+                    "primary": {
+                        "id": "46149695",
+                        "attributes": {
+                            "backups": "false",
+                            "disk": "30",
+                            "id": "46149695",
+                            "image": "24254373",
+                            "ipv4_address": "67.205.152.128",
+                            "ipv4_address_private": "10.136.53.26",
+                            "locked": "false",
+                            "name": "remoteenvironmentdotest-do-worker-0",
+                            "private_networking": "true",
+                            "region": "nyc1",
+                            "resize_disk": "true",
+                            "size": "1gb",
+                            "ssh_keys.#": "1",
+                            "ssh_keys.0": "8266493",
+                            "status": "active",
+                            "tags.#": "3",
+                            "tags.0": "shathel",
+                            "tags.1": "shathel-worker",
+                            "tags.2": "shathel-remoteenvironmentdotest-do",
+                            "vcpus": "1"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_ssh_key.shathel": {
+                    "type": "digitalocean_ssh_key",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "8266493",
+                        "attributes": {
+                            "fingerprint": "c2:9f:79:7d:79:b5:8b:01:8b:c0:4d:f1:b8:e7:68:90",
+                            "id": "8266493",
+                            "name": "remoteenvironmentdotest-do-key",
+                            "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDEF/kPDNONho0p2c3Qy82LCvcfvS3213TOoWZ9UIershXPAn6FGOhtRfXEDAL947BOeLfZmdrZV/sQEooTPFxPRAHmVh5ZcLYRgGxjNGKLM28qDOl+vRdN58APCNILENDa8cvUA1WHXtXG53jXfOGWdpDksvRsM1jsO1a3n69HkkR3pAKuTkNn/Lrl9dZBdgrLfwhHllChWDLLOkSsE5n1WTxEu6R9mMdKe1hOxAwzP+zFkUmm47006dx9isEPrW8RZnoaEPB0CFlISkA4RpeAcCoZGO1vtQbH9vX4ADnjfU7tY3/LMv4zdM4Uls+OgjGbxmmNX3a2eeTD8Jilh+hz someone@RemoteEnvironmentDoTest-do"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_tag.shathel_manager": {
+                    "type": "digitalocean_tag",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "shathel-manager",
+                        "attributes": {
+                            "id": "shathel-manager",
+                            "name": "shathel-manager"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_tag.shathel_solution": {
+                    "type": "digitalocean_tag",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "shathel-RemoteEnvironmentDoTest-do",
+                        "attributes": {
+                            "id": "shathel-RemoteEnvironmentDoTest-do",
+                            "name": "shathel-remoteenvironmentdotest-do"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_tag.shathel_tag": {
+                    "type": "digitalocean_tag",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "shathel",
+                        "attributes": {
+                            "id": "shathel",
+                            "name": "shathel"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                },
+                "digitalocean_tag.shathel_worker": {
+                    "type": "digitalocean_tag",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "shathel-worker",
+                        "attributes": {
+                            "id": "shathel-worker",
+                            "name": "shathel-worker"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": ""
+                }
+            },
+            "depends_on": []
+        }
+    ]
+}

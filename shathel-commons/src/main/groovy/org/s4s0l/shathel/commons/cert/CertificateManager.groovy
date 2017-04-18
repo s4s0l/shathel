@@ -31,6 +31,7 @@ interface CertificateManager {
                                List<String> dns,
                                List<String> ips)
 
+    void afterEnvironmentDestroyed()
 }
 
 class KeyCert {

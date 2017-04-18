@@ -62,6 +62,8 @@ class CertificateManagerImplTest extends Specification {
         cert.cert.getName() == "server-cert.pem"
         cert.key.getName() == "server-key.pem"
 
+        certManager.getKeyAndCert("xxx").get().key == cert.key
+
         new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("TLS Web Client Authentication")
         new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("1.1.1.1")
         new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("dns1")

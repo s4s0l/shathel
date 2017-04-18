@@ -39,6 +39,7 @@
 * shathel.env.{env}.tempDir
 * shathel.env.{env}.pull
 * shathel.env.{env}.domain
+* shathel.env.{env}.useglobalvagrant
 
 ## Passwords settings
 * shathel.env.{env}.safePassword

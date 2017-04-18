@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.cert
 
+import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.utils.ExecWrapper
 
 import java.nio.file.Files
@@ -49,8 +50,8 @@ class CertificateManagerImpl implements CertificateManager {
         File serverKey = new File(serverDir, "server-key.pem")
         File serverCert = new File(serverDir, "server-cert.pem")
         return serverKey.exists() && serverCert.exists() ? Optional.of(
-                new KeyCert(key: serverKey,
-                        cert: serverCert)
+                new KeyCert(serverKey,
+                        serverCert)
         ) : Optional.empty()
     }
 
@@ -62,9 +63,9 @@ class CertificateManagerImpl implements CertificateManager {
         File serverCert = new File(serverDir, "cert.pem")
         File caCert = new File(serverDir, "ca.pem")
         return serverKey.exists() && serverCert.exists() ? new KeyCertCa(
-                key: serverKey,
-                cert: serverCert,
-                ca: caCert
+                serverKey,
+                serverCert,
+                caCert
         ) : generateClientKeyAndCert()
     }
 
@@ -103,12 +104,17 @@ extendedKeyUsage=${extendsdKeyUsage.join(",")}
         Files.copy(rootCaCert.toPath(), caCert.toPath())
 
         return new KeyCertCa(
-                 clientKey,
-                 serverCert,
-                 caCert
+                clientKey,
+                serverCert,
+                caCert
         )
     }
 
+    @Override
+    void afterEnvironmentDestroyed() {
+        FileUtils.deleteDirectory(certificateHome)
+        certificateHome.mkdirs()
+    }
 
     @Override
     KeyCert generateKeyAndCert(String tag, String commonName = tag,
@@ -147,8 +153,8 @@ subjectAltName=${(ips.collect { "IP:$it" } + dns.collect { "DNS:$it" }).join(","
                         "-extfile ${extFile.absolutePath} -passin stdin ")
 
         return new KeyCert(
-                 serverKey,
-                 serverCert
+                serverKey,
+                serverCert
         )
     }
 

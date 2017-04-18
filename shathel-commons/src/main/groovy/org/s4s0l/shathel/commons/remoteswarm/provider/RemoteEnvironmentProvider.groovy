@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.remoteswarm.provider
 
+import com.google.common.io.Files
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.cert.CertificateManagerImpl
@@ -24,6 +25,8 @@ import org.s4s0l.shathel.commons.remoteswarm.downloader.EnvironmentPackageDownlo
 import org.s4s0l.shathel.commons.ssh.SshKeyProvider
 import org.s4s0l.shathel.commons.ssh.SshTunelManagerImpl
 import org.s4s0l.shathel.commons.utils.ExtensionContext
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * @author Marcin Wielgus
@@ -31,6 +34,8 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext
 @TypeChecked
 @CompileStatic
 class RemoteEnvironmentProvider implements EnvironmentProvider {
+    private static
+    final Logger LOGGER = LoggerFactory.getLogger(RemoteEnvironmentProvider.class)
     private ExtensionContext extensionContext
 
     @Override
@@ -50,7 +55,7 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
         RemoteEnvironmentAccessManager accessManager = createAccessManager(packageContext)
         RemoteEnvironmentApiFacade facade = new RemoteEnvironmentApiFacade(accessManager, packageContext)
         RemoteEnvironmentProcessorsFactory factory = new RemoteEnvironmentProcessorsFactory(facade, extensionContext, packageContext)
-        RemoteEnvironmentController controller = new RemoteEnvironmentController(packageContext,factory,
+        RemoteEnvironmentController controller = new RemoteEnvironmentController(packageContext, factory,
                 facade, accessManager)
         RemoteEnvironment re = new RemoteEnvironment(machineSettingsImporterExporter, packageContext, controller, facade)
         return re;
@@ -76,11 +81,21 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
     private RemoteEnvironmentAccessManager createAccessManager(RemoteEnvironmentPackageContext packageContext) {
         def email = packageContext.environmentDescription.getParameter("email").orElse("someone@${packageContext.contextName}".toString())
 
+        File controlSocketsLocation = packageContext.tempDirectory
+        if (controlSocketsLocation.absolutePath.size() >= (108 - 18)) {
+            controlSocketsLocation = new File(new File(System.getProperty("java.io.tmpdir")), packageContext.contextName)
+            controlSocketsLocation.mkdirs()
+            LOGGER.warn("Control socket location is too long, assumed max is 108 characters.\n" +
+                    " Change the location of shathel solution to shorter path.\n " +
+                    "See cat /usr/include/linux/un.h | grep \"define UNIX_PATH_MAX\" to see your limits.\n" +
+                    "Willk use temp file: ${controlSocketsLocation.absolutePath}. This file can be used to hack you:)")
+        }
+
         RemoteEnvironmentAccessManager accessManager = new RemoteEnvironmentAccessManagerImpl(
                 new RemoteEnvironmentInventoryFile(packageContext.ansibleInventoryFile),
                 new CertificateManagerImpl(packageContext.certsDirectory, "TodoRemoveIt".bytes, packageContext.contextName),
                 new SshKeyProvider(packageContext.keysDirectory, email),
-                new SshTunelManagerImpl(packageContext.tempDirectory, packageContext.remoteUser, 33333, packageContext.knownHostsFile)
+                new SshTunelManagerImpl(controlSocketsLocation, packageContext.remoteUser, 33333, packageContext.knownHostsFile)
         )
         accessManager
     }

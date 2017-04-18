@@ -3,6 +3,7 @@ package testutils
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.DefaultExtensionContext
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.CommonParams
 import org.s4s0l.shathel.commons.core.MapParameters
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.dependencies.FileStackDependencyDownloader
@@ -30,9 +31,10 @@ abstract class BaseIntegrationTest extends Specification {
 
     }
 
-//    def cleanupSpec(){
-//        cleanupEnvironment()
-//    }
+    def getTestClassName() {
+        return getClass().getSimpleName()
+    }
+
 
     def onEnd() {
         cleanupEnvironment()
@@ -44,7 +46,7 @@ abstract class BaseIntegrationTest extends Specification {
     abstract setupEnvironment()
 
     String getRootDirName() {
-        "build/Test${getClass().getSimpleName()}"
+        "build/Test${getTestClassName()}"
     }
 
     File getRootDir() {
@@ -61,11 +63,12 @@ abstract class BaseIntegrationTest extends Specification {
         dependenciesDir.mkdirs()
         File src = new File("src/test/$sourceDir")
         Parameters parameters = MapParameters.builder()
+                .parameter(CommonParams.SHATHEL_DIR, rootDir.absolutePath)
                 .parameter("shathel.env.${environmentName}.safePassword", "MySecretPassword")
                 .parameter("shathel.env.${environmentName}.dependenciesDir", dependenciesDir.absolutePath)
                 .parameter("shathel.env.${environmentName}.net", network ?: "1000.1000.1000.1000")
                 .parameter(FileStackDependencyDownloader.SHATHEL_FILE_BASE_DIR, src.getAbsolutePath())
-                .parameter("shathel.solution.name", getClass().getSimpleName())
+                .parameter("shathel.solution.name", getTestClassName())
                 .parameters(additionalParams)
                 .build().hiddenBySystemProperties()
 
@@ -79,12 +82,12 @@ abstract class BaseIntegrationTest extends Specification {
 
     boolean waitForService(Environment e, String serviceName) {
         def node = e.getEnvironmentApiFacade().getManagerNodeWrapper()
-        int i = 0;
+        int i = 0
         while (i < 25 && node.serviceRunningRatio(serviceName) < 0.9999f) {
             Thread.sleep(1000)
-            i++;
+            i++
         }
-        return i < 25;
+        return i < 25
     }
 
     String execInAnyTask(Environment e, String serviceName, String command) {
@@ -98,6 +101,17 @@ abstract class BaseIntegrationTest extends Specification {
         node.serviceContainers(serviceName).collect {
             node.containerExec(it, command)
         }
+    }
+
+    Map<String, String> getPrivateProperties() {
+        Map<String, String> ret = [:]
+        Properties properties = new Properties()
+        properties.load(new FileInputStream("../private.properties"))
+        for (String key : properties.stringPropertyNames()) {
+            String value = properties.getProperty(key)
+            ret.put(key, value)
+        }
+        return ret
     }
 
 }

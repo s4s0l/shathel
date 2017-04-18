@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 class SshWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(SshWrapper.class)
     private final ExecWrapper exec = new ExecWrapper(LOGGER, "ssh", [:])
-    private final File knownHostsLocation
+    final File knownHostsLocation
 
     SshWrapper() {
         knownHostsLocation = null

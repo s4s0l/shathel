@@ -44,6 +44,7 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
         Mockito.when(context.getSettingsDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getDependencyCacheDirectory()).thenReturn(targetDir)
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 
@@ -112,6 +113,7 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
         Mockito.when(context.getSettingsDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getTempDirectory()).thenReturn(targetDir)
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 
@@ -173,6 +175,8 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
         Mockito.when(context.getSettingsDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getTempDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getDependencyCacheDirectory()).thenReturn(targetDir)
         Mockito.when(context.getRemoteUser()).thenReturn("root")
         Mockito.when(context.getKeysDirectory()).thenReturn(scriptRoot)
         Mockito.when(context.getPackageRootDirectory()).thenReturn(scriptRoot)
@@ -183,7 +187,9 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         when:
         def processor = rep.create(new RemoteEnvironmentScript("groovy", "groovy-callback.groovy", "gav", getScriptRoot()))
-        def process = processor.process(ProcessorCommand.APPLY, [TARGET_DIR: targetDir.absolutePath, 'container_name': 'groovy_callback_ansible'])
+        def process = processor.process(ProcessorCommand.APPLY, [TARGET_DIR           : targetDir.absolutePath,
+                                                                 'container_name'     : 'groovy_callback_ansible',
+                                                                 'PACKER_ENV_VARIABLE': 'ubuntu'])
 
         then:
         process.status

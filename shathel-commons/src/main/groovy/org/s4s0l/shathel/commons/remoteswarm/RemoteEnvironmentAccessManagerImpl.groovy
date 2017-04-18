@@ -29,10 +29,25 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
         this.sshKeyProvider = sshKeyProvider
         this.tunnelManager = tunnelManager
     }
+
+    @Override
+    void checkPreConditions() {
+        sshKeyProvider.keys
+        certificateManager.clientCerts
+    }
+
+    @Override
+    void afterEnvironmentDestroyed() {
+        inventoryFile.afterEnvironmentDestroyed()
+        tunnelManager.afterEnvironmentDestroyed()
+        certificateManager.afterEnvironmentDestroyed()
+
+    }
 /**
-     * generates certificates for each node if missing
-     */
-    void generateCertificates() {
+ * generates certificates for each node if missing
+ */
+    void generateNodeCertificates() {
+
         getNodes().each {
             getKeyCertsForNode(it)
         }
