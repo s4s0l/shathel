@@ -26,8 +26,8 @@ abstract class BaseIntegrationTest extends Specification {
 
     def setupSpec() {
         setupEnvironment()
-        cleanupEnvironment()
-        FileUtils.deleteDirectory(getRootDir())
+//        cleanupEnvironment()
+//        FileUtils.deleteDirectory(getRootDir())
 
     }
 

@@ -2,11 +2,9 @@ package org.s4s0l.shathel.commons.scripts.packer
 
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.remoteswarm.ProcessorCommand
-import org.s4s0l.shathel.commons.remoteswarm.RemoteEnvironmentPackageContext
-import org.s4s0l.shathel.commons.scripts.ExecutableResults
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
-import org.s4s0l.shathel.commons.scripts.terraform.TerraformWrapper
 
 /**
  * @author Marcin Wielgus
@@ -54,10 +52,10 @@ class PackerExecutable implements NamedExecutable {
                         extraVarsFile.text = "{" + env.collect {
                             "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
                         }.join(",\n") + "}"
-                        results.output = packer.run(workingDir, "build -var-file=${extraVarsFile.absolutePath} ${script.scriptFileLocation.get().absolutePath}", env)
+                        context.put("result", packer.run(workingDir, "build -var-file=${extraVarsFile.absolutePath} ${script.scriptFileLocation.get().absolutePath}", env))
                     } finally {
                         if (extraVarsFile.exists()) {
-//                            extraVarsFile.delete()
+                            extraVarsFile.delete()
                         }
                     }
                     break
@@ -68,7 +66,7 @@ class PackerExecutable implements NamedExecutable {
             if (context.get("command") == null) {
                 throw new RuntimeException("No command found for vagrant")
             }
-            results.output = packer.run(workingDir, context.get("command") as String, env)
+            context.put("result", packer.run(workingDir, context.get("command") as String, env))
         }
 
     }

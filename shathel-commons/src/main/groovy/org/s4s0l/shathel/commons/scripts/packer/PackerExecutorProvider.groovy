@@ -23,7 +23,8 @@ class PackerExecutorProvider implements ScriptExecutorProvider {
             def locate = one.orElseThrow {
                 new RuntimeException("Binaries manager missing")
             }.getManager(cntext).locate("packer")
-            return Optional.<NamedExecutable> of(new PackerExecutable(typedScript, new PackerWrapper(locate)))
+            def wrapper = new PackerWrapper(locate)
+            return Optional.<NamedExecutable> of(new PackerExecutable(typedScript, wrapper))
         } else {
             return Optional.empty()
         }

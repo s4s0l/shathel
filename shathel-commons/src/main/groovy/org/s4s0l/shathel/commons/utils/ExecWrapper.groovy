@@ -6,14 +6,15 @@ import org.slf4j.Logger
  * @author Marcin Wielgus
  */
 class ExecWrapper {
-    final Logger LOGGER;
-    final String command;
-    final Map<String, String> environment;
+    final Logger LOGGER
+    final String command
+    final Map<String, String> environment
+    final List<Integer> acceptedExitCodes = [0]
 
     ExecWrapper(Logger LOGGER, String command, Map<String, String> environment = [:]) {
         this.LOGGER = LOGGER
         this.command = command
-        this.environment = environment;
+        this.environment = environment
     }
 
     int executeForExitValue(File dir = new File("."), Map<String, String> env = [:], boolean logOutput = false, String args) {
@@ -29,7 +30,7 @@ class ExecWrapper {
             LOGGER.debug("output:  [$it]")
             sb.append(it).append("\n")
         }
-        process.waitFor();
+        process.waitFor()
         if (process.exitValue() != 0 && logOutput) {
             LOGGER.error("Command [${flatten.join(",")}] failed with output:\n" + sb.toString().trim())
             throw new ExecWrapperException("[${flatten.join(",")}] Failed", sb.toString().trim())
@@ -76,13 +77,60 @@ class ExecWrapper {
             LOGGER.debug("output:  [$it]")
             sb.append(it).append("\n")
         }
-        process.waitFor();
-        if (process.exitValue() == 0) {
-            return sb.toString().trim();
+        process.waitFor()
+        if (acceptedExitCodes.contains(process.exitValue())) {
+            return sb.toString().trim()
         } else {
             LOGGER.error("Command [${flatten.join(",")}] failed with output:\n" + sb.toString().trim())
             throw new ExecWrapperException("[${flatten.join(",")}] Failed", sb.toString().trim())
         }
+    }
+
+
+    ExecutableResults execute(File dir, String args) {
+        execute(null, dir, [:], args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(File dir, GString args) {
+        execute(null, dir, [:], args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(File dir, Map<String, String> env, String args) {
+        execute(null, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(File dir, Map<String, String> env, GString args) {
+        execute(null, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], String args) {
+        execute(input, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], GString args) {
+        execute(input, dir, env, args.trim().split('[\\n\\s]+'))
+    }
+
+    ExecutableResults execute(byte[] input = null, File dir = new File("."), Map<String, String> env = [:], String... args) {
+        StringBuilder sb = new StringBuilder()
+        List<?> flatten = fix(args)
+        LOGGER.debug("Running ${flatten.join(",")}")
+        Process process = createProcess(flatten, dir, env)
+        if (input != null) {
+            process.outputStream.write(input)
+            process.outputStream.flush()
+            process.outputStream.close()
+        }
+        process.inputStream.eachLine {
+            LOGGER.debug("output:  [$it]")
+            sb.append(it).append("\n")
+        }
+        process.waitFor()
+        return new ExecutableResults(
+                sb.toString().trim(),
+                acceptedExitCodes.contains(process.exitValue()),
+                process.exitValue()
+        )
     }
 
     private List<?> fix(String... args) {
@@ -100,7 +148,7 @@ class ExecWrapper {
     }
 
     static class ExecWrapperException extends RuntimeException {
-        private final String output;
+        private final String output
 
         String getOutput() {
             return output

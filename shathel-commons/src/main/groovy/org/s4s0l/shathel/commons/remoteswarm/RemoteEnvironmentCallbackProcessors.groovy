@@ -1,6 +1,6 @@
 package org.s4s0l.shathel.commons.remoteswarm
 
-import org.s4s0l.shathel.commons.scripts.ExecutableResults
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 
 /**
  * @author Marcin Wielgus

@@ -62,6 +62,6 @@ class RemoteEnvironmentPackageDescription {
     }
 
     String getEnvPackageImage() {
-        return "shathel-env-${version}"
+        return "shathel-env-${version}".replaceAll("[^A-Za-z0-9-_]", "_")
     }
 }

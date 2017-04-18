@@ -3,7 +3,7 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.scripts.ExecutableResults
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider
 import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext
