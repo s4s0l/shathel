@@ -70,4 +70,28 @@ class CertificateManagerImplTest extends Specification {
 
     }
 
+    def "Generates Server certificates distinguishing ip and dns name"() {
+        given:
+        def certManager = new CertificateManagerImpl(getRootDir(), "pass".bytes, "commonCaName")
+
+        when:
+        def cert = certManager.generateKeyAndCert("xxx2", "serverCommonName", ["dns1","1.1.1.1"])
+
+        then:
+        cert.key.exists()
+        cert.cert.exists()
+
+        cert.key.getParent() == cert.cert.getParent()
+        cert.cert.getParentFile().getName() == "xxx2"
+        cert.cert.getName() == "server-cert.pem"
+        cert.key.getName() == "server-key.pem"
+
+        certManager.getKeyAndCert("xxx2").get().key == cert.key
+
+        new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("TLS Web Client Authentication")
+        new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("1.1.1.1")
+        new OpenSslWrapper().getCertInfo(cert.cert.absolutePath).contains("dns1")
+
+    }
+
 }

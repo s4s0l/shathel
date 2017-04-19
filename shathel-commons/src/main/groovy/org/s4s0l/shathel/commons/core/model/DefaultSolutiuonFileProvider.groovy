@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.core.model
 
 import org.s4s0l.shathel.commons.core.Parameters
+import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 
 /**
@@ -39,6 +40,8 @@ class DefaultSolutiuonFileProvider {
             allParamNames.findAll {
                 it.startsWith("shathel.env.$env.") &&
                         !it.toLowerCase().contains("password") &&
+                        !it.toLowerCase().contains("token") &&
+                        !it.toLowerCase().contains("key") &&
                         !it.toLowerCase().endsWith("_secret_value")
             }.each {
                 envs[env][it - "shathel.env.$env."] = parameters.getParameter(it).orElseThrow {
@@ -46,6 +49,10 @@ class DefaultSolutiuonFileProvider {
                 }
             }
         }
-        return new Yaml().dump(model)
+        def options = new DumperOptions()
+        options.prettyFlow = true
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+        def yaml = new Yaml(options)
+        return yaml.dump(model)
     }
 }

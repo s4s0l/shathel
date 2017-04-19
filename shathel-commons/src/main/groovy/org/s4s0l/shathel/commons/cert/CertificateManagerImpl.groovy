@@ -117,6 +117,14 @@ extendedKeyUsage=${extendsdKeyUsage.join(",")}
     }
 
     @Override
+    KeyCert generateKeyAndCert(String tag, String commonName = tag,List<String> addresses) {
+        return generateKeyAndCert(tag,commonName,
+                addresses.findAll {!(it ==~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)},
+                addresses.findAll {it ==~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/}
+        )
+    }
+
+    @Override
     KeyCert generateKeyAndCert(String tag, String commonName = tag,
                                List<String> dns,
                                List<String> ips,

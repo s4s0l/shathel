@@ -31,6 +31,9 @@ interface CertificateManager {
                                List<String> dns,
                                List<String> ips)
 
+    KeyCert generateKeyAndCert(String tag,
+                               List<String> addresses)
+
     void afterEnvironmentDestroyed()
 }
 

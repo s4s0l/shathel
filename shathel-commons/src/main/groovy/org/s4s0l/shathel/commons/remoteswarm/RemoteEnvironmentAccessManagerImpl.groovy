@@ -81,7 +81,7 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
 
     private KeyCert getKeyCertsForNode(ShathelNode shathelNode) {
         return certificateManager.getKeyAndCert(shathelNode.nodeName).orElseGet {
-            certificateManager.generateKeyAndCert(shathelNode.nodeName, [shathelNode.nodeName, "localhost"], [shathelNode.publicIp, shathelNode.publicIp, "127.0.0.1"])
+            certificateManager.generateKeyAndCert(shathelNode.nodeName, [shathelNode.nodeName, "localhost", shathelNode.publicIp, shathelNode.privateIp, "127.0.0.1"])
         }
     }
 

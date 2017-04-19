@@ -30,6 +30,7 @@ class RemoteEnvironmentController {
     }
 
     boolean isInitialized() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
         int mCount = processorContext.getEnvironmentDescription().managersCount
         int wCount = processorContext.getEnvironmentDescription().workersCount
@@ -40,8 +41,8 @@ class RemoteEnvironmentController {
     }
 
     void initialize() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
-        verifyMandarotyParams()
 
         Map<String, String> envs = createEnvs()
 
@@ -77,7 +78,7 @@ class RemoteEnvironmentController {
         processorContext.asEnvironmentVariables
     }
 
-    private void verifyMandarotyParams() {
+    private void verifyMandatoryParams() {
         def variables = processorContext.asEnvironmentVariables
         def mandatory = processorContext.description.mandatoryEnvs
         def missingMessage = mandatory.findAll {
@@ -91,11 +92,13 @@ class RemoteEnvironmentController {
     }
 
     void start() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
         infrastructureScript.process(ProcessorCommand.START, createEnvs())
     }
 
     boolean inited() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
         Map<String, String> envs = createEnvs()
         ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
@@ -103,6 +106,7 @@ class RemoteEnvironmentController {
     }
 
     boolean isStarted() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
         Map<String, String> envs = createEnvs()
         ExecutableResults res = getImageScript().process(ProcessorCommand.APPLY, envs)
@@ -110,6 +114,7 @@ class RemoteEnvironmentController {
     }
 
     void verify() {
+        verifyMandatoryParams()
         accessManager.checkPreConditions()
         def nodes = apiFacade.nodes
 

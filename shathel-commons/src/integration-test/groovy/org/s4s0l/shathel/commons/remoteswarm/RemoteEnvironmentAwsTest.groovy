@@ -36,7 +36,7 @@ shathel-solution:
             ] << privateProperties)
             def solution = sht.getSolution(sht.getStorage(getRootDir()))
             def environment = solution.getEnvironment(environmentName)
-            if (environment.isInitialized()) {
+            if ((environment.getEnvironmentContext() as RemoteEnvironmentPackageContext).getAnsibleInventoryFile().exists()) {
                 environment.destroy()
             }
         }

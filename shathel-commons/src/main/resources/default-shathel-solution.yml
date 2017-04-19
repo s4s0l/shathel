@@ -6,13 +6,5 @@ shathel-solution:
       type: local-swarm
       build-allowed: true
       domain: localhost
-    vbox:
-      forceful: false
-      pull: true
-      type: docker-machine-vbox
-      build-allowed: true
-      managers: 2
-      workers: 1
-      net: 22.22.22
-      domain: 22.22.22.99
+
 
