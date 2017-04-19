@@ -98,7 +98,7 @@ public class IvyDownloader implements StackDependencyDownloader {
         ResolveOptions resolveOptions = new ResolveOptions().setConfs(confs);
 
         //init resolve report
-        ResolveReport report = ivy.resolve(ivyFile.toURL(), resolveOptions);
+        ResolveReport report = ivy.resolve(ivyFile.toURI().toURL(), resolveOptions);
         if (report.getAllArtifactsReports().length == 0) {
             return Optional.empty();
         }
@@ -134,7 +134,7 @@ public class IvyDownloader implements StackDependencyDownloader {
             try {
                 IvySettings ivy = createEmptyIvySettings();
                 XmlSettingsParser xmlSettingsParser = new XmlSettingsParser(ivy);
-                xmlSettingsParser.parse(x.toURL());
+                xmlSettingsParser.parse(x.toURI().toURL());
                 return ivy;
             } catch (Exception e) {
                 throw new RuntimeException(e);

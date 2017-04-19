@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.docker
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class DockerMachineNode {
     final String name
     final String driver

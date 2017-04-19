@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.ssh
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.utils.IoUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -75,6 +76,28 @@ class SshSharedState implements Closeable {
         opened
     }
 
+    synchronized ExecutableResults sudo(String command) {
+        if (!isOpened()) {
+            open()
+        }
+        sshWrapper.sudo( host, port, controlSocket, command)
+    }
+
+    synchronized ExecutableResults exec(String command) {
+        if (!isOpened()) {
+            open()
+        }
+        sshWrapper.exec( host, port, controlSocket, command)
+    }
+
+    synchronized void scp(File file, String remotePath) {
+        if (!isOpened()) {
+            open()
+        }
+        sshWrapper.scp(controlSocket, file, remotePath)
+
+    }
+
     synchronized int tunnelSocket(String target, int localPortToUse) {
         if (openedSockets.get(target) != null) {
             return openedSockets.get(target).intValue()
@@ -83,7 +106,7 @@ class SshSharedState implements Closeable {
             open()
         }
         def nextPortToUse = localPortToUse
-        sshWrapper.tunnelConnection(user, host, port, key, controlSocket, "127.0.0.1:${nextPortToUse}:${target}")
+        sshWrapper.tunnelConnection( host, port, controlSocket, "127.0.0.1:${nextPortToUse}:${target}")
         openedSockets.put(target, nextPortToUse)
         return nextPortToUse
 
@@ -103,4 +126,6 @@ class SshSharedState implements Closeable {
         openedSockets.clear()
         opened = false
     }
+
+
 }

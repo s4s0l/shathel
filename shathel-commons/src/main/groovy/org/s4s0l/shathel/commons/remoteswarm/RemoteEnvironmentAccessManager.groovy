@@ -3,13 +3,14 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
+import org.s4s0l.shathel.commons.ssh.SshOperations
 
 /**
  * @author Marcin Wielgus
  */
 @TypeChecked
 @CompileStatic
-interface RemoteEnvironmentAccessManager {
+interface RemoteEnvironmentAccessManager extends SshOperations {
 
     void checkPreConditions()
 
@@ -23,8 +24,5 @@ interface RemoteEnvironmentAccessManager {
 
     int openTunnel(ShathelNode node, int internalPort)
 
-    String ssh(ShathelNode node, String command)
-
-    void scp(ShathelNode node, File from, String to)
 
 }

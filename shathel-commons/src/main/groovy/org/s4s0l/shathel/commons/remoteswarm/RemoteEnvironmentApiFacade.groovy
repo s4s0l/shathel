@@ -6,6 +6,7 @@ import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.secrets.SecretManager
+import org.s4s0l.shathel.commons.ssh.SshOperations
 import org.s4s0l.shathel.commons.utils.ExecWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -61,6 +62,10 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
     @Override
     SecretManager getSecretManager() {
         return new SecretManager(packageContext.getEnvironmentDescription(), getManagerNodeClient())
+    }
+
+    SshOperations getSshOperaions(){
+        return accessManager
     }
 
 }

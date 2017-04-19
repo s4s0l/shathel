@@ -13,12 +13,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class SwarmPullingEnricher extends EnricherExecutable {
-    private final SwarmClusterWrapper swarmClusterWrapper;
     private static final Logger LOGGER = getLogger(SwarmPullingEnricher.class);
 
-    public SwarmPullingEnricher(SwarmClusterWrapper swarmClusterWrapper) {
-        this.swarmClusterWrapper = swarmClusterWrapper;
-    }
 
     @Override
     protected void execute(EnricherExecutableParams params) {
@@ -33,7 +29,7 @@ public class SwarmPullingEnricher extends EnricherExecutable {
             model.mapImages((image) -> {
                 provisioners.add("pull-image:" + image, executionContext -> {
                     for (ShathelNode nodeName : executionContext.getCurrentNodes()) {
-                        swarmClusterWrapper.getDocker(nodeName).pull(image);
+                        executionContext.getApiFacade().getDocker(nodeName).pull(image);
                     }
                 });
                 return image;

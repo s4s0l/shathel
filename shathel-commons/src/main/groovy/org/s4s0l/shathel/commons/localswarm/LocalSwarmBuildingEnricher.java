@@ -1,4 +1,4 @@
-package org.s4s0l.shathel.commons.swarm;
+package org.s4s0l.shathel.commons.localswarm;
 
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable;
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
@@ -16,12 +16,15 @@ import java.util.Optional;
 /**
  * @author Marcin Wielgus
  */
-@Deprecated
-public class SwarmBuildingEnricher extends EnricherExecutable {
+public class LocalSwarmBuildingEnricher extends EnricherExecutable {
     private final Optional<String> repository;
 
-    public SwarmBuildingEnricher(Optional<String> repository) {
+    public LocalSwarmBuildingEnricher(Optional<String> repository) {
         this.repository = repository;
+    }
+
+    public LocalSwarmBuildingEnricher() {
+        this.repository = Optional.empty();
     }
 
     @Override

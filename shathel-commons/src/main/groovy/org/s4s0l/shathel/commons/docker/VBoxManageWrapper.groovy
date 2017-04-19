@@ -9,6 +9,7 @@ import java.util.regex.Matcher
 /**
  * @author Marcin Wielgus
  */
+@Deprecated
 class VBoxManageWrapper {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(VBoxManageWrapper.class);

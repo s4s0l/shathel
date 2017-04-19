@@ -34,18 +34,6 @@ class LocalSwarmApiFacade implements ExecutableApiFacade {
         return new SecretManager(context.getEnvironmentDescription(), getManagerNodeClient())
     }
 
-    void setKernelParam(String param) {
-        LOGGER.warn("!Set parameter like: sudo sysctl -w " + param)
-    }
-
-    @TypeChecked
-    @CompileStatic
-    Optional<String> getRegistry() {
-        return Optional.ofNullable(context.getEnvironmentDescription().getParameter("registry").orElseGet {
-            getNodeLabels(getManagerNode()).getOrDefault("shathel.node.registry", null)
-        })
-    }
-
 
     @Override
     List<ShathelNode> getNodes() {

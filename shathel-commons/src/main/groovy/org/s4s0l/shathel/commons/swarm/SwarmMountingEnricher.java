@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams;
 import org.s4s0l.shathel.commons.core.environment.ShathelNode;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
+import org.s4s0l.shathel.commons.ssh.SshOperations;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -23,11 +24,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class SwarmMountingEnricher extends EnricherExecutable {
-    private final SwarmClusterWrapper swarmClusterWrapper;
+    private final String remoteDataDirectory;
+    private final SshOperations sshOperations;
+
     private static final Logger LOGGER = getLogger(SwarmMountingEnricher.class);
 
-    public SwarmMountingEnricher(SwarmClusterWrapper swarmClusterWrapper) {
-        this.swarmClusterWrapper = swarmClusterWrapper;
+    public SwarmMountingEnricher(String remoteDataDirectory, SshOperations sshOperations) {
+        this.remoteDataDirectory = remoteDataDirectory;
+        this.sshOperations = sshOperations;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class SwarmMountingEnricher extends EnricherExecutable {
         EnricherExecutableParams.Provisioners provisioners = params.getProvisioners();
         model.mapMounts((service, volume) -> {
             if (volume.startsWith("./")) {
-                String toPath = swarmClusterWrapper.getDataDirectory() + "/" + stack.getReference().getSimpleName() + "-" + service + "/" + getDirectory(volume);
+                String toPath = remoteDataDirectory + "/" + stack.getReference().getSimpleName() + "-" + service + "/" + getDirectory(volume);
                 String[] split = volume.split(":");
                 String remotePart = split[1];
                 File file = new File(stack.getStackResources().getComposeFileDirectory(), split[0]);
@@ -70,29 +74,24 @@ public class SwarmMountingEnricher extends EnricherExecutable {
     private void prepareMounts(List<ShathelNode> nodeNames, File fromDirectory, String toRemotePath) {
         //ALL nodes must be running!!!!
         Path basePath = Paths.get(fromDirectory.getAbsolutePath());
-
         LOGGER.debug("Moving {} to {} on remotes", fromDirectory.getAbsolutePath(), toRemotePath);
         for (ShathelNode sn : nodeNames) {
             Iterator<File> fileIterator = FileUtils.iterateFilesAndDirs(fromDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-            String nodeName = sn.getNodeName();
-            swarmClusterWrapper.sudo(nodeName, "mkdir -p " + toRemotePath);
-            swarmClusterWrapper.sudo(nodeName, "chown -R " + swarmClusterWrapper.getNonRootUser() + " " + toRemotePath);
+            sshOperations.sudo(sn, "mkdir -p " + toRemotePath);
+            sshOperations.sudo(sn, "chown -R " + sshOperations.getScpUser() + " " + toRemotePath);
             while (fileIterator.hasNext()) {
                 File next = fileIterator.next();
                 String relative = basePath.relativize(Paths.get(next.getAbsolutePath())).toString();
                 if (next.isDirectory()) {
-                    LOGGER.debug("{} Making dir {}", nodeName, toRemotePath + "/" + relative);
-                    swarmClusterWrapper.ssh(nodeName, "mkdir -p " + toRemotePath + "/" + relative);
+                    LOGGER.debug("{} Making dir {}", sn.getNodeName(), toRemotePath + "/" + relative);
+                    sshOperations.ssh(sn, "mkdir -p " + toRemotePath + "/" + relative);
                 }
                 if (next.isFile()) {
-                    LOGGER.debug("{} Scp {} to {}", nodeName, next.getAbsolutePath(), nodeName + ":" + toRemotePath + "/" + relative);
-                    swarmClusterWrapper.scp(next.getAbsolutePath(), nodeName + ":" + toRemotePath + "/" + relative);
+                    LOGGER.debug("{} Scp {} to {}", sn.getNodeName(), next.getAbsolutePath(), sn.getNodeName()+ ":" + toRemotePath + "/" + relative);
+                    sshOperations.scp(sn, next, toRemotePath + "/" + relative);
                 }
             }
-            swarmClusterWrapper.sudo(nodeName, "chown -R 1000 " + toRemotePath);
-
+            sshOperations.sudo(sn, "chown -R 1000 " + toRemotePath);
         }
-
-
     }
 }

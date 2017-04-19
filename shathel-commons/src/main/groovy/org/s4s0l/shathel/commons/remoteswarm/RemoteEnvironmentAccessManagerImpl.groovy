@@ -6,7 +6,9 @@ import org.s4s0l.shathel.commons.cert.CertificateManager
 import org.s4s0l.shathel.commons.cert.KeyCert
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.ssh.SshKeyProvider
+import org.s4s0l.shathel.commons.ssh.SshOperations
 import org.s4s0l.shathel.commons.ssh.SshTunelManager
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 
 /**
  * Knows how to access nodes in InventoryFile
@@ -23,7 +25,8 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
     RemoteEnvironmentAccessManagerImpl(RemoteEnvironmentInventoryFile inventoryFile,
                                        CertificateManager certificateManager,
                                        SshKeyProvider sshKeyProvider,
-                                       SshTunelManager tunnelManager) {
+                                       SshTunelManager tunnelManager
+    ) {
         this.inventoryFile = inventoryFile
         this.certificateManager = certificateManager
         this.sshKeyProvider = sshKeyProvider
@@ -91,13 +94,26 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
     }
 
 
-    String ssh(ShathelNode node, String command) {
-
+    @Override
+    ExecutableResults ssh(ShathelNode node, String command) {
+        return tunnelManager.exec(sshKeyProvider.keys.privateKey, "${node.publicIp}:22",
+                command)
     }
 
+    @Override
+    ExecutableResults sudo(ShathelNode node, String command) {
+        return tunnelManager.sudo(sshKeyProvider.keys.privateKey, "${node.publicIp}:22",
+                command)
+    }
+
+    @Override
     void scp(ShathelNode node, File from, String to) {
-
+        tunnelManager.scp(sshKeyProvider.keys.privateKey, "${node.publicIp}:22",
+                from, to)
     }
 
-
+    @Override
+    String getScpUser() {
+        return tunnelManager.remoteUser
+    }
 }

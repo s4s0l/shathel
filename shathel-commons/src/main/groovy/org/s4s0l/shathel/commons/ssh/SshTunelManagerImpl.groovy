@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.ssh
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -45,13 +46,44 @@ class SshTunelManagerImpl implements SshTunelManager {
         return maxFound + 1
     }
 
+    @Override
+    ExecutableResults exec(File key, String sshHost, String command) {
+        synchronized (connections) {
+            SshSharedState state = getSharedState(sshHost, key)
+            return state.exec(command)
+        }
+    }
+
+    @Override
+    void scp(File key, String sshHost, File localFile, String remotePath) {
+
+        synchronized (connections) {
+            SshSharedState state = getSharedState(sshHost, key)
+            state.scp(localFile, remotePath)
+        }
+    }
+
+    @Override
+    ExecutableResults sudo(File key, String sshHost, String command) {
+        synchronized (connections) {
+            SshSharedState state = getSharedState(sshHost, key)
+            return state.sudo(command)
+        }
+    }
+
+
+
+    private SshSharedState getSharedState(String sshHost, File key) {
+        SshSharedState ret = connections[sshHost] ?: new SshSharedState(user, sshHost, getControlSocketForHost(sshHost), key, ssh)
+        connections[sshHost] = ret
+        ret
+    }
 
     @Override
     int openTunnel(File key, String sshHost, String sshTunnel) {
         synchronized (connections) {
-            SshSharedState state = connections[sshHost] ?: new SshSharedState(user, sshHost, getControlSocketForHost(sshHost), key, ssh)
+            SshSharedState state = getSharedState(sshHost, key)
             def socket = state.tunnelSocket(sshTunnel, nextPort)
-            connections[sshHost] = state
             return socket
         }
 
@@ -85,5 +117,10 @@ class SshTunelManagerImpl implements SshTunelManager {
         if (ssh.knownHostsLocation.exists()) {
             ssh.knownHostsLocation.delete()
         }
+    }
+
+    @Override
+    String getRemoteUser(){
+        return user
     }
 }

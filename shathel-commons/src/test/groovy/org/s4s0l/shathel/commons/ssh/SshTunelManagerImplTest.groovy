@@ -22,6 +22,31 @@ class SshTunelManagerImplTest extends Specification {
         }
     }
 
+
+    def "Ssh Tunel manager can copy file"() {
+        given:
+        getRootDir().mkdirs()
+        def knownHosts = new File(getRootDir(), "known")
+        knownHosts.delete()
+        SshKeys keys = new SshKeyProvider(getRootDir(), "someone@somewhere").keys
+        def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
+        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
+        Thread.sleep(5000)
+
+        when:
+        tunelManager.scp(keys.privateKey, "localhost:2224", keys.privateKey, "/testFile")
+
+        then:
+        tunelManager.exec(keys.privateKey, "localhost:2224", "cat /testFile").output.trim() == keys.privateKey.text.trim()
+        tunelManager.sudo(keys.privateKey, "localhost:2224", "cat /testFile").output.trim() == "ash: sudo: not found"
+
+        cleanup:
+        tunelManager?.closeAll()
+        new DockerWrapper().containerRemove("TestSshTunelServer")
+
+    }
+
+
     def "Ssh Tunel manager opens tunel"() {
         given:
         getRootDir().mkdirs()
@@ -31,6 +56,7 @@ class SshTunelManagerImplTest extends Specification {
         def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
         def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
         Thread.sleep(5000)
+
         when:
         def port = tunelManager.openTunnel(keys.privateKey, "localhost:2224", "github.com:80")
 

@@ -9,7 +9,6 @@ import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
 import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator;
-import org.s4s0l.shathel.commons.swarm.SwarmBuildingEnricher;
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner;
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider;
 import org.slf4j.Logger;
@@ -119,7 +118,7 @@ public class LocalSwarmEnvironment implements Environment {
     public List<NamedExecutable> getEnvironmentEnrichers() {
         return Arrays.asList(
                 new LocalMountingEnricher(),
-                new SwarmBuildingEnricher(getEnvironmentApiFacade().getRegistry()),
+                new LocalSwarmBuildingEnricher(),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator()
         );

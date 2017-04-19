@@ -7,12 +7,9 @@ import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.dependencies.FileStackDependencyDownloader;
 import org.s4s0l.shathel.commons.core.security.DefaultSafeStorageProvider;
-import org.s4s0l.shathel.commons.dind.DindEnvironmentProvider;
 import org.s4s0l.shathel.commons.git.GitStackDependencyDownloader;
 import org.s4s0l.shathel.commons.ivy.IvyDownloader;
-import org.s4s0l.shathel.commons.localcompose.LocalEnvironmentProvider;
 import org.s4s0l.shathel.commons.localswarm.LocalSwarmEnvironmentProvider;
-import org.s4s0l.shathel.commons.machine.vbox.VBoxMachineEnvironmentProvider;
 import org.s4s0l.shathel.commons.remoteswarm.downloader.FileEnvironmentPackageDownloader;
 import org.s4s0l.shathel.commons.remoteswarm.downloader.GitEnvironmentPackageDownloader;
 import org.s4s0l.shathel.commons.remoteswarm.provider.RemoteEnvironmentProvider;
@@ -41,12 +38,9 @@ public class DefaultExtensionContext {
 
     private static ExtensionContext getExtensionContext(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
         ExtensionContext.ExtensionContextBuilder extension = ExtensionContext.builder()
-                .extension(new LocalEnvironmentProvider())
                 .extension(new LocalSwarmEnvironmentProvider())
-                .extension(new VBoxMachineEnvironmentProvider(parameterProvider))
                 .extension(new RemoteEnvironmentProvider())
                 .extension(new BinaryManagerExtension(parameterProvider))
-                .extension(new DindEnvironmentProvider())
                 .extension(new GitEnvironmentPackageDownloader(parameterProvider))
                 .extension(new FileEnvironmentPackageDownloader(parameterProvider))
                 .extensions(DefaultBinaryLocators.getDefaultLocators())

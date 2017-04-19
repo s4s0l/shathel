@@ -8,8 +8,14 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider
+import org.s4s0l.shathel.commons.localswarm.LocalSwarmBuildingEnricher
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
+import org.s4s0l.shathel.commons.secrets.SecretsEnricher
+import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner
+import org.s4s0l.shathel.commons.swarm.SwarmMountingEnricher
+import org.s4s0l.shathel.commons.swarm.SwarmMountingPermissionsEnricher
+import org.s4s0l.shathel.commons.swarm.SwarmPullingEnricher
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider
 
 /**
@@ -118,6 +124,13 @@ class RemoteEnvironment implements Environment {
     @Override
     List<NamedExecutable> getEnvironmentEnrichers() {
         //TODO: register enrichers
-        return []
+        return Arrays.<NamedExecutable>asList(
+                //TODO: parametrize remote data directory - should come from envdesc
+                new SwarmMountingPermissionsEnricher("/shathel-data", this.apiFacade.sshOperaions),
+                new SwarmMountingEnricher("/shathel-data", this.apiFacade.sshOperaions),
+                new SwarmPullingEnricher(),
+                new SecretsEnricher(),
+                new MandatoryEnvironmentsValidator()
+        );
     }
 }

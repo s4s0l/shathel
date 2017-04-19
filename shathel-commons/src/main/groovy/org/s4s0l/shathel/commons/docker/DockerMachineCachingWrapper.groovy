@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
  * this cache is inconsistent:/ Maybe caching should be pushed to swarmwrapper or sth....
  * @author Marcin Wielgus
  */
+@Deprecated
 class DockerMachineCachingWrapper extends DockerMachineWrapper{
     DockerMachineCachingWrapper(File storageDir) {
         super(storageDir)
