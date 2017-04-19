@@ -10,15 +10,15 @@ class PreinstalledBinaryLocatorTest extends Specification {
     def "Preinstalled binary locator should detect version of installed binary"() {
         when:
         PreinstalledBinaryLocator locator = new PreinstalledBinaryLocator(
-                "ls", "--version", /(([0-9]+\.?)+)/, "any"
+                "openssl", "version", /(([0-9]+\.?)+)/, "any"
         )
 
         then:
         locator.requiredVersion == "any"
         locator.getVersionFound(null).isPresent()
         locator.getVersionFound(null).get().length() > 1
-        locator.binaryName == "ls"
-        locator.locate().get() == "ls"
+        locator.binaryName == "openssl"
+        locator.locate(null).get() == "openssl"
     }
 
 }

@@ -43,15 +43,15 @@ class DownloadableBinaryLocatorTest extends Specification {
     def "DownloadableBinaryLocator shouldNot download if installed version is ok"() {
         when:
         DownloadableBinaryLocator locator = new DownloadableBinaryLocator(
-                "ls",
-                ("ls --version".execute().text =~ /(([0-9]+\.?)+)/)[0][1],
-                "--version",
+                "openssl",
+                ("openssl version".execute().text =~ /(([0-9]+\.?)+)/)[0][1],
+                "version",
                 /(([0-9]+\.?)+)/,
                 "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip"
         )
 
         then:
-        locator.locate(getRootDir()).get() == "ls"
+        locator.locate(getRootDir()).get() == "openssl"
 
     }
 }

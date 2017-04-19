@@ -16,10 +16,12 @@ class DefaultSolutiuonFileProviderTest extends Specification {
                 'shathel.env.extraenv.type': 'dind',
                 'shathel.env.extraenv.net' : '0.0.0',
                 'shathel.env.xxxx.net'     : '10.10.10',
-                'shathel.env.vbox.net'      : '0.0.0',
-                'shathel.env.vbox.safePassword' : 'aaaa',
-                'shathel.env.vbox.shathel_some_secret_path' : 'aaaa',
-                'shathel.env.vbox.shathel_some_secret_value' : 'aaaa'
+                'shathel.env.local.net'      : '0.0.0',
+                'shathel.env.local.safePassword' : 'aaaa',
+                'shathel.env.local.shathel_some_secret_path' : 'aaaa',
+                'shathel.env.local.token' : 'aaaa',
+                'shathel.env.local.key' : 'aaaa',
+                'shathel.env.local.shathel_some_secret_value' : 'aaaa'
 
         ])
 
@@ -33,10 +35,12 @@ class DefaultSolutiuonFileProviderTest extends Specification {
         yaml['shathel-solution']['environments']['extraenv'].type == "dind"
         yaml['shathel-solution']['environments']['extraenv'].net == "0.0.0"
         yaml['shathel-solution']['environments']['xxxx'] == null
-        yaml['shathel-solution']['environments']['vbox'].net == "0.0.0"
-        yaml['shathel-solution']['environments']['vbox'].safePassword == null
-        yaml['shathel-solution']['environments']['vbox'].shathel_some_secret_path == 'aaaa'
-        yaml['shathel-solution']['environments']['vbox'].shathel_some_secret_value == null
+        yaml['shathel-solution']['environments']['local'].net == "0.0.0"
+        yaml['shathel-solution']['environments']['local'].safePassword == null
+        yaml['shathel-solution']['environments']['local'].shathel_some_secret_path == 'aaaa'
+        yaml['shathel-solution']['environments']['local'].shathel_some_secret_value == null
+        yaml['shathel-solution']['environments']['local'].token == null
+        yaml['shathel-solution']['environments']['local'].key == null
 
 
     }
