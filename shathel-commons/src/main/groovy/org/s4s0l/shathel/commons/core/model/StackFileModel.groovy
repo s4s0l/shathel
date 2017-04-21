@@ -35,7 +35,7 @@ class StackFileModel implements Cloneable {
     }
 
     String getGav() {
-        parsedYml['shathel-stack']['gav']
+        parsedYml['shathel-stack']['gav'].replace('$version',"UNKNOWN")
     }
 
 
@@ -49,7 +49,7 @@ class StackFileModel implements Cloneable {
         deps.collect {
             kv ->
                 [
-                        gav       : kv.key,
+                        gav       : kv.key.replace('$version',"UNKNOWN"),
                         minVersion: kv.value?.min,
                         maxVersion: kv.value?.max,
                         optional  : kv.value?.optional ?: false,

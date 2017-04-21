@@ -1,6 +1,9 @@
 package org.s4s0l.shathel.deployer
 
+import java.util
+
 import org.yaml.snakeyaml.{DumperOptions, Yaml}
+
 import scala.collection.JavaConverters._
 /**
   * @author Marcin Wielgus
@@ -16,9 +19,11 @@ trait OutputFormatter {
     yaml.dump(map.asJava)
   }
 
-  def response(map: List[String]): String = {
-    yaml.dump(map.asJava)
+  def response(list: Seq[Any]): String = {
+    yaml.dump(list.asJava)
   }
+
+
 
   def response(map: java.util.List[String]): String = {
     yaml.dump(map)

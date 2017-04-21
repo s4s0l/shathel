@@ -19,11 +19,24 @@ class LocalSwarmApiFacade implements ExecutableApiFacade {
     private static final Logger LOGGER = getLogger(LocalSwarmApiFacade.class)
     private final DockerWrapper dockerWrapper
     private final EnvironmentContext context
-
+    private final ShathelNode shathelNode
 
     LocalSwarmApiFacade(DockerWrapper dockerWrapper, EnvironmentContext context) {
         this.dockerWrapper = dockerWrapper
         this.context = context
+
+
+        def currentNodeId = dockerWrapper.daemonInfo().Swarm.NodeID
+        def matching = dockerWrapper.swarmNodes().values().findAll {
+            it.id == currentNodeId
+        }.collect {
+            new ShathelNode(it.hostName, it.hostName, "127.0.0.1", "manager")
+        }
+        if (matching.size() == 1) {
+            shathelNode = matching.head()
+        } else {
+            throw new RuntimeException("There is sth wrong, multiple nodes have same ID?")
+        }
     }
 
 
@@ -59,19 +72,10 @@ class LocalSwarmApiFacade implements ExecutableApiFacade {
         return "127.0.0.1:" + port
     }
 
+
     @Override
     ShathelNode getManagerNode() {
-        def currentNodeId = dockerWrapper.daemonInfo().Swarm.NodeID
-        def matching = dockerWrapper.swarmNodes().values().findAll {
-            it.id == currentNodeId
-        }.collect {
-            new ShathelNode(it.hostName, it.hostName, "127.0.0.1", "manager")
-        }
-        if (matching.size() == 1) {
-            return matching.head()
-        } else {
-            throw new RuntimeException("There is sth wrong, multiple nodes have same ID?")
-        }
+        return shathelNode;
     }
 
 }

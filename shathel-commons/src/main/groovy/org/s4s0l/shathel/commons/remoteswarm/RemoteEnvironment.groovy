@@ -8,7 +8,6 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider
-import org.s4s0l.shathel.commons.localswarm.LocalSwarmBuildingEnricher
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher
 import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator

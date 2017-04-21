@@ -26,7 +26,7 @@ public class StackReference {
     }
 
     public String getVersion() {
-        return version;
+        return version == "$version" ? "UNKNOWN" : version;
     }
 
     public String getGroup() {

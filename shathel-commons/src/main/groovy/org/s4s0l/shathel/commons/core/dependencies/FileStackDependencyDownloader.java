@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.utils.Utils;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -14,7 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Marcin Wielgus
  */
-public class FileStackDependencyDownloader extends FileDownloader implements StackDependencyDownloader{
+public class FileStackDependencyDownloader extends FileDownloader implements StackDependencyDownloader {
     public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
     public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_base_dir";
@@ -34,7 +35,7 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
 
             //we found but it has wrong version
             if (!foundStack.getVersion().equals(stackReference.getVersion())) {
-                if (!foundStack.getVersion().equals("$version")) {
+                if (!Arrays.asList("$version", "UNKNOWN").contains(foundStack.getVersion())) {
                     LOGGER.warn("{} found stack in {}, but in different version, will not pick it up", getClass().getSimpleName(), search.get().getAbsolutePath());
                     search = Optional.empty();
                 }

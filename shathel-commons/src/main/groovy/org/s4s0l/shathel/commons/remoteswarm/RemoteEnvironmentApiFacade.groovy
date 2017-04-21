@@ -2,6 +2,7 @@ package org.s4s0l.shathel.commons.remoteswarm
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.s4s0l.shathel.commons.cert.CertificateManager
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.docker.DockerWrapper
@@ -66,6 +67,10 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
 
     SshOperations getSshOperaions(){
         return accessManager
+    }
+
+    CertificateManager getCertificateManager(){
+        return accessManager.getCertificateManager()
     }
 
 }

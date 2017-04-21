@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.collection.mutable.Seq
 
 /**
   * @author Marcin Wielgus
@@ -59,6 +61,8 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
         return response(ret)
       })
   }
+
+
 
   @CliCommand(value = Array("stack stop"), help = "Displays what will be done with given stack.")
   def stop(
@@ -110,15 +114,15 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
   }
 
 
-  private def inspect(command: StackOperations, inspectLong: Boolean): Map[String, AnyRef] = {
+  private def inspect(command: StackOperations, inspectLong: Boolean): Seq[util.Map[String, AnyRef]] = {
     def arrayToMap = collection.breakOut[Seq[StackCommand], (String, util.Map[String, AnyRef]), Map[String, util.Map[String, AnyRef]]]
 
     def display = (p: NamedExecutable) => p.getName
 
     def displayProv = (p: StackProvisionerDefinition) => p.getScriptName
 
-    return command.getCommands.asScala.map((elem) => {
-      elem.getDescription.getDeployName -> Map(
+    def ret = command.getCommands.asScala.map((elem) => {
+      Map(
         "type" -> elem.getType.name(),
         "gav" -> elem.getDescription.getGav,
         "compose" -> (if (inspectLong) elem.getComposeModel.getParsedYml else "<hidden>"),
@@ -126,7 +130,9 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
         "enriching-provisioners" -> elem.getEnricherPreProvisioners.asScala.map(display).asJava,
         "post-provisioners" -> elem.getDescription.getPostProvisioners.asScala.map(displayProv).asJava
       ).asJava
-    })(arrayToMap)
+    })
+
+    return ret
   }
 }
 

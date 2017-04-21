@@ -29,6 +29,12 @@ public class StackTreeDescription {
             id = stack.getGroup() + ":" + stack.getName();
         }
 
+        @Override
+        public String toString() {
+            return "GraphNode{" +
+                    "id='" + id + '\'' +
+                    '}';
+        }
     }
 
     public static Builder builder(StackDescription root) {
@@ -77,9 +83,16 @@ public class StackTreeDescription {
                     throw new RuntimeException("Dependency will cause cycle!!");
                 }
             }
-
+            //fixing optional dependencies
+            //if sth in the graph had optional dependency and optional dependencies download is off
+            //and some other stack had mandatory dependency on it we include it as regular dependency
+            stream()
+                    .filter(it -> it.stack.isDependantOn(dep.getReference(), true))
+                    .filter(it -> !graph.successors(it).contains(nodeV))
+                    .forEach(it -> graph.putEdge(it, nodeV));
             return this;
         }
+
 
         private Stream<GraphNode> stream() {
             return GraphUtils.depthFirst(graph, rootNode);

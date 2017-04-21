@@ -62,11 +62,11 @@ public class ProvisionerExecutableParams {
         this.currentNodes = currentNodes;
     }
 
-    public EnvironmentContext getEnvironmentContext() {
+    public EnvironmentContext getContext() {
         return environmentContext;
     }
 
-    public ExecutableApiFacade getApiFacade() {
+    public ExecutableApiFacade getApi() {
         return apiFacade;
     }
 
@@ -74,11 +74,11 @@ public class ProvisionerExecutableParams {
         return command;
     }
 
-    public File getDstStackDir() {
+    public File getDir() {
         return dstStackDir;
     }
 
-    public Logger getLogger() {
+    public Logger getLog() {
         return logger;
     }
 
@@ -86,7 +86,7 @@ public class ProvisionerExecutableParams {
         return http;
     }
 
-    public Map<String, String> getEnvironment() {
+    public Map<String, String> getEnv() {
         return environment;
     }
 

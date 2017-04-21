@@ -116,4 +116,9 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
     String getScpUser() {
         return tunnelManager.remoteUser
     }
+
+    @Override
+    CertificateManager getCertificateManager() {
+        return certificateManager
+    }
 }

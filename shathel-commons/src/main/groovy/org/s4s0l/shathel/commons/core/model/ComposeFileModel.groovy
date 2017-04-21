@@ -102,20 +102,22 @@ class ComposeFileModel {
 
     void mapImages(Function<String, String> mapper) {
         parsedYml.services.each {
-            def changed = mapper.apply(it.value.image)
-            if (changed instanceof String) {
-                it.value.image = changed
-            } else {
-                String context = changed.context
-                String dockerfile = changed.dockerfile
-                Map args = changed.args ?: [:]
-                it.value.remove('image')
-                it.value.build = [
-                        context   : context,
-                        dockerfile: dockerfile
-                ]
-                if (!args.isEmpty()) {
-                    it.value.build << [args: args]
+            if (it.value.image != null) {
+                def changed = mapper.apply(it.value.image)
+                if (changed instanceof String) {
+                    it.value.image = changed
+                } else {
+                    String context = changed.context
+                    String dockerfile = changed.dockerfile
+                    Map args = changed.args ?: [:]
+                    it.value.remove('image')
+                    it.value.build = [
+                            context   : context,
+                            dockerfile: dockerfile
+                    ]
+                    if (!args.isEmpty()) {
+                        it.value.build << [args: args]
+                    }
                 }
             }
         }

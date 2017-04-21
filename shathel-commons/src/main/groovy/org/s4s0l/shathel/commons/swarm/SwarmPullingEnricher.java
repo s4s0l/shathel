@@ -29,7 +29,7 @@ public class SwarmPullingEnricher extends EnricherExecutable {
             model.mapImages((image) -> {
                 provisioners.add("pull-image:" + image, executionContext -> {
                     for (ShathelNode nodeName : executionContext.getCurrentNodes()) {
-                        executionContext.getApiFacade().getDocker(nodeName).pull(image);
+                        executionContext.getApi().getDocker(nodeName).pull(image);
                     }
                 });
                 return image;

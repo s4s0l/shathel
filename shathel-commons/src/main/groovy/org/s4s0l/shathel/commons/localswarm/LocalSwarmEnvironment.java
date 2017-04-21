@@ -8,6 +8,7 @@ import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher;
+import org.s4s0l.shathel.commons.swarm.BuildingEnricher;
 import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator;
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner;
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider;
@@ -27,9 +28,11 @@ public class LocalSwarmEnvironment implements Environment {
     private static final Logger LOGGER = getLogger(LocalSwarmEnvironment.class);
     private final EnvironmentContext context;
     private final DockerWrapper dockerWrapper = new DockerWrapper();
+    private final LocalSwarmApiFacade apiFacade;
 
     public LocalSwarmEnvironment(EnvironmentContext context) {
         this.context = context;
+        this.apiFacade = new LocalSwarmApiFacade(getDockerWrapper(), context);
     }
 
     @Override
@@ -111,14 +114,14 @@ public class LocalSwarmEnvironment implements Environment {
 
     @Override
     public LocalSwarmApiFacade getEnvironmentApiFacade() {
-        return new LocalSwarmApiFacade(getDockerWrapper(), context);
+        return apiFacade;
     }
 
     @Override
     public List<NamedExecutable> getEnvironmentEnrichers() {
         return Arrays.asList(
                 new LocalMountingEnricher(),
-                new LocalSwarmBuildingEnricher(),
+                new BuildingEnricher(),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator()
         );
