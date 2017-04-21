@@ -59,18 +59,42 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
     }
 
 
-
     @Override
     SecretManager getSecretManager() {
         return new SecretManager(packageContext.getEnvironmentDescription(), getManagerNodeClient())
     }
 
-    SshOperations getSshOperaions(){
+    SshOperations getSshOperaions() {
         return accessManager
     }
 
-    CertificateManager getCertificateManager(){
+    @Override
+    CertificateManager getCertificateManager() {
         return accessManager.getCertificateManager()
     }
+
+
+//    void setKernelParam(String param) {
+//        getNodeNames().each { node ->
+//            getWrapper().sudo(node, "sysctl -w $param")
+//            String cont = getWrapper().sudo(node, "cat /etc/sysctl.conf")
+//            def name = param.split("=")[0]
+//            if (cont.contains("${name}=")) {
+//                getWrapper().sudo(node, "sed -i.bak s/${name}=.*/$param/g /etc/sysctl.conf")
+//            } else {
+//                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+//                        "\"echo '$param' >> /etc/sysctl.conf\"")
+//            }
+//            cont = getWrapper().sudo(node, "cat /var/lib/boot2docker/profile")
+//            if (cont.contains("sysctl -w ${name}=")) {
+//                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+//                        "\"sed -i.bak s/sysctl\\ -w\\ ${name}=.*/sysctl\\ -w\\ $param/g /var/lib/boot2docker/profile\"")
+//            } else {
+//                getWrapper().exec.executeForOutput(null, new File("."), [:], "ssh", node, "sudo", "/bin/sh", "-c",
+//                        "\"echo 'sysctl -w $param' >> /var/lib/boot2docker/profile\"")
+//            }
+//
+//        }
+//    }
 
 }

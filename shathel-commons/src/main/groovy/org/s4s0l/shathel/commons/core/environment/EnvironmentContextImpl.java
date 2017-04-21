@@ -42,6 +42,11 @@ public class EnvironmentContextImpl implements EnvironmentContext {
     }
 
     @Override
+    public File getAnsibleInventoryFile() {
+        return new File(getSettingsDirectory(), "ansible-inventory");
+    }
+
+    @Override
     public File getSettingsDirectory() {
         return storage.getSettingsDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
     }
@@ -67,6 +72,11 @@ public class EnvironmentContextImpl implements EnvironmentContext {
     }
 
     @Override
+    public File getCertsDirectory() {
+        return ensureExists(new File(getSettingsDirectory(), "certs"));
+    }
+
+    @Override
     public File getDependencyCacheDirectory() {
         return storage.getDependencyCacheDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
     }
@@ -79,6 +89,11 @@ public class EnvironmentContextImpl implements EnvironmentContext {
         ret.putAll(getEnvironmentDescription().getAsEnvironmentVariables());
         ret.put(Parameters.parameterNameToEnvName("shathel.env.solution.name"), getContextName());
         return ret;
+    }
+
+    private File ensureExists(File f) {
+        f.mkdirs();
+        return f;
     }
 
 }

@@ -16,6 +16,8 @@ public interface EnvironmentContext {
 
     SolutionDescription getSolutionDescription();
 
+    File getCertsDirectory();
+
     File getSettingsDirectory();
 
     File getDataDirectory();
@@ -24,9 +26,12 @@ public interface EnvironmentContext {
 
     File getEnrichedDirectory();
 
-    String getContextName();
+    File getAnsibleInventoryFile();
 
     File getDependencyCacheDirectory();
 
+    String getContextName();
+
     Map<String, String> getAsEnvironmentVariables();
+
 }

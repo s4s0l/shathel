@@ -17,8 +17,7 @@ public class LocalSwarmEnvironmentProvider implements EnvironmentProvider {
 
     @Override
     public Environment getEnvironment(EnvironmentContext environmentContext) {
-
-        return new LocalSwarmEnvironment(environmentContext);
+        return new LocalSwarmEnvironment(new LocalSwarmEnvironmentContextImpl(environmentContext));
     }
 
 

@@ -60,9 +60,7 @@ public class Stack {
     }
 
     public void run(StackOperations schedule) {
-        new StackProvisionerExecutor(extensionContext, environment.getEnvironmentContext(),
-                environment.getEnvironmentApiFacade(),
-                environment.getContainerRunner()).execute(schedule);
+        new StackProvisionerExecutor(extensionContext, environment).execute(schedule);
     }
 
     public static class StackContext {

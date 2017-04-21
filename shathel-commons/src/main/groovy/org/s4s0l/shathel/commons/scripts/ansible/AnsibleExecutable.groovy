@@ -38,6 +38,13 @@ class AnsibleExecutable implements NamedExecutable {
         ])
         AnsibleScriptContext ansibleScriptContext = (AnsibleScriptContext) context.get("ansible")
         EnvironmentContext econtext = (EnvironmentContext) context.get("context")
+        if (ansibleScriptContext == null) {
+            throw new RuntimeException("Unable to find ansible script context! Ansible unsupported in this context?")
+        }
+        ansibleScriptContext.sudoPasswordEnvName.ifPresent {
+            if (env.containsKey(it))
+                env['ANSIBLE_BECOME_PASS'] = env[it]
+        }
 
         def extraVarsFile = new File(econtext.tempDirectory, "ansible-extra-vars.json")
         try {
@@ -47,9 +54,7 @@ class AnsibleExecutable implements NamedExecutable {
             }.join(",\n") + "}"
 
             def out = ansible.play(script.getBaseDirectory(),
-                    ansibleScriptContext.getUser(),
-                    ansibleScriptContext.getSshKey(),
-                    ansibleScriptContext.getInventoryFile(),
+                    ansibleScriptContext,
                     env,
                     extraVarsFile,
                     script.getScriptFileLocation().get()

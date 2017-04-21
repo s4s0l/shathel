@@ -11,19 +11,16 @@ import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 @TypeChecked
 @CompileStatic
 interface RemoteEnvironmentPackageContext extends EnvironmentContext {
-    String getRemoteUser()
 
     RemoteEnvironmentPackageDescription getDescription()
 
     File getKeysDirectory()
 
-    File getCertsDirectory()
-
-    File getAnsibleInventoryFile()
-
     File getKnownHostsFile()
 
     File getPackageRootDirectory()
+
+    String getRemoteUser()
 
     String getGav()
 }

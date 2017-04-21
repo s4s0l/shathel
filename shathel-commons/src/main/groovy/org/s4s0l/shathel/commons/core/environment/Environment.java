@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
+import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext;
 
 import java.util.List;
 
@@ -67,5 +68,7 @@ public interface Environment {
     ExecutableApiFacade getEnvironmentApiFacade();
 
     List<NamedExecutable> getEnvironmentEnrichers();
+
+    AnsibleScriptContext getAnsibleScriptContext();
 
 }

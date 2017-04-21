@@ -16,7 +16,8 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
     private final EnvironmentContext environmentContext
     private final RemoteEnvironmentPackageDescription description
 
-    RemoteEnvironmentPackageContextImpl(EnvironmentContext environmentContext, RemoteEnvironmentPackageDescription description) {
+    RemoteEnvironmentPackageContextImpl(EnvironmentContext environmentContext,
+                                        RemoteEnvironmentPackageDescription description) {
         this.environmentContext = environmentContext
         this.description = description
     }
@@ -41,16 +42,6 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
     }
 
     @Override
-    File getCertsDirectory() {
-        return ensureExists(new File(settingsDirectory, "certs"))
-    }
-
-    @Override
-    File getAnsibleInventoryFile() {
-        return new File(settingsDirectory, "ansible-inventory")
-    }
-
-    @Override
     File getKnownHostsFile() {
         return new File(settingsDirectory, "known-hosts")
     }
@@ -67,7 +58,9 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
 
     @Override
     Map<String, String> getAsEnvironmentVariables() {
-        Map<String, String> ret = [
+        Map<String, String> ret = new HashMap<>()
+        ret.putAll(environmentContext.asEnvironmentVariables)
+        ret.putAll([
                 "SHATHEL_ENVPACKAGE_VERSION"          : description.version,
                 "SHATHEL_ENVPACKAGE_SETTINGS_DIR"     : settingsDirectory.absolutePath,
                 "SHATHEL_ENVPACKAGE_IMAGE_NAME"       : description.envPackageImage,
@@ -77,8 +70,7 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
                 "SHATHEL_ENVPACKAGE_ANSIBLE_INVENTORY": ansibleInventoryFile.absolutePath,
                 "SHATHEL_ENVPACKAGE_USER"             : description.remoteUser,
                 "SHATHEL_ENVPACKAGE_CERTS_DIR"        : certsDirectory.absolutePath,
-        ]
-        ret.putAll(environmentContext.asEnvironmentVariables)
+        ])
         return ret
     }
 

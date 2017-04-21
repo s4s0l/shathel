@@ -21,29 +21,31 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class StackProvisionerExecutor {
     private final ExtensionContext extensionContext;
-    private final EnvironmentContext environmentContext;
-    private final ExecutableApiFacade executableApiFacade;
-    private final EnvironmentContainerRunner runner;
+    private final Environment environment;
 
     public StackProvisionerExecutor(ExtensionContext extensionContext,
-                                    EnvironmentContext environmentContext,
-                                    ExecutableApiFacade executableApiFacade,
-                                    EnvironmentContainerRunner runner) {
+                                    Environment environment) {
         this.extensionContext = extensionContext;
-        this.environmentContext = environmentContext;
-        this.executableApiFacade = executableApiFacade;
-        this.runner = runner;
+        this.environment = environment;
+    }
+
+    private EnvironmentContext getEnvironmentContext() {
+        return environment.getEnvironmentContext();
+    }
+
+    private EnvironmentContainerRunner getRunner() {
+        return environment.getContainerRunner();
     }
 
     public void execute(StackOperations schedule) {
         try {
 
-            File executionDirectory = environmentContext.getEnrichedDirectory();
+            File executionDirectory = getEnvironmentContext().getEnrichedDirectory();
             FileUtils.deleteDirectory(executionDirectory);
             executionDirectory.mkdirs();
 
 
-            try (EnvironmentContainerRunnerContext ecrc = runner.createContext()) {
+            try (EnvironmentContainerRunnerContext ecrc = getRunner().createContext()) {
                 for (StackCommand stackCommand : schedule.getCommands()) {
 
                     File srcStackDirectory = stackCommand.getDescription().getStackResources().getStackDirectory();
@@ -94,15 +96,15 @@ public class StackProvisionerExecutor {
 
     private void execute(File dstStackDir, NamedExecutable executable, StackCommand stackCommand) {
         ProvisionerExecutableParams params = new ProvisionerExecutableParams(
-                environmentContext,
-                executableApiFacade,
+                getEnvironmentContext(),
+                environment.getEnvironmentApiFacade(),
                 stackCommand,
                 dstStackDir,
                 LOGGER,
                 new HttpApis(),
                 stackCommand.getEnvironment(),
-                executableApiFacade.getNodes()
-        );
+                environment.getEnvironmentApiFacade().getNodes(),
+                environment.getAnsibleScriptContext());
         LOGGER.info("Provisioning with: {}.", executable.getName());
         executable.execute(params.toMap());
     }

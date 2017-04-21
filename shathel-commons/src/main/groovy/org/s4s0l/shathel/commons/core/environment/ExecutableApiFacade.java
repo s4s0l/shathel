@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core.environment;
 
+import org.s4s0l.shathel.commons.cert.CertificateManager;
 import org.s4s0l.shathel.commons.docker.DockerClientWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.secrets.SecretManager;
@@ -44,6 +45,8 @@ public interface ExecutableApiFacade {
     ShathelNode getManagerNode();
 
     SecretManager getSecretManager();
+
+    CertificateManager getCertificateManager();
 
     default Map<String, String> getNodeLabels(ShathelNode node) {
         return getManagerNodeWrapper().swarmNodeGetLabels(node.getNodeName());

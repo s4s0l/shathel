@@ -43,6 +43,7 @@
 
 ## Passwords settings
 * shathel.env.{env}.safePassword
+* shathel.env.{env}.ANSIBLE_BECOME_PASSWORD
 * shathel.env.{env}.{secretName}_secret_path
 * shathel.env.{env}.{secretName}_secret_path
 

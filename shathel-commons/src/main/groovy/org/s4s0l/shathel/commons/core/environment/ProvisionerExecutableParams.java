@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.core.environment;
 
 import org.s4s0l.shathel.commons.scripts.HttpApis;
+import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class ProvisionerExecutableParams {
     private final HttpApis http;
     private final Map<String, String> environment;
     private final List<ShathelNode> currentNodes;
+    private final AnsibleScriptContext ansibleScriptContext;
 
     public ProvisionerExecutableParams(Map<String, Object> map) {
         this(
@@ -27,8 +29,8 @@ public class ProvisionerExecutableParams {
                 (Logger) map.get("log"),
                 (HttpApis) map.get("http"),
                 (Map<String, String>) map.get("env"),
-                (List<ShathelNode>) map.get("currentNodes")
-
+                (List<ShathelNode>) map.get("currentNodes"),
+                (AnsibleScriptContext) map.get("ansible")
         );
     }
 
@@ -42,6 +44,7 @@ public class ProvisionerExecutableParams {
         map.put("dir", dstStackDir);
         map.put("http", http);
         map.put("currentNodes", currentNodes);
+        map.put("ansible", ansibleScriptContext);
         return map;
     }
 
@@ -51,7 +54,7 @@ public class ProvisionerExecutableParams {
                                        StackCommand command, File dstStackDir,
                                        Logger logger, HttpApis http,
                                        Map<String, String> environment,
-                                       List<ShathelNode> currentNodes) {
+                                       List<ShathelNode> currentNodes, AnsibleScriptContext ansibleScriptContext) {
         this.environmentContext = environmentContext;
         this.apiFacade = apiFacade;
         this.command = command;
@@ -60,6 +63,7 @@ public class ProvisionerExecutableParams {
         this.http = http;
         this.environment = environment;
         this.currentNodes = currentNodes;
+        this.ansibleScriptContext = ansibleScriptContext;
     }
 
     public EnvironmentContext getContext() {
@@ -92,5 +96,9 @@ public class ProvisionerExecutableParams {
 
     public List<ShathelNode> getCurrentNodes() {
         return currentNodes;
+    }
+
+    public AnsibleScriptContext getAnsible() {
+        return ansibleScriptContext;
     }
 }

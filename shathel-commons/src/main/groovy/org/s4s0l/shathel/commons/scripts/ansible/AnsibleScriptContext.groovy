@@ -10,12 +10,21 @@ import groovy.transform.TypeChecked
 @CompileStatic
 class AnsibleScriptContext {
     final String user
-    final File sshKey
+    final Optional<File> sshKey
+    final Optional<String> sudoPasswordEnvName
     final File inventoryFile
 
     AnsibleScriptContext(String user, File sshKey, File inventoryFile) {
         this.user = user
-        this.sshKey = sshKey
+        this.sshKey = Optional.of(sshKey)
+        this.sudoPasswordEnvName = Optional.empty()
+        this.inventoryFile = inventoryFile
+    }
+
+    AnsibleScriptContext(String user, String envPasswordName, File inventoryFile) {
+        this.user = user
+        this.sshKey = Optional.empty()
+        this.sudoPasswordEnvName = Optional.of(envPasswordName)
         this.inventoryFile = inventoryFile
     }
 
