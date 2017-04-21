@@ -297,6 +297,25 @@ class DockerWrapper {
                 exec.executeForOutput(composeFile.getParentFile(), environment, "stack rm $deploymentName")
             }
         }
+        //DOCKER has nasty habit of destroying networks asynchronously, and if
+        //you deploy the same stack just after stopping it it will 'see' the
+        //network and not create it, and then async go from undeploy removes this network
+        //and new deployment fails so I wait until network is really removed
+        int atts = 0
+        int maxAtts = 5
+        while (true) {
+            int networkCount = networkBasicsByFilter("label=com.docker.stack.namespace=${deploymentName}").size()
+            if (networkCount == 0) {
+                break
+            }
+            atts++
+            if (atts >= maxAtts) {
+                LOGGER.warn("Seems like there are some networks left lieing around after undeployment of ${deploymentName}, will not wait any longer, we will see what happens...")
+                break
+            }
+            LOGGER.warn("Seems like there are some networks left lieing around after undeployment of ${deploymentName}, will wait a little longer...")
+            Thread.sleep(2000)
+        }
     }
 
     /**
