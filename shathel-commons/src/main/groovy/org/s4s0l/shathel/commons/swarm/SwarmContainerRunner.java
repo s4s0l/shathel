@@ -59,6 +59,13 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
                 String status = "updating";
                 Map map = docker.serviceInspect(serviceName);
                 Map updateStatus = (Map) map.get("UpdateStatus");
+                if(updateStatus == null){
+                    //this happens when service is removed?!?
+                    //todo: rethink how to handle - remove by hand?
+                    //for now lets just ignore it, new behaviour from 17.04
+                    //before it was left untouched
+                    continue services;
+                }
                 status = (String) updateStatus.get("State");
                 LOGGER.info("Running: {}. Service {} has update status {}, waiting...", reference.getGav(), serviceName, status);
                 if (null == status || "completed".equals(status)) {
