@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
@@ -69,6 +70,6 @@ public interface Environment {
 
     List<NamedExecutable> getEnvironmentEnrichers();
 
-    AnsibleScriptContext getAnsibleScriptContext();
+    Optional<AnsibleScriptContext> getAnsibleScriptContext();
 
 }

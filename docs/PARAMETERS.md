@@ -26,11 +26,9 @@
 
 ## Environment level settings
 * shathel.env.{env}.net
-* shathel.env.{env}.init
-* shathel.env.{env}.registry
-* shathel.env.{env}.managers
+* shathel.env.{env}.init //wtf??
+* shathel.env.{env}.registry //deprecated
 * shathel.env.{env}.forceful
-* shathel.env.{env}.workers
 * shathel.env.{env}.dependenciesDir
 * shathel.env.{env}.dataDir
 * shathel.env.{env}.safeDir
@@ -39,11 +37,20 @@
 * shathel.env.{env}.tempDir
 * shathel.env.{env}.pull
 * shathel.env.{env}.domain
+
+## Remote swarm environment
+* shathel.env.{env}.managers
+* shathel.env.{env}.workers
 * shathel.env.{env}.useglobalvagrant
+
+## Local Swarm environment
+* shathel.env.{env}.ansible_become_password
+* shathel.env.{env}.ansible_enabled // for local swarm
+
+
 
 ## Passwords settings
 * shathel.env.{env}.safePassword
-* shathel.env.{env}.ANSIBLE_BECOME_PASSWORD
 * shathel.env.{env}.{secretName}_secret_path
 * shathel.env.{env}.{secretName}_secret_path
 

@@ -146,9 +146,14 @@ class LocalSwarmEnvironment implements Environment {
     }
 
     @Override
-    AnsibleScriptContext getAnsibleScriptContext() {
-        return new AnsibleScriptContext(context.getRemoteUser(),
-                "SHATHEL_ENV_ANSIBLE_BECOME_PASSWORD",
-                context.getAnsibleInventoryFile())
+    Optional<AnsibleScriptContext> getAnsibleScriptContext() {
+        boolean ansibleEnabled = context.getEnvironmentDescription().getParameterAsBoolean("ansible_enabled").orElse(false)
+        return Optional.ofNullable(
+                ansibleEnabled ?
+                        new AnsibleScriptContext(context.getRemoteUser(),
+                                "SHATHEL_ENV_ANSIBLE_BECOME_PASSWORD",
+                                context.getAnsibleInventoryFile())
+                        : null)
+
     }
 }

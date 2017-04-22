@@ -37,8 +37,8 @@ class DefaultSolutiuonFileProviderTest extends Specification {
         yaml['shathel-solution']['environments']['xxxx'] == null
         yaml['shathel-solution']['environments']['local'].net == "0.0.0"
         yaml['shathel-solution']['environments']['local'].safePassword == null
-        yaml['shathel-solution']['environments']['local'].shathel_some_secret_path == 'aaaa'
-        yaml['shathel-solution']['environments']['local'].shathel_some_secret_value == null
+        yaml['shathel-solution']['environments']['local']['shathel.some.secret.path'] == 'aaaa'
+        yaml['shathel-solution']['environments']['local']['shathel.some.secret.value'] == null
         yaml['shathel-solution']['environments']['local'].token == null
         yaml['shathel-solution']['environments']['local'].key == null
 

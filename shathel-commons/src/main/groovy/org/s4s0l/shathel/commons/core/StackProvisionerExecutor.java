@@ -104,7 +104,7 @@ public class StackProvisionerExecutor {
                 new HttpApis(),
                 stackCommand.getEnvironment(),
                 environment.getEnvironmentApiFacade().getNodes(),
-                environment.getAnsibleScriptContext());
+                environment.getAnsibleScriptContext().orElse(null));
         LOGGER.info("Provisioning with: {}.", executable.getName());
         executable.execute(params.toMap());
     }

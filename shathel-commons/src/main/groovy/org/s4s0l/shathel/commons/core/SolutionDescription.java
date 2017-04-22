@@ -34,7 +34,8 @@ public class SolutionDescription {
     }
 
     public Optional<String> getParameter(String name) {
-        String s = overrides.getParameter("shathel.solution." + name).orElseGet(() -> parameters.get(name));
+        String normalizedParameterName = Parameters.getNormalizedParameterName(name);
+        String s = overrides.getParameter("shathel.solution." + normalizedParameterName).orElseGet(() -> parameters.get(normalizedParameterName));
         return Optional.ofNullable(s);
     }
 
@@ -52,7 +53,7 @@ public class SolutionDescription {
 
     }
 
-    public Map<String,String> getAsEnvironmentVariables(){
+    public Map<String, String> getAsEnvironmentVariables() {
         Map<String, String> ret = new HashMap<>(getEnvs());
         ret.put(Parameters.parameterNameToEnvName("shathel.solution.name"), getName());
         parameters.entrySet()
@@ -73,7 +74,7 @@ public class SolutionDescription {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public Map<String,String> getEnvs(){
+    public Map<String, String> getEnvs() {
         return model.getEnvs();
     }
 }

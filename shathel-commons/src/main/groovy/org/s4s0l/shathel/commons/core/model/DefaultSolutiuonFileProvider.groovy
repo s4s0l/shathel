@@ -26,10 +26,10 @@ class DefaultSolutiuonFileProvider {
         def envs = solution['environments']
 
         allParamNames.findAll {
-            it.matches("shathel\\.env\\.[a-zA-Z0-1\\-_]+\\.type")
+            it.matches("shathel\\.env\\.[a-z0-9\\-.]+\\.type")
         }
         .each {
-            def envName = it =~ /shathel\.env\.([a-zA-Z0-1\-_]+)\.type/
+            def envName = it =~ /shathel\.env\.([a-z0-9\-.]+)\.type/
             envName = envName[0][1]
             if (envs[envName] == null) {
                 envs[envName] = [:]
@@ -42,7 +42,7 @@ class DefaultSolutiuonFileProvider {
                         !it.toLowerCase().contains("password") &&
                         !it.toLowerCase().contains("token") &&
                         !it.toLowerCase().contains("key") &&
-                        !it.toLowerCase().endsWith("_secret_value")
+                        !it.toLowerCase().endsWith(".secret.value")
             }.each {
                 envs[env][it - "shathel.env.$env."] = parameters.getParameter(it).orElseThrow {
                     new RuntimeException("WTF?!")

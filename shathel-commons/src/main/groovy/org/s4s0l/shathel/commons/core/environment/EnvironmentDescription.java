@@ -22,7 +22,7 @@ public class EnvironmentDescription implements ParameterProvider {
         this.overrides = overrides;
         this.name = name;
         this.type = type;
-        this.parameters = parameters;
+        this.parameters = Parameters.getNormalizedParameterNames(parameters);
     }
 
     public String getName() {
@@ -30,7 +30,8 @@ public class EnvironmentDescription implements ParameterProvider {
     }
 
     public Optional<String> getParameter(String name) {
-        String s = overrides.getParameter("shathel.env." + getName() + "." + name).orElseGet(() -> parameters.get(name));
+        String normalizedName = Parameters.getNormalizedParameterName(name);
+        String s = overrides.getParameter("shathel.env." + getName() + "." + normalizedName).orElseGet(() -> parameters.get(normalizedName));
         return Optional.ofNullable(s);
     }
 

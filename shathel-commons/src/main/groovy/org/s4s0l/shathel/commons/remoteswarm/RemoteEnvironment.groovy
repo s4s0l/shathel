@@ -135,11 +135,11 @@ class RemoteEnvironment implements Environment {
     }
 
     @Override
-    AnsibleScriptContext getAnsibleScriptContext() {
-        return new AnsibleScriptContext(
+    Optional<AnsibleScriptContext> getAnsibleScriptContext() {
+        return Optional.of(new AnsibleScriptContext(
                 packageContext.remoteUser,
                 new File(packageContext.keysDirectory, "id_rsa"),
                 packageContext.ansibleInventoryFile
-        )
+        ))
     }
 }

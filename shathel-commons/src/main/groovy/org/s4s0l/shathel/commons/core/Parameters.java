@@ -1,9 +1,6 @@
 package org.s4s0l.shathel.commons.core;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +17,19 @@ public interface Parameters extends ParameterProvider {
     }
 
     static String parameterNameToEnvName(String parameterName) {
-        return parameterName.toUpperCase().replaceAll("\\.", "_");
+        return parameterName.toUpperCase().replaceAll("[^A-Z0-9\\-]", "_");
+    }
+
+    static String getNormalizedParameterName(String key) {
+        return key.toLowerCase().replaceAll("[^a-z0-9\\-]", ".");
+    }
+
+    static Map<String, String> getNormalizedParameterNames(Map<String, String> parameters) {
+        Map<String, String> ret = new HashMap<>();
+        for (Map.Entry<String, String> e : parameters.entrySet()) {
+            ret.put(Parameters.getNormalizedParameterName(e.getKey()), e.getValue());
+        }
+        return ret;
     }
 
     default Parameters hiddenByVariables() {
@@ -36,15 +45,21 @@ public interface Parameters extends ParameterProvider {
     class EnvParameters implements Parameters {
         @Override
         public Optional<String> getParameter(String name) {
-            return Optional.ofNullable(System.getenv(parameterNameToEnvName(name)));
+            String normalized = getNormalizedParameterName(name);
+            return System.getenv().entrySet()
+                    .stream()
+                    .filter(it -> getNormalizedParameterName(it.getKey()).startsWith("shathel"))
+                    .filter(it -> getNormalizedParameterName(it.getKey()).equals(normalized))
+                    .findFirst()
+                    .map(it -> it.getValue());
         }
 
         @Override
         public Set<String> getAllParameters() {
             return System.getenv().keySet()
                     .stream()
-                    .filter(x -> x.startsWith("SHATHEL_"))
-                    .map(x -> x.toLowerCase().replace("_", "."))
+                    .filter(it -> getNormalizedParameterName(it).startsWith("shathel"))
+                    .map(x -> getNormalizedParameterName(x))
                     .collect(Collectors.toSet());
         }
     }
@@ -52,7 +67,15 @@ public interface Parameters extends ParameterProvider {
     class SystemParameters implements Parameters {
         @Override
         public Optional<String> getParameter(String name) {
-            return Optional.ofNullable(System.getProperty(name));
+            String normalized = getNormalizedParameterName(name);
+            return System.getProperties().entrySet()
+                    .stream()
+                    .filter(x -> x.getValue() instanceof String && x.getKey() instanceof String)
+                    .map(x -> new AbstractMap.SimpleEntry<>((String) x.getKey(), (String) x.getValue()))
+                    .filter(it -> getNormalizedParameterName(it.getKey()).startsWith("shathel"))
+                    .filter(it -> getNormalizedParameterName(it.getKey()).equals(normalized))
+                    .findFirst()
+                    .map(it -> it.getValue());
         }
 
         @Override
@@ -61,6 +84,7 @@ public interface Parameters extends ParameterProvider {
                     .stream()
                     .filter(x -> x instanceof String)
                     .map(x -> (String) x)
+                    .map(it -> getNormalizedParameterName(it))
                     .filter(x -> x.startsWith("shathel"))
                     .collect(Collectors.toSet());
         }

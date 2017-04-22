@@ -11,7 +11,7 @@ class EnvironmentDescriptionTest extends Specification {
     def "environment map should contain all not null parameters and globals matching env name prefix"() {
         given:
         def env = Parameters.fromMapWithSysPropAndEnv(['shathel.env.test.sysprop': 'sysprop'])
-        EnvironmentDescription des = new EnvironmentDescription(env, "test", "type", ['file': 'file', 'sysprop': 'file'])
+        EnvironmentDescription des = new EnvironmentDescription(env, "test", "type", ['file_prop': 'file', 'sysprop': 'file'])
 
 
         when:
@@ -19,7 +19,7 @@ class EnvironmentDescriptionTest extends Specification {
 
         then:
         variabbles == [
-                'SHATHEL_ENV_FILE'      : 'file',
+                'SHATHEL_ENV_FILE_PROP'      : 'file',
                 'SHATHEL_ENV_SYSPROP'   : 'sysprop',
                 'SHATHEL_ENV_ENVPROP'   : 'envprop',
                 'SHATHEL_ENV_SIZE'      : '1',
@@ -28,5 +28,11 @@ class EnvironmentDescriptionTest extends Specification {
                 'SHATHEL_ENV_MGM_QUORUM': '1',
                 'SHATHEL_ENV_DOMAIN'    : 'localhost',
         ]
+
+        when:
+        def val = des.getParameter("File.prop")
+
+        then:
+        val.get() == "file"
     }
 }

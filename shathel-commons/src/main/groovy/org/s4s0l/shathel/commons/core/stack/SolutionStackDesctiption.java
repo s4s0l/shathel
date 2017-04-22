@@ -18,13 +18,14 @@ public class SolutionStackDesctiption implements ParameterProvider {
     public SolutionStackDesctiption(StackReference reference, Map<String, String> environments, Map<String, String> params, Parameters overrides) {
         this.reference = reference;
         this.environments = environments;
-        this.params = params;
+        this.params = Parameters.getNormalizedParameterNames(params);
         this.overrides = overrides;
     }
 
     @Override
     public Optional<String> getParameter(String name) {
-        String s = overrides.getParameter("shathel." + reference.getName() + "." + name).orElseGet(() -> params.get(name));
+        String normalizedParameterName = Parameters.getNormalizedParameterName(name);
+        String s = overrides.getParameter("shathel." + reference.getName() + "." + normalizedParameterName).orElseGet(() -> params.get(normalizedParameterName));
         return Optional.ofNullable(s);
     }
 
