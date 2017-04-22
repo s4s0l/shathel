@@ -21,24 +21,14 @@ class AnsibleWrapper {
     }
 
     String play(File workingDir, AnsibleScriptContext asc,
-                Map<String, String> envs,File extraVars,  File playbook) {
-
-        if(asc.sshKey.isPresent()){
-            return exec.executeForOutput(null, workingDir, envs,
-                    "-u", asc.user,
-                    "--timeout=180",
-                    "--private-key=${asc.sshKey.get().absolutePath}".toString(),
-                    "--inventory-file=${asc.inventoryFile.absolutePath}".toString(),
-                    "--extra-vars", "@${extraVars.absolutePath}",
-                    "${playbook.absolutePath}".toString())
-        }else{
-            return exec.executeForOutput(null, workingDir, envs,
-                    "-u", asc.user,
-                    "--timeout=180",
-                    "--inventory-file=${asc.inventoryFile.absolutePath}".toString(),
-                    "--extra-vars", "@${extraVars.absolutePath}",
-                    "${playbook.absolutePath}".toString())
-        }
-
+                Map<String, String> envs, File extraVars, File playbook) {
+        asc.customize(envs)
+        Map<String, String> args = [
+                "timeout"   : "180",
+                "extra-vars": "@${extraVars.absolutePath}".toString()
+        ]
+        args.putAll(asc.arguments)
+        String fullArgs = args.collect { "--${it.key}=${it.value}" }.join(" ")
+        return exec.executeForOutput(null, workingDir, envs, "$fullArgs ${playbook.absolutePath}".toString())
     }
 }

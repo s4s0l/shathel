@@ -55,6 +55,9 @@ abstract class BaseIntegrationTest extends Specification {
 
 
     Shathel shathel(Map additionalParams = [:], String sourceDir = "sampleDependencies") {
+        new File(rootDir, "shathel-solution.yml").with {
+            if (exists()) delete()
+        }
         additionalParams = additionalParams.collectEntries {
             [(it.key.toString()): it.value.toString()]
         }

@@ -39,6 +39,6 @@ eval "${PRIVATE_VARS}"
 export $(echo "${PRIVATE_VARS}" | cut -d= -f1)
 
 export JAVA_OPTS="-Xmx1024m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
-
+chmod +x ./build/localrepo/org/s4s0l/shathel/shathel-deployer/DEVELOPER-SNAPSHOT/shathel-deployer-DEVELOPER-SNAPSHOT.jar
 ./build/localrepo/org/s4s0l/shathel/shathel-deployer/DEVELOPER-SNAPSHOT/shathel-deployer-DEVELOPER-SNAPSHOT.jar
 

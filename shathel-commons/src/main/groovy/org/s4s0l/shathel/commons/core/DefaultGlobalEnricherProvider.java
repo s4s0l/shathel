@@ -78,7 +78,6 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
             Map<String, String> environment = params.getEnvironment();
             environment.putAll(params.getStack().getEnvs());
             environment.putAll(params.getEnvironmentContext().getAsEnvironmentVariables());
-            environment.putAll(System.getenv());
         }
     }
 

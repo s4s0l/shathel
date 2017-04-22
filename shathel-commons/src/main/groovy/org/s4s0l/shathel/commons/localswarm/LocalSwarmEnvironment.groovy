@@ -62,7 +62,7 @@ class LocalSwarmEnvironment implements Environment {
                             .append(managerNode.getPublicIp())
                             .append(" shathel_name=")
                             .append(managerNode.getNodeName())
-                            .append(" shathel_role=manager\n[shathel_worker_hosts]\n\n")
+                            .append(" shathel_role=manager ansible_connection=local\n[shathel_worker_hosts]\n\n")
                             .toString()
             )
         } catch (IOException e) {
@@ -146,14 +146,21 @@ class LocalSwarmEnvironment implements Environment {
     }
 
     @Override
-    Optional<AnsibleScriptContext> getAnsibleScriptContext() {
+    AnsibleScriptContext getAnsibleScriptContext() {
         boolean ansibleEnabled = context.getEnvironmentDescription().getParameterAsBoolean("ansible_enabled").orElse(false)
-        return Optional.ofNullable(
-                ansibleEnabled ?
-                        new AnsibleScriptContext(context.getRemoteUser(),
-                                "SHATHEL_ENV_ANSIBLE_BECOME_PASSWORD",
-                                context.getAnsibleInventoryFile())
-                        : null)
+        return ansibleEnabled ? getEnabledAnsibleContext() : getDisabledAnsibleContext()
 
+    }
+
+    private AnsibleScriptContext getEnabledAnsibleContext() {
+        new AnsibleScriptContext(context.getRemoteUser(),
+                "SHATHEL_ENV_ANSIBLE_BECOME_PASSWORD",
+                context.getAnsibleInventoryFile())
+    }
+
+    private AnsibleScriptContext getDisabledAnsibleContext() {
+        new AnsibleScriptContext("In local swarm environment ansible is disabled, " +
+                "set 'ansible_enabled' to true in environment or SHATHEL_ENV_${context.environmentDescription.name.toUpperCase()}_ANSIBLE_ENABLED env var to 'true'. " +
+                "Sudo password might be also needed, set it with SHATHEL_ENV_${context.environmentDescription.name.toUpperCase()}_ANSIBLE_BECOME_PASSWORD")
     }
 }

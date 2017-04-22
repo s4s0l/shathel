@@ -70,6 +70,6 @@ public interface Environment {
 
     List<NamedExecutable> getEnvironmentEnrichers();
 
-    Optional<AnsibleScriptContext> getAnsibleScriptContext();
+    AnsibleScriptContext getAnsibleScriptContext();
 
 }

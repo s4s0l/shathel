@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -104,8 +105,9 @@ public class StackProvisionerExecutor {
                 new HttpApis(),
                 stackCommand.getEnvironment(),
                 environment.getEnvironmentApiFacade().getNodes(),
-                environment.getAnsibleScriptContext().orElse(null));
+                environment.getAnsibleScriptContext());
+        Map<String, Object> context = params.toMap();
         LOGGER.info("Provisioning with: {}.", executable.getName());
-        executable.execute(params.toMap());
+        executable.execute(context);
     }
 }

@@ -21,6 +21,7 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
         Mockito.when(context.getRemoteUser()).thenReturn("root")
         Mockito.when(context.getKeysDirectory()).thenReturn(scriptRoot)
+        Mockito.when(context.getTempDirectory()).thenReturn(targetDir)
         Mockito.when(context.getAnsibleInventoryFile()).thenReturn(new File(scriptRoot, "ai"))
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
@@ -31,10 +32,10 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         def process = processor.process(ProcessorCommand.APPLY, envs)
 
         then:
-        [TARGET_DIR: targetDir.absolutePath, ANSIBLE_HOST_KEY_CHECKING: "False", ANSIBLE_NOCOWS: "1"] == envs
+        [TARGET_DIR: targetDir.absolutePath, ANSIBLE_RETRY_FILES_SAVE_PATH: scriptRoot.absolutePath, ANSIBLE_HOST_KEY_CHECKING: "False", ANSIBLE_NOCOWS: "1"] == envs
         process.status
         process.output.contains("127.0.0.1")
-        new File(targetDir, "out.txt").text == "[\"192.168.99.4\"]"
+        new File(targetDir, "out.txt").text == "[\"192.168.92.4\"]"
     }
 
     def "Vagrant scripts should be runnable"() {
@@ -43,8 +44,10 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         Mockito.when(api.getNodes()).thenReturn([])
 
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
+        Mockito.when(context.getRemoteUser()).thenReturn("root")
         Mockito.when(context.getSettingsDirectory()).thenReturn(targetDir)
         Mockito.when(context.getDependencyCacheDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getAnsibleInventoryFile()).thenReturn(targetDir)
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 
@@ -112,8 +115,10 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         Mockito.when(api.getNodes()).thenReturn([])
 
         def context = Mockito.mock(RemoteEnvironmentPackageContext)
+        Mockito.when(context.getRemoteUser()).thenReturn("root")
         Mockito.when(context.getSettingsDirectory()).thenReturn(targetDir)
         Mockito.when(context.getTempDirectory()).thenReturn(targetDir)
+        Mockito.when(context.getAnsibleInventoryFile()).thenReturn(targetDir)
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 

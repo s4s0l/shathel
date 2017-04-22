@@ -1,0 +1,10 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:ansible:1.0
+  pre-provisioners:
+    test1:
+      type: ansible
+  post-provisioners:
+    test2:
+        type: ansible
+

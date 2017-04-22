@@ -2,15 +2,21 @@ package org.s4s0l.shathel.commons.core.stack;
 
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 import org.s4s0l.shathel.commons.scripts.TypedScript;
+import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Marcin Wielgus
  */
 public class StackScriptDefinition implements TypedScript {
+    private static final Logger LOGGER = getLogger(StackScriptDefinition.class);
     private final StackDescription origin;
     private final String category;
     private final String name;
@@ -65,6 +71,28 @@ public class StackScriptDefinition implements TypedScript {
         if (inline != null) {
             return Optional.empty();
         }
-        return Optional.of(new File(getBaseDirectory(), getName() + "." + getType()));
+        Optional<File> ret = Stream.of(
+                new File(getBaseDirectory(), getName() + "." + getType()),
+                new File(getBaseDirectory(), getName()))
+                .filter(it -> it.exists())
+                .findFirst();
+        if (ret.isPresent()) {
+            return ret;
+        }
+        File[] list = getBaseDirectory().listFiles((dir, name) -> {
+            int dotIdx = name.lastIndexOf(".");
+            return dotIdx > 0 && name.substring(0, dotIdx).equals(getName());
+        });
+        if (list.length == 1) {
+            return Optional.of(list[0]);
+        }
+        if (list.length > 1) {
+            LOGGER.warn("Multiple files named {} found in directory in directory {}. Provide extension in script name?", getName(), getBaseDirectory().getAbsolutePath());
+        }
+        if (list.length != 1) {
+            LOGGER.warn("Unable to found script file named {} in directory {}", getName(), getBaseDirectory().getAbsolutePath());
+        }
+        return Optional.empty();
+
     }
 }
