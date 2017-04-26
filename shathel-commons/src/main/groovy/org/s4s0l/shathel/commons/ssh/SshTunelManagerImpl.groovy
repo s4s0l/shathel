@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.ssh
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.utils.ExecutableResults
+import org.s4s0l.shathel.commons.utils.IoUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -43,7 +44,16 @@ class SshTunelManagerImpl implements SshTunelManager {
                 }
             }
         }
-        return maxFound + 1
+        int candidate = maxFound + 1
+        for (int i = 0; i < 100; i++) {
+            if (!IoUtils.isSocketOpened("127.0.0.1", candidate + i, 500)) {
+                LOGGER.debug("Socket ${candidate + i} seems to be free.")
+                return candidate + i
+            } else {
+                LOGGER.warn("Socket ${candidate + i} seems to be taken...")
+            }
+        }
+        throw new RuntimeException("No free ports starting from $candidate found!")
     }
 
     @Override
@@ -72,7 +82,6 @@ class SshTunelManagerImpl implements SshTunelManager {
     }
 
 
-
     private SshSharedState getSharedState(String sshHost, File key) {
         SshSharedState ret = connections[sshHost] ?: new SshSharedState(user, sshHost, getControlSocketForHost(sshHost), key, ssh)
         connections[sshHost] = ret
@@ -94,7 +103,7 @@ class SshTunelManagerImpl implements SshTunelManager {
     }
 
     @Override
-    synchronized void closeAllConnections(String sshHost) {
+    void closeAllConnections(String sshHost) {
         synchronized (connections) {
             connections[sshHost]?.close()
             connections.remove(sshHost)
@@ -102,7 +111,7 @@ class SshTunelManagerImpl implements SshTunelManager {
     }
 
     @Override
-    synchronized void closeAll() {
+    void closeAll() {
         synchronized (connections) {
             new HashSet<String>(connections.keySet()).each {
                 closeAllConnections(it)
@@ -110,6 +119,18 @@ class SshTunelManagerImpl implements SshTunelManager {
             connections.clear()
         }
     }
+
+    static void globalCloseAll() {
+        synchronized (connections) {
+            new HashSet<String>(connections.keySet()).each {
+                connections[it]?.close()
+                connections.remove(it)
+            }
+            connections.clear()
+        }
+    }
+
+
 
     @Override
     void afterEnvironmentDestroyed() {
@@ -120,7 +141,7 @@ class SshTunelManagerImpl implements SshTunelManager {
     }
 
     @Override
-    String getRemoteUser(){
+    String getRemoteUser() {
         return user
     }
 }

@@ -30,7 +30,7 @@ class SshWrapper {
         return knownHostsLocation == null ? "" : "-o UserKnownHostsFile=${knownHostsLocation.absolutePath}"
     }
 
-    void openConnection(String user, String host, int port, File key, File controlSocket) {
+    String openConnection(String user, String host, int port, File key, File controlSocket) {
         exec.executeForOutput("${knownHosts} -oStrictHostKeyChecking=no -f -i ${key.absolutePath} -M -S ${controlSocket.absolutePath} -l ${user} -N  -p ${port} ${host}")
     }
 

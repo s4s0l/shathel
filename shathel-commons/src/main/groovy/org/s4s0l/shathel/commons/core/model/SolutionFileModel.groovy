@@ -30,7 +30,7 @@ class SolutionFileModel {
         def e = parsedYml['shathel-solution']['environments'][name];
         def params = [
                 name: name,
-                type: e.type.toString() //dummy npe based verification
+                type: e.type.toString() //dummy npe based verification, TODO
         ] << e;
         params.collectEntries {
             [(it.key): it.value?.toString()]

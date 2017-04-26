@@ -1,0 +1,49 @@
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+integrationTest.mustRunAfter test
+
+
+
+dependencies {
+    testCompile 'com.google.guava:guava:21.0'
+    testCompile 'com.squareup.okhttp3:okhttp:3.6.0'
+    testCompile "org.s4s0l.shathel:shathel-test-utils:${System.getProperty('bootcker_project_version') ?: "DEVELOPER-SNAPSHOT"}"
+}
+
+
+shathel {
+    image {
+        context { from(bootRepackage) { into 'app' } }
+    }
+    shathelParams = [
+            SHATHEL_SOLUTION_FILE_BASE_DIR    : "${project.rootDir.absolutePath}/../../../shathel-stacks",
+            SHATHEL_SOLUTION_FILE_ENV_BASE_DIR: "${project.rootDir.absolutePath}/../../../shathel-envs",
+            "shathel.env"                     : "vboxplugin",
+            "shathel.dir"                     : "./solution",
+    ]
+    runAroundTasks += integrationTest
+    prepareForTasks += test
+}

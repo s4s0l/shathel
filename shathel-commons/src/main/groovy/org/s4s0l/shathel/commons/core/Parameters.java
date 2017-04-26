@@ -27,7 +27,7 @@ public interface Parameters extends ParameterProvider {
     static Map<String, String> getNormalizedParameterNames(Map<String, String> parameters) {
         Map<String, String> ret = new HashMap<>();
         for (Map.Entry<String, String> e : parameters.entrySet()) {
-            ret.put(Parameters.getNormalizedParameterName(e.getKey()), e.getValue());
+            ret.put(Parameters.getNormalizedParameterName(e.getKey().toString()), e.getValue().toString());
         }
         return ret;
     }

@@ -1,9 +1,12 @@
 package org.s4s0l.lshathel.testutils;
 
 import org.s4s0l.shathel.commons.scripts.HttpApis;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Marcin Wielgus
@@ -20,8 +23,11 @@ public class WaitForHttpServiceVerifier implements Verifier {
         this.expectedStatus = expectedStatus;
     }
 
+    private static final Logger LOGGER = getLogger(WaitForHttpServiceVerifier.class);
+
     @Override
     public boolean verify(VerifierContextContract context) {
+        LOGGER.warn("Verifying " + address);
         String fill = context.fill(address);
         new HttpApis().test(fill, getExpectedStatus());
         return true;

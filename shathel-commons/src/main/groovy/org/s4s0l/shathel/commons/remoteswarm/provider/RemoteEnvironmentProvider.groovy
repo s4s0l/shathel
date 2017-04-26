@@ -88,7 +88,7 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
             LOGGER.warn("Control socket location is too long, assumed max is 108 characters.\n" +
                     " Change the location of shathel solution to shorter path.\n " +
                     "See cat /usr/include/linux/un.h | grep \"define UNIX_PATH_MAX\" to see your limits.\n" +
-                    "Willk use temp file: ${controlSocketsLocation.absolutePath}. This file can be used to hack you:)")
+                    "Will use temp file in: ${controlSocketsLocation.absolutePath}. Files in this dir can be used to hack you:)")
         }
 
         RemoteEnvironmentAccessManager accessManager = new RemoteEnvironmentAccessManagerImpl(

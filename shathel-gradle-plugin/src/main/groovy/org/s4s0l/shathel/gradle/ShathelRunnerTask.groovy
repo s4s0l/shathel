@@ -11,34 +11,49 @@ import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.Stack
 import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
+import org.s4s0l.shathel.commons.core.environment.StackIntrospection
 import org.s4s0l.shathel.commons.core.stack.StackReference
+import org.s4s0l.shathel.commons.ssh.SshTunelManagerImpl
 
 /**
  * @author Marcin Wielgus
  */
 
 class ShathelOperationTask extends DefaultTask {
-    Map<String, String> shathelParams = [:]
 
-    String getShathelEnvironmentName() {
-        return getCombinedParams().getOrDefault(CommonParams.SHATHEL_ENV, "local")
+
+    protected Parameters getShathelParameters() {
+        ShathelExtension extension = getExtension()
+        def paramsWithDefault = extension.shathelParams.collectEntries {
+            [(Parameters.getNormalizedParameterName(it.key.toString())): it.value.toString()]
+        }
+        paramsWithDefault.putIfAbsent(CommonParams.SHATHEL_ENV, "local")
+        String envName = paramsWithDefault[CommonParams.SHATHEL_ENV]
+        paramsWithDefault.putIfAbsent("shathel.env.${envName}.dependenciesDir".toString(), getDependenciesDir().absolutePath)
+        paramsWithDefault.putIfAbsent(CommonParams.SHATHEL_DIR, new File(project.buildDir, ".shathel").absolutePath)
+        paramsWithDefault[CommonParams.SHATHEL_DIR] = absolutize(paramsWithDefault.get(CommonParams.SHATHEL_DIR))
+        if (!new File("${paramsWithDefault[CommonParams.SHATHEL_DIR]}/shathel-solution.yml").exists()) {
+            paramsWithDefault['shathel.solution.name'] = "shathel-gradle-${project.getName()}".toString()
+        }
+        Parameters.fromMapWithSysPropAndEnv(paramsWithDefault)
+
+
+    }
+
+    private String absolutize(String it) {
+        if (new File(it).isAbsolute()) {
+            return new File(it).absolutePath
+        } else {
+            return new File(project.projectDir, it).absolutePath
+        }
     }
 
     File getShathelDir() {
-        return getShathelParameters().getParameter(CommonParams.SHATHEL_DIR)
-                .map {
-            if (new File(it).isAbsolute()) {
-                return new File(it)
-            } else {
-                return new File(project.projectDir, it)
-            }
-        }.orElse(new File(project.buildDir, ".shathel"))
+        return new File(getShathelParameters().getParameter(CommonParams.SHATHEL_DIR).get())
     }
 
-
-    boolean isShathelInitEnabled() {
-        return getShathelParameters().getParameterAsBoolean("shathel.env.${shathelEnvironmentName}.init")
-                .orElse(true)
+    String getShathelEnvironmentName() {
+        return getShathelParameters().getParameter(CommonParams.SHATHEL_ENV).get()
     }
 
     File getShathelMappingsDir() {
@@ -53,27 +68,10 @@ class ShathelOperationTask extends DefaultTask {
         return prepareTask.settings.to
     }
 
-    private void fillDefault(Map map, String key, String value) {
-        if (map[key] == null) {
-            map[key] = value
-        }
-    }
-
-    Map<String, String> getParamsWithDefaults() {
-        Map paramsWithDefault = getCombinedParams()
-        fillDefault(paramsWithDefault, "shathel.env.${getShathelEnvironmentName()}.dependenciesDir", getDependenciesDir().absolutePath)
-        return paramsWithDefault
-    }
-
     File getDependenciesDir() {
         new File(project.rootProject.buildDir, "shathel-dependencies")
     }
 
-    private Map getCombinedParams() {
-        ShathelExtension extension = getExtension()
-        def paramsWithDefault = [:] << extension.shathelParams << shathelParams
-        paramsWithDefault
-    }
 
     private ShathelExtension getExtension() {
         ShathelExtension extension = project.extensions.findByName("shathel") ?: new ShathelExtension(project)
@@ -94,14 +92,24 @@ class ShathelOperationTask extends DefaultTask {
     Stack getShathelCurrentStack() {
         def solution = getShathelSolution()
         def environment = solution.getEnvironment(getShathelEnvironmentName())
-        if (isShathelInitEnabled() && !environment.isInitialized()) {
+        if (!environment.isInitialized()) {
             environment.initialize()
         }
         return solution.openStack(environment, new StackLocator(LocalOverriderDownloader.CURRENT_PROJECT_LOCATION))
     }
 
-    private Parameters getShathelParameters() {
-        Parameters.fromMapWithSysPropAndEnv(getParamsWithDefaults())
+
+    Map<String, String> getDefaultPropsToLeave() {
+        [
+                "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
+                "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),
+                "shathel.plugin.current.gav"                                : new StackReference(project.group, project.name, project.version).gav,
+                "shathel.plugin.current"                                    : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
+                (CommonParams.SHATHEL_ENV)                                  : shathelEnvironmentName,
+                "shathel.env.${getShathelEnvironmentName()}.dependenciesDir": getDependenciesDir().absolutePath,
+                "shathel.env.${getShathelEnvironmentName()}.init"           : "true",
+                (CommonParams.SHATHEL_DIR)                                  : getShathelDir()
+        ]
     }
 
 }
@@ -109,27 +117,47 @@ class ShathelOperationTask extends DefaultTask {
 class ShathelNotifyingTask extends ShathelOperationTask {
     List<JavaForkOptions> tasksToNotify = []
 
-    protected void notifyTasks(Stack stack) {
-         def propsToleaveForOthers = [
-                (CommonParams.SHATHEL_ENV)                                  : shathelEnvironmentName,
-                "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
-                "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),
-                "shathel.plugin.current.gav"                                : new StackReference(project.group, project.name, project.version).gav,
-                "shathel.plugin.current"                                    : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
-                "shathel.env.${getShathelEnvironmentName()}.dependenciesDir": getDependenciesDir().absolutePath,
-                "shathel.env.${getShathelEnvironmentName()}.init"           : "true",
-                (CommonParams.SHATHEL_DIR)                                  : getShathelDir()
-        ]
 
-        stack.environment.introspectionProvider.allStacks.stacks.each { stk ->
-            stk.services.each { service ->
-                def keyPrefix = "shathel.plugin.${stk.reference.name}.${service.serviceName}"
-                service.getPortMapping().each {
-                    propsToleaveForOthers << ["${keyPrefix}.${it.key}": "${it.value}"]
-                }
-
+    @TaskAction
+    void build() {
+        def propsToleaveForOthers = [:]
+        def parameters = shathelParameters
+        parameters.allParameters.each {
+            propsToleaveForOthers << [(it): parameters.getParameter(it).get()]
+        }
+        propsToleaveForOthers << defaultPropsToLeave
+        tasksToNotify.findAll { it instanceof JavaForkOptions }.each { task ->
+            propsToleaveForOthers.each {
+                task.systemProperties.put(it.key.toString(), it.value.toString())
             }
         }
+
+    }
+
+}
+
+class ShathelStartTask extends ShathelOperationTask {
+    List<JavaForkOptions> tasksToNotify = []
+    boolean withOptionalDependencies = false
+
+
+    protected void notifyTasks(Stack stack) {
+        def propsToleaveForOthers = [:]
+        def allStacks = stack.environment.introspectionProvider.allStacks.stacks
+        for (StackIntrospection allStack : allStacks) {
+            for (StackIntrospection.Service service : allStack.getServices()) {
+                String servicePrefix = service.getServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_"
+                String fullNamePrefix = service.getFullServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_"
+                for (Map.Entry<Integer, Integer> entry : service.getPortMapping().entrySet()) {
+                    String tunneledPort = stack.environment.environmentApiFacade.openPublishedPort(entry.getValue())
+                    def shortKey = Parameters.getNormalizedParameterName("shathel.plugin." + servicePrefix + entry.getKey())
+                    def longKey = Parameters.getNormalizedParameterName("shathel.plugin." + fullNamePrefix + entry.getKey())
+                    propsToleaveForOthers.put(shortKey, tunneledPort)
+                    propsToleaveForOthers.put(longKey, tunneledPort)
+                }
+            }
+        }
+        propsToleaveForOthers << defaultPropsToLeave
         tasksToNotify.findAll { it instanceof JavaForkOptions }.each { task ->
             propsToleaveForOthers.each {
                 task.systemProperties.put(it.key.toString(), it.value.toString())
@@ -137,22 +165,8 @@ class ShathelNotifyingTask extends ShathelOperationTask {
         }
     }
 
-    @TaskAction
-    void build() {
-        def stack = getShathelCurrentStack()
-        notifyTasks(stack)
-
-    }
-
-}
-
-class ShathelStartTask extends ShathelNotifyingTask {
-
-    boolean withOptionalDependencies = false
-
 
     @TaskAction
-    @Override
     void build() {
         def stack = getShathelCurrentStack()
         def command = stack.createStartCommand(withOptionalDependencies)
@@ -169,11 +183,16 @@ class ShathelStopTask extends ShathelOperationTask {
     boolean withOptionalDependencies = false
     boolean withDependencies = true
 
+
     @TaskAction
     void build() {
         def stack = getShathelCurrentStack()
-        def command = stack.createStopCommand(withDependencies, withOptionalDependencies)
-        stack.run(command)
+        try {
+            def command = stack.createStopCommand(withDependencies, withOptionalDependencies)
+            stack.run(command)
+        } finally {
+            SshTunelManagerImpl.globalCloseAll()
+        }
 
 
     }

@@ -1,0 +1,13 @@
+version: 1
+shathel-solution:
+  name: shathel-gradle-project2
+  environments:
+    vboxplugin:
+      public.net: 192.168.47
+      type: remote
+      forceful: 'true'
+      gav: ./virtualbox
+      domain: shathel-vbox-plugin-test2
+      workers: '0'
+      private.net: 33.33.37
+      managers: '1'

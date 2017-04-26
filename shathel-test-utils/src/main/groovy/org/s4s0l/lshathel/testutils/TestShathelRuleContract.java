@@ -5,6 +5,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader;
+import org.s4s0l.shathel.commons.ssh.SshTunelManagerImpl;
 import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 import org.s4s0l.shathel.commons.utils.TemplateUtils;
 
@@ -44,8 +45,6 @@ public interface TestShathelRuleContract extends SchathelCreationCommonContract,
                 .putAllParams(params())
                 .build();
     }
-
-
 
 
     @Value.Derived
@@ -148,12 +147,16 @@ public interface TestShathelRuleContract extends SchathelCreationCommonContract,
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                start();
-                verify();
                 try {
+                    start();
+                    verify();
                     base.evaluate();
                 } finally {
-                    stop();
+                    try {
+                        stop();
+                    } finally {
+                        SshTunelManagerImpl.globalCloseAll();
+                    }
                 }
             }
         };

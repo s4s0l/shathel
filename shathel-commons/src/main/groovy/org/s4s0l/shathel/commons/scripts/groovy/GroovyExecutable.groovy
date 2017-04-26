@@ -32,7 +32,7 @@ class GroovyExecutable implements NamedExecutable {
         if (variables.get("result") == null) {
             variables.put("result", new ExecutableResults())
         }
-        GroovyShell shell = new GroovyShell()
+        GroovyShell shell = new GroovyShell(GroovyExecutable.class.classLoader)
         def scrpt = shell.parse(scriptFile)
         Binding binding = new Binding()
         variables.each {

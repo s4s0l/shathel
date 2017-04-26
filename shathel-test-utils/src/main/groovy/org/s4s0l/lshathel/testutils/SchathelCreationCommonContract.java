@@ -22,7 +22,7 @@ public interface SchathelCreationCommonContract {
 
     @Value.Default
     default String shathelEnv() {
-        return params().getOrDefault(CommonParams.SHATHEL_ENV, "local");
+        return parameters().getParameter(CommonParams.SHATHEL_ENV).orElse("local");
     }
 
     @Value.Lazy

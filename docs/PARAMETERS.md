@@ -8,6 +8,8 @@
 
 ## Solution level settings
 * shathel.solution.name
+
+//TODO these do not work in yml solution file! have to be set as env vars/sys props
 * shathel.solution.file_default_version
 * shathel.solution.file_default_group
 * shathel.solution.file_base_dir

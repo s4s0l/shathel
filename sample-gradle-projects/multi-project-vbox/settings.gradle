@@ -1,0 +1,3 @@
+rootProject.name = "multi-project-vbox"
+include 'project1'
+include 'project2'

@@ -158,6 +158,29 @@ public class IoUtils {
 
     }
 
+
+
+
+
+    public static boolean isSocketOpened(String host, int port, int timeout) {
+        final Socket sock = new Socket();
+        try {
+            sock.connect(new InetSocketAddress(host, port), timeout);
+            return true;
+        } catch (IOException e1) {
+            LOGGER.trace("Exception during waiting for socket - should happen", e1);
+        } finally {
+            if (sock.isConnected()) {
+                try {
+                    sock.close();
+                } catch (IOException e1) {
+                    LOGGER.warn("Closing socket failed", e1);
+                }
+            }
+        }
+        return false;
+    }
+
     public static void waitForSocket(String host, int port, int maxSeconds, RuntimeException e) {
         for (int i = 0; i < maxSeconds; i++) {
             final Socket sock = new Socket();
@@ -185,8 +208,6 @@ public class IoUtils {
         throw e;
 
     }
-
-
 
 
 }
