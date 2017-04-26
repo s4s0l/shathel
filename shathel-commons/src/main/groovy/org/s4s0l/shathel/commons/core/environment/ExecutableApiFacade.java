@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.cert.CertificateManager;
 import org.s4s0l.shathel.commons.docker.DockerClientWrapper;
 import org.s4s0l.shathel.commons.docker.DockerWrapper;
 import org.s4s0l.shathel.commons.secrets.SecretManager;
+import org.s4s0l.shathel.commons.secrets.SecretManagerApi;
 
 import java.io.File;
 import java.util.List;
@@ -44,7 +45,7 @@ public interface ExecutableApiFacade {
      */
     ShathelNode getManagerNode();
 
-    SecretManager getSecretManager();
+    SecretManagerApi getSecretManager();
 
     CertificateManager getCertificateManager();
 

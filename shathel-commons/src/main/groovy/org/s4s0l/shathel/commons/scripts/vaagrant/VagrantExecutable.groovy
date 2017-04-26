@@ -41,8 +41,8 @@ class VagrantExecutable implements NamedExecutable {
                 "VAGRANT_DOTFILE_PATH": econtext.settingsDirectory.absolutePath,
                 "VAGRANT_VAGRANTFILE" : script.scriptFileLocation.get().getName(),
         ])
-        boolean localVagrant = econtext.environmentDescription?.getParameter("useglobalvagrant")?.orElse("true") == "false"
-        if (localVagrant) {
+        boolean localVagrant = econtext.environmentDescription?.getParameterAsBoolean("useglobalvagrant")?.orElse(true)
+        if (!localVagrant) {
             env.putAll([
                     "VAGRANT_HOME": new File(econtext.dependencyCacheDirectory, ".vagrant.d").absolutePath
             ])

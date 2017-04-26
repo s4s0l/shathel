@@ -22,7 +22,6 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
     @Override
     def setupEnvironment() {
         environmentName = "local"
-        network = "222.222.222"
     }
 
 

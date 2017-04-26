@@ -32,7 +32,7 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         def process = processor.process(ProcessorCommand.APPLY, envs)
 
         then:
-        [TARGET_DIR: targetDir.absolutePath, ANSIBLE_RETRY_FILES_SAVE_PATH: scriptRoot.absolutePath, ANSIBLE_HOST_KEY_CHECKING: "False", ANSIBLE_NOCOWS: "1"] == envs
+        [TARGET_DIR: targetDir.absolutePath, ANSIBLE_RETRY_FILES_SAVE_PATH: targetDir.absolutePath, ANSIBLE_HOST_KEY_CHECKING: "False", ANSIBLE_NOCOWS: "1"] == envs
         process.status
         process.output.contains("127.0.0.1")
         new File(targetDir, "out.txt").text == "[\"192.168.92.4\"]"
@@ -52,7 +52,11 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 
         def envs = [DOCKER_NAME: "${getClass().simpleName}"]
-        def expectedMap = [DOCKER_NAME: "${getClass().simpleName}", VAGRANT_VAGRANTFILE: "Vagrantfile", VAGRANT_DOTFILE_PATH: "${targetDir.absolutePath}"]
+        def expectedMap = [
+                DOCKER_NAME: "${getClass().simpleName}",
+                VAGRANT_HOME: new File(targetDir, ".vagrant.d").absolutePath,
+                VAGRANT_VAGRANTFILE: "Vagrantfile",
+                VAGRANT_DOTFILE_PATH: "${targetDir.absolutePath}"]
         when:
         def processor = rep.create(new RemoteEnvironmentScript("vagrant", "Vagrantfile", "gav", getScriptRoot()))
         def process = processor.process(ProcessorCommand.INITED, envs)

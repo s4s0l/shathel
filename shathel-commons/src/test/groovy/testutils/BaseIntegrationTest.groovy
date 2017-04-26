@@ -18,8 +18,6 @@ abstract class BaseIntegrationTest extends Specification {
     @Shared
     String environmentName
     @Shared
-    String network
-    @Shared
     String solutionDescription
     @Shared
     File dependenciesDir
@@ -69,7 +67,6 @@ abstract class BaseIntegrationTest extends Specification {
                 .parameter(CommonParams.SHATHEL_DIR, rootDir.absolutePath)
                 .parameter("shathel.env.${environmentName}.safePassword", "MySecretPassword")
                 .parameter("shathel.env.${environmentName}.dependenciesDir", dependenciesDir.absolutePath)
-                .parameter("shathel.env.${environmentName}.net", network ?: "1000.1000.1000.1000")
                 .parameter(FileStackDependencyDownloader.SHATHEL_FILE_BASE_DIR, src.getAbsolutePath())
                 .parameter("shathel.solution.name", getTestClassName())
                 .parameters(additionalParams)

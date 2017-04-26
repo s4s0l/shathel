@@ -6,22 +6,25 @@ package org.s4s0l.shathel.commons.core.stack;
 public class StackEnricherDefinition extends StackScriptDefinition {
 
     public boolean isApplicableTo(StackDescription forStack) {
-        if (getOrigin().equals(forStack)) {
-            return false;
-        }
-        if (target == Target.ALL) {
-            return true;
-        } else if (target == Target.ALLOTHERS) {
-            return !getOrigin().isDependantOn(forStack.getReference(), true);
-        } else {
-            return forStack.isDependantOn(getOrigin().getReference(), true);
+        switch (target) {
+            case ALL:
+                return !getOrigin().equals(forStack);
+            case DEPS:
+                return !getOrigin().equals(forStack) && forStack.isDependantOn(getOrigin().getReference(), true);
+            case ALLOTHERS:
+                return !getOrigin().equals(forStack) && !getOrigin().isDependantOn(forStack.getReference(), true);
+            case SELF:
+                return getOrigin().equals(forStack);
+            default:
+                return false;
         }
     }
 
     public enum Target {
         ALL,
         DEPS,
-        ALLOTHERS
+        ALLOTHERS,
+        SELF
     }
 
 

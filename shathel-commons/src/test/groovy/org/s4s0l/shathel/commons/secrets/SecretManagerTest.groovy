@@ -19,7 +19,6 @@ class SecretManagerTest
     @Override
     def setupEnvironment() {
         environmentName = "local"
-        network = "222.222.222"
     }
 
 

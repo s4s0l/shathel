@@ -15,7 +15,6 @@ class SwarmStackIntrospectionProviderTest extends BaseIntegrationTest {
     @Override
     def setupEnvironment() {
         environmentName = "local"
-        network = "222.212.222"
     }
 
 

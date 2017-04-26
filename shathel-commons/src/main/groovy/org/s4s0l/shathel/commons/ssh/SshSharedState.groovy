@@ -61,10 +61,10 @@ class SshSharedState implements Closeable {
                 }
                 sshWrapper.openConnection(user, host, port, key, controlSocket)
             } catch (Exception e) {
-                LOGGER.error("ssh connection open failed", e)
+                LOGGER.debug("ssh connection open failed", e)
             }
             closeInternal()
-            LOGGER.info("ssh connection closed")
+            LOGGER.debug("ssh connection closed")
         })
         openProcess.start()
         IoUtils.waitForFile(controlSocket, 10, new RuntimeException("Unable to open ssh connection, check logs"))

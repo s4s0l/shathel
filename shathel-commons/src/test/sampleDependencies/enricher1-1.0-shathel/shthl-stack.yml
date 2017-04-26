@@ -1,0 +1,35 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:enricher1:1.0
+  enrichers:
+    self:
+        target: SELF
+        inline: |
+              def name = "enricher1-self"
+              provisioners.add(name, { context ->
+                  context.log.info("Called:${name}")
+              } as org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable)
+    all:
+        target: ALL
+        inline: |
+              def name = "enricher1-all"
+              provisioners.add(name, { context ->
+                  context.log.info("Called:${name}")
+              } as org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable)
+    deps:
+        target: DEPS
+        inline: |
+              def name = "enricher1-deps"
+              provisioners.add(name, { context ->
+                  context.log.info("Called:${name}")
+              } as org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable)
+    allothers:
+        target: ALLOTHERS
+        inline: |
+              def name = "enricher1-allothers"
+              provisioners.add(name, { context ->
+                  context.log.info("Called:${name}")
+              } as org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable)
+  dependencies:
+    org.s4s0l.shathel:enricher2:1.0:
+

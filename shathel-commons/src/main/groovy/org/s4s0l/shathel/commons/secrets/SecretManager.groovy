@@ -7,11 +7,13 @@ import org.s4s0l.shathel.commons.docker.DockerClientWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.function.Supplier
+
 /**
  * @author Marcin Wielgus
  */
 
-class SecretManager {
+class SecretManager implements SecretManagerApi {
     private static
     final Logger LOGGER = LoggerFactory.getLogger(SecretManager.class)
     private final ParameterProvider parameters
@@ -25,29 +27,42 @@ class SecretManager {
 
     @TypeChecked
     @CompileStatic
+    @Override
     boolean secretExists(String secretName) {
         return !getAllSecrets(secretName).isEmpty()
     }
 
+    @Override
     String secretCurrentName(String secretName) {
         return getAllSecrets(secretName)[0].Spec.Name
     }
 
     @TypeChecked
     @CompileStatic
+    @Override
     String secretInitialName(String secretName) {
         secretName + "_1"
     }
 
-    /**
-     *
-     * @param secretName name of secret
-     * @param defaultValue file from which to get default value
-     * @return current secret name
-     */
-    @TypeChecked
-    @CompileStatic
+    @Override
     String secretCreate(String secretName, File defaultValue) {
+        secretCreate(secretName, { defaultValue.bytes } as Supplier<byte[]>)
+    }
+
+    @Override
+    String secretUpdate(String secretName, File defaultValue) {
+        secretUpdate(secretName, { defaultValue.bytes } as Supplier<byte[]>)
+    }
+/**
+ *
+ * @param secretName name of secret
+ * @param defaultValue file from which to get default value
+ * @return current secret name
+ */
+    @TypeChecked
+    @Override
+    @CompileStatic
+    String secretCreate(String secretName, Supplier<byte[]> defaultValue) {
         List secretsMatching = getAllSecrets(secretName)
         if (!secretsMatching.isEmpty()) {
             throw new RuntimeException("Secret $secretName already present")
@@ -60,14 +75,15 @@ class SecretManager {
 
     @TypeChecked
     @CompileStatic
-    String secretUpdate(String secretName, File defaultValue) {
+    @Override
+    String secretUpdate(String secretName, Supplier<byte[]> defaultValue) {
         def finalName = secretAddNewVersion(secretName, defaultValue)
         secretUpdateForServices(secretName)
         return finalName
     }
 
 
-    String secretAddNewVersion(String secretName, File defaultValue) {
+    private String secretAddNewVersion(String secretName, Supplier<byte[]> defaultValue) {
         List secretsMatching = getAllSecrets(secretName)
         if (secretsMatching.isEmpty()) {
             LOGGER.warn("Secret does not exist so creating new")
@@ -86,6 +102,7 @@ class SecretManager {
         return finalSecretName
     }
 
+    @Override
     List<String> getAllSecretNames() {
         List secretsMatching = dockerWrapper.secrets().content
         return secretsMatching.sort {
@@ -93,6 +110,7 @@ class SecretManager {
         }.collect { it.Spec.Name }
     }
 
+    @Override
     List<String> getAllSecretNames(String secretName) {
         def pattern = /${secretName}(_[0-9]+)?/
         List secretsList = dockerWrapper.secrets().content
@@ -104,6 +122,7 @@ class SecretManager {
         }.collect { it.Spec.Name }
     }
 
+    @Override
     List<String> getServicesUsingSecret(String secretName) {
         List secretsMatching = getAllSecrets(secretName)
         if (secretsMatching.isEmpty()) {
@@ -122,7 +141,7 @@ class SecretManager {
         }.sort()
     }
 
-    void secretUpdateForServices(String secretName) {
+    private void secretUpdateForServices(String secretName) {
         List secretsMatching = getAllSecrets(secretName)
         if (secretsMatching.isEmpty()) {
             throw new RuntimeException("Secret $secretName is not present")
@@ -172,7 +191,7 @@ class SecretManager {
     }
 
 
-    private byte[] getValue(String secretName, File defaultValue) {
+    private byte[] getValue(String secretName, Supplier<byte[]> defaultValue) {
         return parameters.getParameter(secretName.toLowerCase() + "_secret_path")
                 .map { new File(it).bytes }
                 .orElseGet {
@@ -182,8 +201,8 @@ class SecretManager {
                 if (defaultValue == null) {
                     throw new RuntimeException("Unable to find value of secret $secretName.")
                 }
-                LOGGER.warn("For secret $secretName default value will be used from file ${defaultValue.absolutePath}")
-                defaultValue.bytes
+                LOGGER.warn("For secret $secretName default value will be used from supplier.")
+                defaultValue.get()
             }
         }
     }

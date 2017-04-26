@@ -93,6 +93,8 @@ public class EnricherExecutableParams {
         return environmentContext;
     }
 
+
+    //todo: change to getApi to be consistent with map key names
     public ExecutableApiFacade getApiFacade() {
         return apiFacade;
     }

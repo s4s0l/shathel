@@ -43,6 +43,10 @@
 * shathel.env.{env}.workers
 * shathel.env.{env}.useglobalvagrant
 
+### VBOX
+* shathel.env.{env}.private_net
+* shathel.env.{env}.public_net
+
 ## Local Swarm environment
 * shathel.env.{env}.ansible_become_password
 * shathel.env.{env}.ansible_enabled // for local swarm
