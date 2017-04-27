@@ -1,0 +1,10 @@
+version: "3.1"
+services:
+  service:
+    image: tutum/hello-world
+    volumes:
+          - volume2a-data:/dataA
+          - volume2b-data:/dataB
+volumes:
+  volume2a-data:
+  volume2b-data:

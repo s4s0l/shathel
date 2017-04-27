@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core.environment;
 
+import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 
 import java.util.Collections;
@@ -25,7 +26,7 @@ public class StackIntrospection {
 
     public boolean isDependantOn(StackReference other) {
         return labels.entrySet().stream()
-                .filter(it -> it.getKey().startsWith("org.shathel.stack.dependency."))
+                .filter(it -> it.getKey().startsWith(DefaultGlobalEnricherProvider.LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY))
                 .filter(it -> it.getValue().equals(other.getGa()))
                 .findAny().isPresent();
     }

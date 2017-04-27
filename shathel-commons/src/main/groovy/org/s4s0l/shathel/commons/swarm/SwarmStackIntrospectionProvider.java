@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.swarm;
 
+import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionResolver;
@@ -27,7 +28,7 @@ public class SwarmStackIntrospectionProvider implements StackIntrospectionProvid
 
     protected List<StackIntrospection.Service> getServicesFromOneStackLabels(StackIntrospectionResolver resolver) {
         return resolver.getMap().stream().map(x -> new StackIntrospection.Service(
-                resolver.getShathelLabels().get("org.shathel.stack.deployName"),
+                resolver.getShathelLabels().get(DefaultGlobalEnricherProvider.LABEL_SHATHEL_STACK_DEPLOY_NAME),
                 x.get("shathel.service.name"),
                 Integer.parseInt(x.get("shathel.service.count")),
                 Integer.parseInt(x.get("shathel.service.expectedCount")),
@@ -71,7 +72,7 @@ public class SwarmStackIntrospectionProvider implements StackIntrospectionProvid
     public StackIntrospections getAllStacks() {
         List<Map<String, String>> oneByFilter = getByFilter("label=org.shathel.stack.marker=true");
         Map<String, List<Map<String, String>>> collect = oneByFilter.stream().collect(
-                Collectors.groupingBy(x -> x.get("org.shathel.stack.ga"),
+                Collectors.groupingBy(x -> x.get(DefaultGlobalEnricherProvider.LABEL_SHATHEL_STACK_GA),
                         Collectors.mapping(x -> x, Collectors.toList())
                 )
         );

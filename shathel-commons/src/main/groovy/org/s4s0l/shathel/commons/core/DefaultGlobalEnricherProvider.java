@@ -16,6 +16,15 @@ import java.util.Map;
 public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
 
 
+    public static final String LABEL_PREFIX_SHATHEL = "org.shathel.stack";
+    public static final String LABEL_SHATHEL_STACK_GAV = LABEL_PREFIX_SHATHEL + ".gav";
+    public static final String LABEL_SHATHEL_STACK_DEPLOY_NAME = LABEL_PREFIX_SHATHEL + ".deployName";
+    public static final String LABEL_SHATHEL_STACK_GA = LABEL_PREFIX_SHATHEL + ".ga";
+    public static final String LABEL_SHATHEL_STACK_MARKER = LABEL_PREFIX_SHATHEL + ".marker";
+    public static final String LABEL_SHATHEL_DEPLOYER_VERSION = "org.shathel.deployer.version";
+    public static final String LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY = LABEL_PREFIX_SHATHEL + ".dependency";
+    public static final String LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY_OPTIONAL = LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY + ".optional";
+
     @Override
     public List<NamedExecutable> getGlobalEnrichers() {
         return Arrays.asList(
@@ -40,23 +49,23 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         protected void execute(EnricherExecutableParams params) {
             ComposeFileModel model = params.getModel();
             StackDescription stack = params.getStack();
-            addLabels(model, "org.shathel.stack.gav", stack.getGav());
-            addLabels(model, "org.shathel.stack.deployName", stack.getDeployName());
-            addLabels(model, "org.shathel.stack.ga", stack.getGroup() + ":" + stack.getName());
-            addLabels(model, "org.shathel.stack.marker", "true");
-            addLabels(model, "org.shathel.deployer.version", versionInfo());
+            addLabels(model, LABEL_SHATHEL_STACK_GAV, stack.getGav());
+            addLabels(model, LABEL_SHATHEL_STACK_DEPLOY_NAME, stack.getDeployName());
+            addLabels(model, LABEL_SHATHEL_STACK_GA, stack.getReference().getGa());
+            addLabels(model, LABEL_SHATHEL_STACK_MARKER, "true");
+            addLabels(model, LABEL_SHATHEL_DEPLOYER_VERSION, versionInfo());
             List<StackDependency> dependencies = stack.getDependencies();
             int i = 0;
             for (StackDependency dependency : dependencies) {
                 if (!dependency.isOptional()) {
-                    model.addLabelToServices("org.shathel.stack.dependency." + i, dependency.getStackReference().getGa());
+                    model.addLabelToServices(LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY + "." + i, dependency.getStackReference().getGa());
                 }
                 i++;
             }
             i = 0;
             for (StackDependency dependency : dependencies) {
                 if (dependency.isOptional()) {
-                    model.addLabelToServices("org.shathel.stack.dependency.optional." + i, dependency.getStackReference().getGa());
+                    model.addLabelToServices(LABEL_PREFIX_SHATHEL_STACK_DEPENDENCY_OPTIONAL + "." + i, dependency.getStackReference().getGa());
                 }
                 i++;
             }

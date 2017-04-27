@@ -432,6 +432,11 @@ class DockerWrapper {
         exec.executeForOutput("node update ${labels.collect { "--label-add ${it.key}=${it.value}" }.join(" ")} $nodeName")
     }
 
+    Map swarmNodeInspect(String nodeName) {
+        def output = exec.executeForOutput("node inspect $nodeName")
+        return new JsonSlurper().parseText(output)[0]
+    }
+
     Map<String, String> swarmNodeGetLabels(String nodeName) {
         def output = exec.executeForOutput("node inspect $nodeName")
         new JsonSlurper().parseText(output)[0].Spec.Labels
@@ -450,8 +455,20 @@ class DockerWrapper {
             exec.executeForOutput("secret rm $name")
     }
 
-    Map swarmNodeInspect(String nodeName) {
-        def output = exec.executeForOutput("node inspect $nodeName")
-        return new JsonSlurper().parseText(output)[0]
+
+    List<Map<String, String>> volumesList(String filter) {
+        def output = exec.executeForOutput("volume", "ls", "-f", "$filter", "--format", "{{ json . }}")
+        def json = fixPsOutToJson(output)
+        return json.collect {
+            [
+                    name  : it.Name,
+                    driver: it.Driver,
+                    labels: it.Labels.split(",").collectEntries { x -> [(x.split("=")[0]): x.split("=")[1]] }
+            ]
+        }
+    }
+
+    void volumeRemove(String volumeName) {
+        exec.executeForOutput("volume rm ${volumeName}")
     }
 }

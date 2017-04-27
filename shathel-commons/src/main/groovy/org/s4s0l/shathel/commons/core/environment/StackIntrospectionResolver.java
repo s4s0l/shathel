@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.commons.core.environment;
 
+import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,7 +22,7 @@ public class StackIntrospectionResolver {
 
     public String getGa() {
         List<String> collect = map.stream()
-                .map(x -> x.get("org.shathel.stack.ga"))
+                .map(x -> x.get(DefaultGlobalEnricherProvider.LABEL_SHATHEL_STACK_GA))
                 .distinct().collect(Collectors.toList());
         if (collect.size() != 1) {
             throw new RuntimeException("Existing stack is not consistent org.shathel.stack.ga for all services should have same value!");
@@ -30,7 +32,7 @@ public class StackIntrospectionResolver {
 
     public String getGav() {
         List<String> collect = map.stream()
-                .map(x -> x.get("org.shathel.stack.gav"))
+                .map(x -> x.get(DefaultGlobalEnricherProvider.LABEL_SHATHEL_STACK_GAV))
                 .distinct().collect(Collectors.toList());
         if (collect.size() != 1) {
             throw new RuntimeException("Existing stack is not consistent org.shathel.stack.gav for all services should have same value!");
@@ -51,12 +53,12 @@ public class StackIntrospectionResolver {
         List<Map<String, String>> collect = map.stream().map(x ->
                 x.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().startsWith("org.shathel.stack"))
+                        .filter(e -> e.getKey().startsWith(DefaultGlobalEnricherProvider.LABEL_PREFIX_SHATHEL))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         ).distinct()
                 .collect(Collectors.toList());
         if(collect.size()!=1){
-            throw new RuntimeException("org.shathel.stack labels inconsistent");
+            throw new RuntimeException(DefaultGlobalEnricherProvider.LABEL_PREFIX_SHATHEL + " labels inconsistent");
         }
         return collect.get(0);
     }
