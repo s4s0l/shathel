@@ -12,6 +12,7 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -70,6 +71,22 @@ public class Solution {
         DependencyManager dependencyManager = getDependencyManager(e);
         return new Stack(extensionContext, reference, dependencyManager, e);
     }
+
+    public StackOperations getPurgeCommand(Environment environment) {
+        List<StackIntrospection> rootStacks = environment.getIntrospectionProvider().getAllStacks().getRootStacks();
+        StackOperations.Builder builder = StackOperations.builder(environment);
+        for (StackIntrospection rootStack : rootStacks) {
+            Stack stack = openStack(environment, rootStack.getReference());
+            StackOperations stopCommand = stack.createStopCommand(true, true);
+            builder.add(stopCommand.getCommands());
+        }
+        return builder.build();
+    }
+
+    public void run(StackOperations schedule) {
+        new StackProvisionerExecutor(schedule, extensionContext).execute();
+    }
+
 
     private DependencyManager getDependencyManager(Environment e) {
         Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");

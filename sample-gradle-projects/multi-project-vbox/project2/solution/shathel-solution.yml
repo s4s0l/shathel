@@ -6,7 +6,7 @@ shathel-solution:
       public.net: 192.168.47
       type: remote
       forceful: 'true'
-      gav: ./virtualbox
+      gav: git@github.com/s4s0l/shathel-envs:virtualbox:0.0.1
       domain: shathel-vbox-plugin-test2
       workers: '0'
       private.net: 33.33.37

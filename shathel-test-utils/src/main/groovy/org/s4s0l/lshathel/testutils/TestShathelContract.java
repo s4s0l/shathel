@@ -72,13 +72,13 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
 
     default void start(String gav, boolean withOptional) {
         Stack stack = stack(gav);
-        stack.run(stack.createStartCommand(withOptional));
+        solution().run(stack.createStartCommand(withOptional));
     }
 
 
     default void stop(String gav, boolean withDependencies, boolean withOptional) {
         Stack stack = stack(gav);
-        stack.run(stack.createStopCommand(withDependencies, withOptional));
+        solution().run(stack.createStopCommand(withDependencies, withOptional));
     }
 
 }

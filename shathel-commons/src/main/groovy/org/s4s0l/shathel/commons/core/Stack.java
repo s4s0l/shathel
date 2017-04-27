@@ -59,8 +59,14 @@ public class Stack {
         return new StackEnricherExecutor(extensionContext, getStackContext(withOptional), withOptional);
     }
 
+    /**
+     * Please use @{link {@link Solution#run(StackOperations)}}
+     *
+     * @param schedule shedule to be run
+     */
+    @Deprecated
     public void run(StackOperations schedule) {
-        new StackProvisionerExecutor(extensionContext, environment).execute(schedule);
+        new StackProvisionerExecutor(schedule, extensionContext).execute();
     }
 
     public static class StackContext {

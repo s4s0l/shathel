@@ -59,7 +59,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command.commands.size() == 3
 
         when:
-        stack.run(command)
+        solution.run(command)
 
 
         then:
@@ -79,7 +79,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command.commands.size() == 1
 
         when:
-        stack.run(command)
+        solution.run(command)
 
         then:
         "present" == execInAnyTask(environment, "dependency1_service", "printenv DEPENDENCY2")
@@ -124,7 +124,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command.commands.size() == 5
 
         when:
-        stack.run(command)
+        solution.run(command)
 
         then:
         environment.getIntrospectionProvider().allStacks.stacks.size() == 0
@@ -152,7 +152,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command.commands.size() == 4
 
         when:
-        stack.run(command)
+        solution.run(command)
 
 
         then:
@@ -170,7 +170,7 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command.commands.size() == 1
 
         when:
-        stack.run(command)
+        solution.run(command)
 
         then:
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY1")

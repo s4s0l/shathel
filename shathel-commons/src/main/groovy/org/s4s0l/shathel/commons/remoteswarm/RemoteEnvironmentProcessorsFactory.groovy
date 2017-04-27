@@ -36,7 +36,8 @@ class RemoteEnvironmentProcessorsFactory implements RemoteEnvironmentCallbackPro
         }
         def ansibleScriptContext = new AnsibleScriptContext(packageContext.remoteUser,
                 new File(packageContext.keysDirectory, "id_rsa"),
-                packageContext.ansibleInventoryFile)
+                packageContext.ansibleInventoryFile,
+                packageContext.knownHostsFile)
         def terraformScriptContext = new TerraformScriptContext(new File(packageContext.settingsDirectory, "terraform.state"))
         return {
             String command, Map<String, String> envs ->

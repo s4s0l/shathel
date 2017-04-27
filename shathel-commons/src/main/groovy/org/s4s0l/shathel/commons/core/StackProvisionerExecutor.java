@@ -21,24 +21,29 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class StackProvisionerExecutor {
+    private final StackOperations schedule;
     private final ExtensionContext extensionContext;
-    private final Environment environment;
 
-    public StackProvisionerExecutor(ExtensionContext extensionContext,
-                                    Environment environment) {
+
+    public StackProvisionerExecutor(StackOperations schedule, ExtensionContext extensionContext) {
+        this.schedule = schedule;
         this.extensionContext = extensionContext;
-        this.environment = environment;
     }
 
+    private Environment getEnvironment() {
+        return schedule.getEnvironment();
+    }
+
+
     private EnvironmentContext getEnvironmentContext() {
-        return environment.getEnvironmentContext();
+        return schedule.getEnvironment().getEnvironmentContext();
     }
 
     private EnvironmentContainerRunner getRunner() {
-        return environment.getContainerRunner();
+        return schedule.getEnvironment().getContainerRunner();
     }
 
-    public void execute(StackOperations schedule) {
+    public void execute() {
         try {
 
             File executionDirectory = getEnvironmentContext().getEnrichedDirectory();
@@ -98,14 +103,14 @@ public class StackProvisionerExecutor {
     private void execute(File dstStackDir, NamedExecutable executable, StackCommand stackCommand) {
         ProvisionerExecutableParams params = new ProvisionerExecutableParams(
                 getEnvironmentContext(),
-                environment.getEnvironmentApiFacade(),
+                getEnvironment().getEnvironmentApiFacade(),
                 stackCommand,
                 dstStackDir,
                 LOGGER,
                 new HttpApis(),
                 stackCommand.getEnvironment(),
-                environment.getEnvironmentApiFacade().getNodes(),
-                environment.getAnsibleScriptContext());
+                getEnvironment().getEnvironmentApiFacade().getNodes(),
+                getEnvironment().getAnsibleScriptContext());
         Map<String, Object> context = params.toMap();
         LOGGER.info("Provisioning with: {}.", executable.getName());
         executable.execute(context);

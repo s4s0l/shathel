@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.core.stack.StackReference;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
@@ -28,6 +29,17 @@ public interface StackIntrospectionProvider {
 
         public Optional<StackIntrospection> getIntrospection(StackReference reference) {
             return stacks.stream().filter(x -> x.getReference().isSameStack(reference)).findFirst();
+        }
+
+        /**
+         * returns all stacks no one depends on
+         *
+         * @return only stacks which none depends on
+         */
+        public List<StackIntrospection> getRootStacks() {
+            return stacks.stream()
+                    .filter(it -> !stacks.stream().filter(itt -> itt.isDependantOn(it.getReference())).findAny().isPresent())
+                    .collect(Collectors.toList());
         }
 
         public int size() {

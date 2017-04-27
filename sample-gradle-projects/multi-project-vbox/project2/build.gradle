@@ -39,8 +39,6 @@ shathel {
         context { from(bootRepackage) { into 'app' } }
     }
     shathelParams = [
-            SHATHEL_SOLUTION_FILE_BASE_DIR    : "${project.rootDir.absolutePath}/../../../shathel-stacks",
-            SHATHEL_SOLUTION_FILE_ENV_BASE_DIR: "${project.rootDir.absolutePath}/../../../shathel-envs",
             "shathel.env"                     : "vboxplugin",
             "shathel.dir"                     : "./solution",
     ]

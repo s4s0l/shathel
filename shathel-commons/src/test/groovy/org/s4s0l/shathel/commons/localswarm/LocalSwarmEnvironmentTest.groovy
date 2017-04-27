@@ -70,7 +70,7 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
         def command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
 
         then:
@@ -96,7 +96,7 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
         preparedCompose.services.dummy.labels['sidekick'] == 'true'
 
         when:
-        stack.run(command)
+        solution.run(command)
 
         then:
         def preparedCompose2 = new Yaml().load(new File(root, "local/enriched/dummy-2.0-shathel/stack/docker-compose.yml").text)
@@ -121,7 +121,7 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
 
 
         when:
-        stack.run(stopCommand)
+        solution.run(stopCommand)
 
         then:
         stack.createStartCommand(false).commands.size() == 2

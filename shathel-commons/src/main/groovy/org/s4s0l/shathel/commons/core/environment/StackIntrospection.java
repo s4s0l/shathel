@@ -23,6 +23,14 @@ public class StackIntrospection {
     }
 
 
+    public boolean isDependantOn(StackReference other) {
+        return labels.entrySet().stream()
+                .filter(it -> it.getKey().startsWith("org.shathel.stack.dependency."))
+                .filter(it -> it.getValue().equals(other.getGa()))
+                .findAny().isPresent();
+    }
+
+
     public List<Service> getServices() {
         return services;
     }

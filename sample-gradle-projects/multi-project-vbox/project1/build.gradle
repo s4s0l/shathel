@@ -5,11 +5,9 @@ shathel {
         context { from(bootRepackage) { into 'app' } }
     }
     shathelParams = [
-        SHATHEL_SOLUTION_FILE_BASE_DIR: "${project.rootDir.absolutePath}/../../../shathel-stacks",
-        SHATHEL_SOLUTION_FILE_ENV_BASE_DIR: "${project.rootDir.absolutePath}/../../../shathel-envs",
         "shathel.env" : "vboxplugin",
         SHATHEL_ENV_VBOXPLUGIN_TYPE: "remote",
-        SHATHEL_ENV_VBOXPLUGIN_GAV: "./virtualbox",
+        SHATHEL_ENV_VBOXPLUGIN_GAV: "git@github.com/s4s0l/shathel-envs:virtualbox:0.0.1",
         SHATHEL_ENV_VBOXPLUGIN_FORCEFUL: "true",
         SHATHEL_ENV_VBOXPLUGIN_DOMAIN: "shathel-vbox-plugin-test",
         SHATHEL_ENV_VBOXPLUGIN_SAFEPASSWORD: "HelloWorld",

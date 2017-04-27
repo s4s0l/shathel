@@ -88,7 +88,7 @@ shathel-solution:
         command.commands.size() == 2
 
         when:
-        stack.run(command)
+        solution.run(command)
 
         then:
         environment.getIntrospectionProvider().allStacks.size() == 2

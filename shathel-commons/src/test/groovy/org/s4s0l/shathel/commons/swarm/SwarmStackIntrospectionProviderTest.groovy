@@ -39,7 +39,7 @@ class SwarmStackIntrospectionProviderTest extends BaseIntegrationTest {
 
         when:
         def stack = solution.openStack(environment, reference)
-        stack.run(stack.createStartCommand(false))
+        solution.run(stack.createStartCommand(false))
         def introspection = environment.getIntrospectionProvider().getStackIntrospection(reference)
 
         then:

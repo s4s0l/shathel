@@ -139,7 +139,8 @@ class RemoteEnvironment implements Environment {
         return new AnsibleScriptContext(
                 packageContext.remoteUser,
                 new File(packageContext.keysDirectory, "id_rsa"),
-                packageContext.ansibleInventoryFile
+                packageContext.ansibleInventoryFile,
+                packageContext.knownHostsFile
         )
     }
 }

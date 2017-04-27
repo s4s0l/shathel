@@ -89,8 +89,7 @@ class ShathelOperationTask extends DefaultTask {
     }
 
 
-    Stack getShathelCurrentStack() {
-        def solution = getShathelSolution()
+    Stack getShathelCurrentStack(Solution solution) {
         def environment = solution.getEnvironment(getShathelEnvironmentName())
         if (!environment.isInitialized()) {
             environment.initialize()
@@ -168,9 +167,10 @@ class ShathelStartTask extends ShathelOperationTask {
 
     @TaskAction
     void build() {
-        def stack = getShathelCurrentStack()
+        def solution = getShathelSolution()
+        def stack = getShathelCurrentStack(solution)
         def command = stack.createStartCommand(withOptionalDependencies)
-        stack.run(command)
+        solution.run(command)
         notifyTasks(stack)
 
     }
@@ -186,14 +186,25 @@ class ShathelStopTask extends ShathelOperationTask {
 
     @TaskAction
     void build() {
-        def stack = getShathelCurrentStack()
+        def solution = getShathelSolution()
+        def stack = getShathelCurrentStack(solution)
         try {
             def command = stack.createStopCommand(withDependencies, withOptionalDependencies)
-            stack.run(command)
+            solution.run(command)
         } finally {
             SshTunelManagerImpl.globalCloseAll()
         }
+    }
+}
 
 
+class ShathelDestroyTask extends ShathelOperationTask {
+
+
+    @TaskAction
+    void build() {
+        def solution = getShathelSolution()
+        def environment = solution.getEnvironment(getShathelEnvironmentName())
+        environment.destroy()
     }
 }

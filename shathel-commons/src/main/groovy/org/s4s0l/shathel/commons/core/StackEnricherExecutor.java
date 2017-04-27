@@ -102,7 +102,7 @@ public class StackEnricherExecutor {
     }
 
     private StackOperations buildOperations(Stream<StackCommand> stackCommandStream) {
-        StackOperations.Builder builder = StackOperations.builder();
+        StackOperations.Builder builder = StackOperations.builder(stack.getEnvironment());
         stackCommandStream.forEach(x -> builder.add(x));
         return builder.build();
     }

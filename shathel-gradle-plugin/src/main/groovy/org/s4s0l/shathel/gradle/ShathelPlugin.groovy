@@ -21,6 +21,7 @@ class ShathelPlugin implements Plugin<Project> {
             finalizeDockerTasks(project)
             ShathelPrepareTask exportedTask = finalizePrepareTasks(project)
             createDockerAssembleTasks(project, exportedTask)
+            createShathelDestroyTask(project, exportedTask)
         }
 
     }
@@ -51,6 +52,11 @@ class ShathelPlugin implements Plugin<Project> {
             }
             deps.removeAll(toBeeRemoved)
         }
+    }
+
+    private void createShathelDestroyTask(Project project, ShathelPrepareTask exportedTask) {
+        ShathelDestroyTask destroy = project.task("shathelDestroy", type: ShathelDestroyTask)
+        destroy.dependsOn exportedTask
     }
 
     private void createDockerTasks(Project project) {

@@ -1,9 +1,9 @@
 package org.s4s0l.shathel.commons.core
 
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.environment.StackCommand
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import org.s4s0l.shathel.commons.utils.ExecWrapper
 import testutils.BaseIntegrationTest
 
 /**
@@ -14,7 +14,7 @@ import testutils.BaseIntegrationTest
  * enricher3
  * @author Marcin Wielgus
  */
-class EnricherTargetsTest extends BaseIntegrationTest {
+class StackPurgeTest extends BaseIntegrationTest {
 
     @Override
     def setupEnvironment() {
@@ -43,23 +43,33 @@ class EnricherTargetsTest extends BaseIntegrationTest {
 
 
         when:
+
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:enricher3:1.0"))
         def command = stack.createStartCommand(false)
-
-        then:
-        command.commands.size() == 1
-        command.commands[0].enricherPreProvisioners.collect {it.name} == ["enricher3-self"]
-
-        when:
         solution.run(command)
         stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:enricher1:1.0"))
         command = stack.createStartCommand(false)
+        solution.run(command)
 
         then:
-        command.commands.size() == 2
-        command.commands[0].enricherPreProvisioners.collect {it.name} == ["enricher2-self", "enricher1-all", "enricher3-all", "enricher3-allothers"]
-        command.commands[1].enricherPreProvisioners.collect {it.name} == ["enricher2-all", "enricher2-deps", "enricher2-allothers", "enricher1-self", "enricher3-all", "enricher3-allothers"]
+        environment.introspectionProvider.allStacks.rootStacks.size() == 2
 
+        when:
+        def purgeCommand = solution.getPurgeCommand(environment)
+
+        then:
+        purgeCommand.commands.collectEntries {
+            [(it.description.name): it.type]
+        } == ['enricher1', 'enricher2', 'enricher3'].collectEntries {
+            [(it): StackCommand.Type.STOP]
+        }
+        purgeCommand.commands[0].description.name != 'enricher1'
+
+        when:
+        solution.run(purgeCommand)
+
+        then:
+        environment.introspectionProvider.allStacks.size() == 0
 
         onEnd()
 

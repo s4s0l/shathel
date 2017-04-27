@@ -46,7 +46,7 @@ class SecretManagerTest
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:secret-consumer:1.0"))
         def command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
 
         then:
@@ -71,7 +71,7 @@ class SecretManagerTest
 
         when:
         def command2 = stack.createStopCommand(true, true)
-        stack.run(command2)
+        solution.run(command2)
 
         then:
         environment.getIntrospectionProvider().allStacks.size() == 0
@@ -81,7 +81,7 @@ class SecretManagerTest
         //because swarm has lag in destroying networks
         Thread.sleep(10000)
         command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
 
         then:

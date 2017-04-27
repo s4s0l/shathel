@@ -12,15 +12,17 @@ class AnsibleScriptContext {
     final Optional<String> disabledMessage
     final Optional<String> user
     final Optional<File> sshKey
+    final Optional<File> knownHostsFile
     final Optional<String> sudoPasswordEnvName
     final Optional<File> inventoryFile
 
-    AnsibleScriptContext(String user, File sshKey, File inventoryFile) {
+    AnsibleScriptContext(String user, File sshKey, File inventoryFile, File knownHostsFile) {
         this.user = Optional.of(user)
         this.sshKey = Optional.of(sshKey)
         this.sudoPasswordEnvName = Optional.empty()
         this.inventoryFile = Optional.of(inventoryFile)
         this.disabledMessage = Optional.empty()
+        this.knownHostsFile = Optional.of(knownHostsFile)
     }
 
     AnsibleScriptContext(String user, String envPasswordName, File inventoryFile) {
@@ -29,6 +31,7 @@ class AnsibleScriptContext {
         this.sudoPasswordEnvName = Optional.of(envPasswordName)
         this.inventoryFile = Optional.of(inventoryFile)
         this.disabledMessage = Optional.empty()
+        this.knownHostsFile = Optional.empty()
     }
 
     AnsibleScriptContext(String disabledMessage) {
@@ -36,6 +39,7 @@ class AnsibleScriptContext {
         this.sshKey = Optional.empty()
         this.sudoPasswordEnvName = Optional.empty()
         this.inventoryFile = Optional.empty()
+        this.knownHostsFile = Optional.empty()
         this.disabledMessage = Optional.of(disabledMessage)
     }
 
@@ -48,12 +52,14 @@ class AnsibleScriptContext {
             if (env.containsKey(it))
                 env['ANSIBLE_BECOME_PASS'] = env[it]
         }
+        knownHostsFile.ifPresent {
+            env['ANSIBLE_SSH_ARGS'] = "-o UserKnownHostsFile=${knownHostsFile.get().absolutePath}".toString()
+        }
     }
 
     Map<String, String> getArguments() {
         Map<String, String> ret = [:]
-        user.ifPresent {String it -> ret.put("user", it) }
-        ret.put("timeout", "180")
+        user.ifPresent { String it -> ret.put("user", it) }
         sshKey.ifPresent { File it -> ret.put("private-key", it.absolutePath) }
         inventoryFile.ifPresent { File it -> ret.put("inventory-file", it.absolutePath) }
         return ret

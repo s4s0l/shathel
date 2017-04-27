@@ -45,7 +45,7 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:ansible:1.0"))
         def command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
 
         then:
@@ -71,7 +71,7 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:ansible:1.0"))
         def command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
 
         then:

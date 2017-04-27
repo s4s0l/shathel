@@ -61,6 +61,10 @@ public class StackReference {
         return getGroup() + ":" + getName() + ":" + getVersion();
     }
 
+    public String getGa() {
+        return getGroup() + ":" + getName();
+    }
+
     @Override
     public String toString() {
         return "StackReference{" +

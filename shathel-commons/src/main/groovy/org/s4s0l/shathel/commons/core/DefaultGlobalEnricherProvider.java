@@ -49,14 +49,14 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
             int i = 0;
             for (StackDependency dependency : dependencies) {
                 if (!dependency.isOptional()) {
-                    model.addLabelToServices("org.shathel.stack.dependency." + i, dependency.getStackReference().getGav());
+                    model.addLabelToServices("org.shathel.stack.dependency." + i, dependency.getStackReference().getGa());
                 }
                 i++;
             }
             i = 0;
             for (StackDependency dependency : dependencies) {
                 if (dependency.isOptional()) {
-                    model.addLabelToServices("org.shathel.stack.dependency.optional." + i, dependency.getStackReference().getGav());
+                    model.addLabelToServices("org.shathel.stack.dependency.optional." + i, dependency.getStackReference().getGa());
                 }
                 i++;
             }

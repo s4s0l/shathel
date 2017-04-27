@@ -38,7 +38,7 @@ class SwarmContainerRunnerTest extends BaseIntegrationTest {
         when:
         def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:updateing:1.0"))
         def command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
         then:
         ["1","1","1","1","1"] == execInAllTasks(environment, "updateing_service", "printenv CURRENT_VERSION")
@@ -47,7 +47,7 @@ class SwarmContainerRunnerTest extends BaseIntegrationTest {
         when:
         stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:updateing:2.0"))
         command = stack.createStartCommand(false)
-        stack.run(command)
+        solution.run(command)
 
         then:
         ["2","2","2","2","2", "2"] == execInAllTasks(environment, "updateing_service", "printenv CURRENT_VERSION")

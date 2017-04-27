@@ -100,7 +100,7 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
           return response(this.inspect(command, inspectLong))
         } else {
           try {
-            openStack.run(command)
+            solution.run(command)
             return ok();
           } catch {
             case e: Exception => {

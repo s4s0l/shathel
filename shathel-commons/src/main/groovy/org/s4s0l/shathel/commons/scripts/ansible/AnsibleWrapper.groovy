@@ -24,7 +24,7 @@ class AnsibleWrapper {
                 Map<String, String> envs, File extraVars, File playbook) {
         asc.customize(envs)
         Map<String, String> args = [
-                "timeout"   : "180",
+                "timeout"   : "360",
                 "extra-vars": "@${extraVars.absolutePath}".toString()
         ]
         args.putAll(asc.arguments)
