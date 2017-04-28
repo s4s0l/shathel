@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.remoteswarm
 
 import org.s4s0l.shathel.commons.Shathel
+import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.docker.VBoxManageWrapper
@@ -28,6 +29,8 @@ shathel-solution:
       build-allowed: true
       managers: 2
       workers: 1
+      private_net: '33.33.39'
+      public_net: '192.168.49'
       domain: some.test.io
 """
     }
@@ -84,17 +87,35 @@ shathel-solution:
         thrown(RuntimeException)
 
         when:
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
+        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:volume1:1.0"))
         def command = stack.createStartCommand(false)
 
         then:
-        command.commands.size() == 2
+        command.commands.size() == 1
 
         when:
         solution.run(command)
 
         then:
-        environment.getIntrospectionProvider().allStacks.size() == 2
+        environment.getIntrospectionProvider().allStacks.size() == 1
+
+        /****************************************************************************
+         *  STICKY VOLUME ASSERTIONS */
+        when:
+        def nodesWithLabel = environment.environmentApiFacade.nodes.collectEntries {
+            [(it): environment.environmentApiFacade.getNodeLabels(it).get("org.shathel.volume.volume1_volume1-data")]
+        }.findAll { it.value == "true" }.collect { it.key }
+        def nodesWithVolume = environment.environmentApiFacade.nodes.collectEntries {
+            def volumes = environment.environmentApiFacade.getDocker(it).volumesList("label=${DefaultGlobalEnricherProvider.LABEL_SHATHEL_STACK_MARKER}=true")
+            [(it): volumes]
+        }.findAll {
+            it.value.find { it.name == "volume1_volume1-data" } != null
+        }.collect { it.key }
+
+        then:
+        nodesWithLabel.size() == 1
+        nodesWithVolume.nodeName == nodesWithLabel.nodeName
+        /** *************************************************************************/
 
         when:
         environment.stop()
@@ -109,7 +130,7 @@ shathel-solution:
         then:
         environment.isInitialized()
         environment.isStarted()
-        environment.getIntrospectionProvider().allStacks.size() == 2
+        environment.getIntrospectionProvider().allStacks.size() == 1
 
         when:
         environment.destroy()

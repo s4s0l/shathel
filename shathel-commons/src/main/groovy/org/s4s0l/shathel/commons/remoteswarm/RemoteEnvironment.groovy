@@ -17,6 +17,7 @@ import org.s4s0l.shathel.commons.swarm.SwarmMountingEnricher
 import org.s4s0l.shathel.commons.swarm.SwarmMountingPermissionsEnricher
 import org.s4s0l.shathel.commons.swarm.SwarmPullingEnricher
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider
+import org.s4s0l.shathel.commons.swarm.SwarmStickyVolumeEnricher
 
 /**
  * @author Marcin Wielgus
@@ -130,7 +131,8 @@ class RemoteEnvironment implements Environment {
                 new SwarmMountingEnricher("/shathel-data", this.apiFacade.sshOperaions),
                 new SwarmPullingEnricher(),
                 new SecretsEnricher(),
-                new MandatoryEnvironmentsValidator()
+                new MandatoryEnvironmentsValidator(),
+                new SwarmStickyVolumeEnricher()
         );
     }
 

@@ -145,6 +145,7 @@ class RemoteEnvironmentController {
 
     void destroy() {
         accessManager.checkPreConditions()
+        accessManager.closeAllTunnels()
         infrastructureScript.process(ProcessorCommand.DESTROY, createEnvs())
         accessManager.afterEnvironmentDestroyed()
 
@@ -152,6 +153,7 @@ class RemoteEnvironmentController {
 
     void stop() {
         accessManager.checkPreConditions()
+        accessManager.closeAllTunnels()
         infrastructureScript.process(ProcessorCommand.STOP, createEnvs())
     }
 }

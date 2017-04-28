@@ -17,6 +17,8 @@ interface RemoteEnvironmentAccessManager extends SshOperations {
 
     void afterEnvironmentDestroyed()
 
+    void closeAllTunnels()
+
     void generateNodeCertificates()
 
     List<ShathelNode> getNodes()

@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 /**
+ * This class needs attention, race conditions aare possible:/
+ *
  * @author Marcin Wielgus
  */
 @TypeChecked
@@ -63,6 +65,7 @@ class SshSharedState implements Closeable {
                     }
                 }
                 out = sshWrapper.openConnection(user, host, port, key, controlSocket)
+                //RACE AS IT IS UNSYNCHRONIZED BUT HOW COULD IT BE?
             } catch (Exception e) {
                 LOGGER.debug("ssh connection open failed", e)
             } finally {
@@ -75,20 +78,28 @@ class SshSharedState implements Closeable {
         Thread.sleep(1000)//todo find a better way
         opened = true
     }
+    volatile boolean dirty = false
 
     private synchronized void handleSshClosed(String output) {
         if (isOpened()) {
+            dirty = true
             def self = this
             LOGGER.warn("Unexpectedly closed ssh connection ${host}:${port} via control socket: ${controlSocket}, output: $output")
             new Thread({
+                Thread.sleep(1000) // giving a chance for eventual close to complete
                 synchronized (self) {
+                    if (!isOpened()) {
+                        LOGGER.warn("Aborting reopen ${host}:${port} via control socket: ${controlSocket}, as seems to be closed.")
+                    }
                     LOGGER.warn("Trying to reopen ${host}:${port} via control socket: ${controlSocket}.")
                     if (!controlSocket.exists()) {
                         open()
                         restoreTunnels()
-                    }else{
+                    } else {
                         LOGGER.warn("WTF? Control socket exists so doing nothing for ${host}:${port} via control socket: ${controlSocket}.")
                     }
+                    dirty = false
+                    self.notifyAll()
                 }
             }).start()
         }
@@ -134,6 +145,11 @@ class SshSharedState implements Closeable {
         if (!isOpened()) {
             open()
         }
+        if (dirty) {
+            wait(60000)
+            if (dirty)
+                throw new RuntimeException("Unable to recover from previous failure of connection to ${host}")
+        }
         sshWrapper.tunnelConnection(host, port, controlSocket, "127.0.0.1:${localPortToUse}:${target}")
         openedSockets.put(target, localPortToUse)
         return localPortToUse
@@ -144,13 +160,14 @@ class SshSharedState implements Closeable {
     @Override
     synchronized void close() throws IOException {
         try {
-            if (isOpened() || controlSocket.exists()) {
+            if (controlSocket.exists()) {
                 LOGGER.warn("Closing ssh connection to ${host}:${port} via control socket: ${controlSocket}")
                 sshWrapper.closeConnection(host, port, controlSocket)
             }
         } finally {
             openedSockets.clear()
             opened = false
+            dirty = false
         }
 
     }

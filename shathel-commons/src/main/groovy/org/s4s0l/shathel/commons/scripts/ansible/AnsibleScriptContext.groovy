@@ -52,8 +52,9 @@ class AnsibleScriptContext {
             if (env.containsKey(it))
                 env['ANSIBLE_BECOME_PASS'] = env[it]
         }
+        env['ANSIBLE_SSH_ARGS'] = "-o ConnectTimeout=60 -o ConnectionAttempts=6"
         knownHostsFile.ifPresent {
-            env['ANSIBLE_SSH_ARGS'] = "-o UserKnownHostsFile=${knownHostsFile.get().absolutePath}".toString()
+            env['ANSIBLE_SSH_ARGS'] = "${env['ANSIBLE_SSH_ARGS']} -o UserKnownHostsFile=${knownHostsFile.get().absolutePath}".toString()
         }
     }
 

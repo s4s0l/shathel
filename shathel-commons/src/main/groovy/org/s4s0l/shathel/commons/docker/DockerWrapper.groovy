@@ -310,10 +310,10 @@ class DockerWrapper {
             }
             atts++
             if (atts >= maxAtts) {
-                LOGGER.warn("Seems like there are some networks left lieing around after undeployment of ${deploymentName}, will not wait any longer, we will see what happens...")
+                LOGGER.warn("Seems like there are some networks left lying around after undeployment of ${deploymentName}, will not wait any longer, we will see what happens...")
                 break
             }
-            LOGGER.warn("Seems like there are some networks left lieing around after undeployment of ${deploymentName}, will wait a little longer...")
+            LOGGER.warn("Seems like there are some networks left lying around after undeployment of ${deploymentName}, will wait a little longer...")
             Thread.sleep(2000)
         }
     }
@@ -439,7 +439,7 @@ class DockerWrapper {
 
     Map<String, String> swarmNodeGetLabels(String nodeName) {
         def output = exec.executeForOutput("node inspect $nodeName")
-        new JsonSlurper().parseText(output)[0].Spec.Labels
+        new JsonSlurper().parseText(output)[0].Spec.Labels ?: [:]
     }
 
     boolean secretExists(String name) {

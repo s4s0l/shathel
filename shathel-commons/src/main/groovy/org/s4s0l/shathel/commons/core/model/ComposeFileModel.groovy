@@ -146,6 +146,29 @@ class ComposeFileModel {
         }
     }
 
+    void addConstraintToService(String serviceName, String constraint) {
+        def all = parsedYml.services.findAll { it.key == serviceName }
+        if (all.isEmpty()) {
+            throw new RuntimeException("$serviceName nmot found in compose file!")
+        }
+        all.each {
+            if (it.value == null) {
+                it.value = [:]
+            }
+            if (it.value.deploy == null) {
+                it.value.deploy = [:]
+            }
+            if (it.value.deploy.placement == null) {
+                it.value.deploy.placement = [:]
+            }
+            if (it.value.deploy.placement.constraints == null) {
+                it.value.deploy.placement.constraints = []
+            }
+            it.value.deploy.placement.constraints << constraint
+
+        }
+    }
+
     void addLabelToServices(String key, String value) {
 
 

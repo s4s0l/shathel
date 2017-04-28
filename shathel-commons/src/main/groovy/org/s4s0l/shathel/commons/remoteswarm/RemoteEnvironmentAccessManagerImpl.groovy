@@ -40,6 +40,11 @@ class RemoteEnvironmentAccessManagerImpl implements RemoteEnvironmentAccessManag
     }
 
     @Override
+    void closeAllTunnels() {
+        tunnelManager.closeAll()
+    }
+
+    @Override
     void afterEnvironmentDestroyed() {
         inventoryFile.afterEnvironmentDestroyed()
         tunnelManager.afterEnvironmentDestroyed()
