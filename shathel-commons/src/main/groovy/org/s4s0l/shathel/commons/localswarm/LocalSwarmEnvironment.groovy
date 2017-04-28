@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
+import org.s4s0l.shathel.commons.core.SettingsImporterExporter
 import org.s4s0l.shathel.commons.core.environment.*
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
@@ -14,10 +15,6 @@ import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider
 import org.slf4j.Logger
-
-import java.io.IOException
-import java.util.Arrays
-import java.util.List
 
 import static org.slf4j.LoggerFactory.getLogger
 
@@ -31,10 +28,12 @@ class LocalSwarmEnvironment implements Environment {
     private final LocalSwarmEnvironmentContext context
     private final DockerWrapper dockerWrapper = new DockerWrapper()
     private final LocalSwarmApiFacade apiFacade
+    private final SettingsImporterExporter machineSettingsImporterExporter
 
-    LocalSwarmEnvironment(LocalSwarmEnvironmentContext context) {
+    LocalSwarmEnvironment(LocalSwarmEnvironmentContext context, SettingsImporterExporter machineSettingsImporterExporter) {
         this.context = context
         this.apiFacade = new LocalSwarmApiFacade(getDockerWrapper(), context)
+        this.machineSettingsImporterExporter = machineSettingsImporterExporter
     }
 
     @Override
@@ -92,7 +91,7 @@ class LocalSwarmEnvironment implements Environment {
 
     @Override
     void destroy() {
-
+        context.getAnsibleInventoryFile().delete()
     }
 
     @Override
@@ -105,14 +104,30 @@ class LocalSwarmEnvironment implements Environment {
         }
     }
 
+    private String getSafeStorageKey() {
+        return "machines"
+    }
+
     @Override
     void save() {
-
+        String safeStoreKey = getSafeStorageKey()
+        machineSettingsImporterExporter.saveSettings(context.settingsDirectory,
+                context.getSafeStorage().outputStream(safeStoreKey))
     }
 
     @Override
     void load() {
-
+        String safeStoreKey = getSafeStorageKey()
+        Optional<InputStream> inputStream = context.getSafeStorage().inputStream(safeStoreKey)
+        if (inputStream.isPresent()) {
+            if (isStarted()) {
+                stop()
+            }
+            machineSettingsImporterExporter.loadSettings(inputStream.get(),
+                    context.settingsDirectory)
+        } else {
+            throw new RuntimeException("No saved state found!")
+        }
     }
 
     @Override

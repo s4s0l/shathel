@@ -88,7 +88,6 @@ class RemoteEnvironment implements Environment {
 
     @Override
     void load() {
-        stop()
         String safeStoreKey = getSafeStorageKey()
         Optional<InputStream> inputStream = packageContext.getSafeStorage().inputStream(safeStoreKey)
         if (inputStream.isPresent()) {

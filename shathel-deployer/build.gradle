@@ -46,5 +46,5 @@ task(type: GitHubReleaseUploadAsset, dependsOn: assemble, "uploadGithubRelease")
 apply from: '../gradle/integration.gradle'
 
 install.dependsOn assemble
-integrationTest.dependsOn install
+test.dependsOn install
 

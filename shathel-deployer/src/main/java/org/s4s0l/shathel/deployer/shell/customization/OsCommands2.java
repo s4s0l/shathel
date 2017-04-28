@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 /**
  * Command type to allow execution of native OS commands from the Spring Shell.
- * 
+ *
  * @author Stefan Schmidt
  * @since 1.2.0
  */
@@ -40,20 +40,20 @@ public class OsCommands2 implements CommandMarker {
     private static final Logger LOGGER = HandlerUtils
             .getLogger(OsCommands2.class);
 
-    private OsOperations osOperations = new OsOperationsImpl();
+    private OsOperationsImpl osOperations = new OsOperationsImpl();
 
     @CliCommand(value = "~", help = "Allows execution of operating system (OS) commands")
-    public void command(
-            @CliOption(key = { "", "command" }, mandatory = false, specifiedDefaultValue = "", unspecifiedDefaultValue = "", help = "The command to execute") final String command) {
+    public String command(
+            @CliOption(key = {"", "command"}, mandatory = false, specifiedDefaultValue = "", unspecifiedDefaultValue = "", help = "The command to execute") final String command) {
 
         if (command != null && command.length() > 0) {
             try {
-                osOperations.executeCommand(command);
+                return osOperations.executeCommand(command);
+            } catch (final IOException e) {
+                throw new RuntimeException("Unable to run command :" + command);
             }
-            catch (final IOException e) {
-                LOGGER.severe("Unable to execute command " + command + " ["
-                        + e.getMessage() + "]");
-            }
+        } else {
+            return "";
         }
     }
 }

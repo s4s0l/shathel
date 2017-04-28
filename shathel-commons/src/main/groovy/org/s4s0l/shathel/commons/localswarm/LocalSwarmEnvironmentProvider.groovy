@@ -1,23 +1,25 @@
-package org.s4s0l.shathel.commons.localswarm;
+package org.s4s0l.shathel.commons.localswarm
 
-import org.s4s0l.shathel.commons.core.environment.Environment;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext;
-import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider;
+import org.s4s0l.shathel.commons.core.DefaultSettingsImporterExporter
+import org.s4s0l.shathel.commons.core.environment.Environment
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider
 
 /**
  * @author Marcin Wielgus
  */
-public class LocalSwarmEnvironmentProvider implements EnvironmentProvider {
+class LocalSwarmEnvironmentProvider implements EnvironmentProvider {
 
 
     @Override
-    public String getType() {
-        return "local-swarm";
+    String getType() {
+        return "local-swarm"
     }
 
     @Override
-    public Environment getEnvironment(EnvironmentContext environmentContext) {
-        return new LocalSwarmEnvironment(new LocalSwarmEnvironmentContextImpl(environmentContext));
+    Environment getEnvironment(EnvironmentContext environmentContext) {
+        DefaultSettingsImporterExporter machineSettingsImporterExporter = new DefaultSettingsImporterExporter()
+        return new LocalSwarmEnvironment(new LocalSwarmEnvironmentContextImpl(environmentContext), machineSettingsImporterExporter)
     }
 
 

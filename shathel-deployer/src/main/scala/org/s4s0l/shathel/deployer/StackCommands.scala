@@ -62,6 +62,37 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
       })
   }
 
+  @CliCommand(value = Array("stack purge"), help = "Removes all stacks!")
+  def purge(
+             @CliOption(key = Array("inspect"), mandatory = false, help = "If true will only inspect not run",
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
+             inspect: Boolean,
+             @CliOption(key = Array("inspect-compose"), mandatory = false, help = "If true will output compose files used",
+               specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
+             inspectLong: Boolean,
+             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
+             map: java.util.Map[String, String]
+           ): String = {
+    shathel(map, builder())(
+      context => {
+        val (storage, solution, environment) = environmentCommands.getEnvironment(context)
+        val command = solution.getPurgeCommand(environment)
+
+        if (inspect) {
+          return response(this.inspect(command, inspectLong))
+        } else {
+          try {
+            solution.run(command)
+            return ok();
+          } catch {
+            case e: Exception => {
+              LOGGER.warn(response(this.inspect(command, true)))
+              throw e
+            }
+          }
+        }
+      })
+  }
 
 
   @CliCommand(value = Array("stack stop"), help = "Displays what will be done with given stack.")

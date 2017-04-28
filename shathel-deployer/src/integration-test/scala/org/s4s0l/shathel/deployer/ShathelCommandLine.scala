@@ -2,8 +2,10 @@ package org.s4s0l.shathel.deployer
 
 import java.io.{File, PrintWriter}
 import java.util.UUID
-import sys.process._
-import org.scalatest.Assertions
+
+import org.s4s0l.shathel.commons.utils.Utils
+
+import scala.sys.process._
 
 /**
   * @author Marcin Wielgus
@@ -11,10 +13,11 @@ import org.scalatest.Assertions
 trait ShathelCommandLine {
 
 
-  def version = "0.0.3"
+  def version = "0.0.4"
 
   def shathel(): String = {
-    val x = "../build/localrepo/org/s4s0l/shathel/shathel-deployer/DEVELOPER-SNAPSHOT/shathel-deployer-DEVELOPER-SNAPSHOT.jar"
+    val version = Utils.getShathelVersion
+    val x = s"../build/localrepo/org/s4s0l/shathel/shathel-deployer/${version}/shathel-deployer-${version}.jar"
     new File(x).setExecutable(true)
     x
   }

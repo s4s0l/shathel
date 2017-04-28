@@ -16,11 +16,11 @@ trait OutputFormatter {
   }
 
   def response(map: Map[String, Any]): String = {
-    yaml.dump(map.asJava)
+    yaml.dump(map.asJava).trim
   }
 
   def response(list: Seq[Any]): String = {
-    yaml.dump(list.asJava)
+    yaml.dump(list.asJava).trim
   }
 
 
@@ -30,6 +30,6 @@ trait OutputFormatter {
   }
 
   def ok(): String = {
-    yaml.dump(Map("status" -> "ok").asJava)
+    yaml.dump(Map("status" -> "ok").asJava).trim
   }
 }

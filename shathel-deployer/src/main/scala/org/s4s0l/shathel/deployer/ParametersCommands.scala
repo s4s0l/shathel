@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 /**
   * @author Marcin Wielgus
   */
-class ParametersCommands extends CommandMarker with ParametersKeyProvider {
+class ParametersCommands extends CommandMarker with ParametersKeyProvider with OutputFormatter {
   private var parameters: Parameters = Parameters.fromMapWithSysPropAndEnv(Map[String, String]().asJava)
   private val globalParameters = new DeployerParameters.Provider(() => parameters);
 
@@ -29,6 +29,7 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
     DeployerParameters.getParams(getParameter(CommonParams.SHATHEL_ENV))
       .filter((x) => env || getParameter(x).isDefined)
       .map((paramName) => s"${paramName}=${getParameter(paramName).getOrElse("")}")
+      .sorted
       .mkString("\n")
   }
 
@@ -37,7 +38,7 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider {
            @CliOption(key = Array("params"), mandatory = false, help = "map of parameters to set for other commands in format name1=value,name2=value")
            map: java.util.Map[String, String]): String = {
     setParameters(map)
-    return null;
+    return ok();
   }
 
   def buildParameters(paramMap: java.util.Map[String, String]): Parameters = {

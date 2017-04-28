@@ -1,0 +1,6 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:inspect2:1.0
+  dependencies:
+    org.s4s0l.shathel:inspect3:1.0:
+      optional: true

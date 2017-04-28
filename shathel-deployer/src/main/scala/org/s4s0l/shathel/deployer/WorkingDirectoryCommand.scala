@@ -10,7 +10,7 @@ import org.springframework.shell.core.annotation.{CliCommand, CliOption}
   */
 class WorkingDirectoryCommand extends CommandMarker {
 
-  @CliCommand(value = Array("cd"), help = "Changes working directory for ! commands.")
+  @CliCommand(value = Array("cd"), help = "Changes working directory for ~ commands.")
   def cd(@CliOption(key = Array("", " dir"), mandatory = false, help = "working dir")
          path: File): String = {
     if (path.isAbsolute) {

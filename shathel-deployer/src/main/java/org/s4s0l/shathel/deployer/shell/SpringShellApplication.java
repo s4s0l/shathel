@@ -15,9 +15,6 @@ import java.util.logging.Logger;
  */
 public class SpringShellApplication {
 
-    public static int run(Object source, String... args) {
-        return run(new Object[]{source}, args);
-    }
 
     public static int run(Object[] sources, String[] args) {
         ConfigurableApplicationContext ctx = new SpringApplication(sources).run(args);

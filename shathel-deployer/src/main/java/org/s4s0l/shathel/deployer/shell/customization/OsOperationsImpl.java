@@ -15,47 +15,31 @@ import java.util.logging.Logger;
  * @author Marcin Wielgus
  */
 
-public class OsOperationsImpl implements OsOperations {
+public class OsOperationsImpl {
     private static final Logger LOGGER = HandlerUtils.getLogger(org.springframework.shell.commands.OsOperationsImpl.class);
 
-    public void executeCommand(final String command) throws IOException {
+    public String executeCommand(final String command) throws IOException {
         final File root = new File(".").getAbsoluteFile();
         final Process p = Runtime.getRuntime().exec(command, null, root);
         Reader input = new InputStreamReader(p.getInputStream());
         Reader errors = new InputStreamReader(p.getErrorStream());
 
+        StringBuilder sb = new StringBuilder();
         for (String line : IOUtils.readLines(input)) {
-            if (line.startsWith("[ERROR]")) {
-                LOGGER.severe(line);
-            } else if (line.startsWith("[WARNING]")) {
-                LOGGER.warning(line);
-            } else {
-                LOGGER.info(line);
-            }
+            sb.append(line).append("\n");
         }
-
-
         for (String line : IOUtils.readLines(errors)) {
-            if (line.startsWith("[ERROR]")) {
-                LOGGER.severe(line);
-            } else if (line.startsWith("[WARNING]")) {
-                LOGGER.warning(line);
-            } else {
-                LOGGER.info(line);
-            }
+            LOGGER.severe(line);
         }
-
-
         p.getOutputStream().close();
-
-
         try {
             if (p.waitFor() != 0) {
-                LOGGER.warning("The command '" + command + "' did not complete successfully");
+                throw new RuntimeException("The command '" + command + "' did not complete successfully");
             }
         } catch (final InterruptedException e) {
             throw new IllegalStateException(e);
         }
+        return sb.toString();
     }
 
 }
