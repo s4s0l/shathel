@@ -27,13 +27,18 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
         def envs = [TARGET_DIR: targetDir.absolutePath]
+        def expectedEnvs = [TARGET_DIR                   : targetDir.absolutePath,
+                            ANSIBLE_SSH_ARGS             : "-o ConnectTimeout=60 -o ConnectionAttempts=6 -o UserKnownHostsFile=${new File(targetDir, "known_hosts").absolutePath}",
+                            ANSIBLE_RETRY_FILES_SAVE_PATH: targetDir.absolutePath,
+                            ANSIBLE_HOST_KEY_CHECKING    : "False",
+                            ANSIBLE_NOCOWS               : "1"]
 
         when:
         def processor = rep.create(new RemoteEnvironmentScript("ansible", "empty-playbook.yml", "gav", getScriptRoot()))
         def process = processor.process(ProcessorCommand.APPLY, envs)
 
         then:
-        [TARGET_DIR: targetDir.absolutePath, ANSIBLE_SSH_ARGS: "-o UserKnownHostsFile=${new File(targetDir, "known_hosts").absolutePath}", ANSIBLE_RETRY_FILES_SAVE_PATH: targetDir.absolutePath, ANSIBLE_HOST_KEY_CHECKING: "False", ANSIBLE_NOCOWS: "1"] == envs
+        expectedEnvs == envs
         process.status
         process.output.contains("127.0.0.1")
         new File(targetDir, "out.txt").text == "[\"192.168.92.4\"]"
@@ -55,9 +60,9 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
 
         def envs = [DOCKER_NAME: "${getClass().simpleName}"]
         def expectedMap = [
-                DOCKER_NAME: "${getClass().simpleName}",
-                VAGRANT_HOME: new File(targetDir, ".vagrant.d").absolutePath,
-                VAGRANT_VAGRANTFILE: "Vagrantfile",
+                DOCKER_NAME         : "${getClass().simpleName}",
+                VAGRANT_HOME        : new File(targetDir, ".vagrant.d").absolutePath,
+                VAGRANT_VAGRANTFILE : "Vagrantfile",
                 VAGRANT_DOTFILE_PATH: "${targetDir.absolutePath}"]
         when:
         def processor = rep.create(new RemoteEnvironmentScript("vagrant", "Vagrantfile", "gav", getScriptRoot()))
