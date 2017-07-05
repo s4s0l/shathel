@@ -57,6 +57,9 @@ class SwarmStickyVolumeEnricher extends EnricherExecutable {
                     throw new RuntimeException("Multiple nodes have label ${labelForVolume}!")
                 }
                 if (alreadyLabeledNodes.size() == 0) {
+                    if(applicableNodes.size() == 0){
+                        throw new RuntimeException("stack ${params.stack.deployName} cannot be run at any node, so unable to auto label some node, to make volume not floatable")
+                    }
                     params.provisioners.add("sticky-volume-node-label:${labelForVolume}", getLabelingProvisioner(applicableNodes, labelForVolume))
                 }
                 it.attachedServices.each { s ->
