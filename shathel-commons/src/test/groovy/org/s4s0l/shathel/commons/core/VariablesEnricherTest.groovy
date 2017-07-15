@@ -19,6 +19,7 @@ class VariablesEnricherTest extends BaseIntegrationTest {
 version: 1
 shathel-solution:
   name: playground
+  xxx: XxX
   envs:
     FROM_SHATHEL_FILE_SOLUTION: FROM_SHATHEL_FILE_SOLUTION 
   variables:
@@ -66,6 +67,7 @@ shathel-solution:
         "FROM_SHATHEL_FILE_STACK" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_STACK")
         "FROM_SHATHEL_FILE_SOLUTION" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_SOLUTION")
         "mydomain.com" == execInAnyTask(environment, "variables_service", "printenv DNS")
+        "XxX" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_PARAM")
 
         onEnd()
 

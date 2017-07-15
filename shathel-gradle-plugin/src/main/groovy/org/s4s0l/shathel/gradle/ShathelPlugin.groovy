@@ -20,8 +20,10 @@ class ShathelPlugin implements Plugin<Project> {
             createDockerTasks(project)
             finalizeDockerTasks(project)
             ShathelPrepareTask exportedTask = finalizePrepareTasks(project)
-            createDockerAssembleTasks(project, exportedTask)
-            createShathelDestroyTask(project, exportedTask)
+            if (exportedTask != null) {
+                createDockerAssembleTasks(project, exportedTask)
+                createShathelDestroyTask(project, exportedTask)
+            }
         }
 
     }
@@ -75,7 +77,11 @@ class ShathelPlugin implements Plugin<Project> {
         def prepareTasks = project.tasks.withType(ShathelPrepareTask).collect {
             it
         }
-        if (prepareTasks.isEmpty()) {
+        if (prepareTasks.find {it.settings.exported} == null) {
+            if (!new File(project.file(extension.sourceRoot), "shthl-stack.yml").exists()) {
+                return null
+            }
+
             ShathelPrepareTask shathelPrepareTask = project.task("shathelPrepare", type: ShathelPrepareTask) {
                 settings {
                     exported = true
@@ -83,6 +89,7 @@ class ShathelPlugin implements Plugin<Project> {
             }
             extension.runAroundTasks.each {
                 shathelPrepareTask.runAround(it)
+
             }
             extension.prepareForTasks.each {
                 shathelPrepareTask.prepareFor(it)
@@ -94,10 +101,19 @@ class ShathelPlugin implements Plugin<Project> {
         }
 
         def exportedTasks = prepareTasks.findAll { it.settings.exported }
-        if (exportedTasks.size() != 1) {
-            throw new RuntimeException("Multiple exported ShathelPrepareTasks! Not allowed must be exactly one.")
+        if (exportedTasks.size() > 1) {
+            throw new RuntimeException("Multiple exported ShathelPrepareTasks! Not allowed must be most one.")
+        }
+        if (exportedTasks.size() == 0) {
+            return null
         }
         def exportedTask = exportedTasks.head()
+
+
+        project.task("shathelStart", dependsOn: exportedTask, type: ShathelStartTask)
+        project.task("shathelStop", dependsOn: exportedTask, type: ShathelStopTask)
+
+
         exportedTask
     }
 

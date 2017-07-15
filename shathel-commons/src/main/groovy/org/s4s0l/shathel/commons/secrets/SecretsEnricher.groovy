@@ -5,6 +5,7 @@ import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutable
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams
 import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable
+import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutableParams
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 
 /**
@@ -22,7 +23,7 @@ class SecretsEnricher extends EnricherExecutable {
         def manager = apiFacade.getSecretManager()
         def provisioners = params.getProvisioners()
         model.mapSecrets {
-            Map<String,String> secret ->
+            Map<String, String> secret ->
                 if (secret.name.startsWith("shathel_")) {
                     if (secret.file != null) {
                         //this means secret is defined here so we rule it
@@ -32,8 +33,12 @@ class SecretsEnricher extends EnricherExecutable {
                             return [name: currentName, external: true]
                         } else {
                             //does not exist will be created in pre provisioning
-                            provisioners.add("secret-add:${secret.name}", { context ->
-                                manager.secretCreate(secret.name, new File(stack.getStackResources().getComposeFileDirectory(), secret.file))
+                            provisioners.add("secret-add:${secret.name}", { ProvisionerExecutableParams context ->
+                                if (manager.secretExists(secret.name)) {
+                                    context.log.info("Skipping default password creation, as some other provisioner apparently did that!")
+                                } else {
+                                    manager.secretCreate(secret.name, new File(stack.getStackResources().getComposeFileDirectory(), secret.file))
+                                }
                             } as ProvisionerExecutable)
                             return [name: manager.secretInitialName(secret.name), external: true]
                         }

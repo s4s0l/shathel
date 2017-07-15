@@ -1,0 +1,18 @@
+import org.s4s0l.shathel.gradle.ShathelPrepareTask
+shathel {
+    image {
+        context { from(bootRepackage) { into 'app' } }
+    }
+    runAroundTasks += tasks.withType(Test)
+}
+
+task dummyTask << {
+    println("aaa")
+}
+
+task prepareUnmanaged(type: ShathelPrepareTask) {
+    settings {
+        from = file('src/test/shathel')
+    }
+}
+prepareUnmanaged.runAround(dummyTask)

@@ -41,6 +41,11 @@ class SolutionFileModel {
         parsedYml['shathel-solution']['name']
     }
 
+    Map<String,String> getSolutionParameters(){
+        Map<String,Object> mapped = parsedYml['shathel-solution']
+        mapped.findAll {it.value instanceof String}.collectEntries {[(it.key): it.value?.toString()]}
+    }
+
     Set<String> getEnvironments() {
         return parsedYml['shathel-solution']['environments'].keySet();
     }

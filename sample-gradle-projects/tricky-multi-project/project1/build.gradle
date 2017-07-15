@@ -1,0 +1,5 @@
+shathel {
+    image {
+        context { from(bootRepackage) { into 'app' } }
+    }
+}

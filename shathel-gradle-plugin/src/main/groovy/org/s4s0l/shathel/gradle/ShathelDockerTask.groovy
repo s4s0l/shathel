@@ -54,6 +54,10 @@ class ShathelDockerTask extends DefaultTask {
             prepareTask.dependsOn it
         }
         this.dependsOn prepareTask
+
+        this.inputs.dir(config.targetDir)
+        this.outputs.dir(config.targetDir)
+        this.outputs.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file")
     }
 
     boolean isPushingSomewhere() {
@@ -72,6 +76,7 @@ class ShathelDockerTask extends DefaultTask {
                 }
             }
         }
+        project.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file").text = UUID.randomUUID().toString()
     }
 
     DockerWrapper getWrapper() {

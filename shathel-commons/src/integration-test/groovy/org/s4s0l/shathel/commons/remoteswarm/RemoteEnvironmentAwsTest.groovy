@@ -17,6 +17,7 @@ class RemoteEnvironmentAwsTest extends BaseIntegrationTest {
 version: 1
 shathel-solution:
   name: ${getClass().getSimpleName()}
+  docker_version: 17.06.0
   environments:
     aws:
       forceful: 'true'

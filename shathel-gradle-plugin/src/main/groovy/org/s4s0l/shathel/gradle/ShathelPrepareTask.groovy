@@ -32,6 +32,8 @@ class ShathelPrepareTask extends DefaultTask {
         finalizeAddDependenciesFromCompose()
         inputs.dir(settings.from)
         outputs.dir(settings.to)
+
+
     }
 
     private void finalizeAddDependenciesFromCompose() {
@@ -76,6 +78,7 @@ class ShathelPrepareTask extends DefaultTask {
         }.collect {
             it[0][1]
         }.each {
+            //todo zdaje sie ze raczej powinno sie poiterowac po taskach i znalesc wyeksportowany
             def otherTask = project.project(it).tasks.getByName('shathelPrepare');
             selfTask.dependsOn otherTask
         }

@@ -1,0 +1,6 @@
+version: '3.1'
+services:
+  project12:
+      image: project(:project1)
+      ports:
+        - 7070:8080

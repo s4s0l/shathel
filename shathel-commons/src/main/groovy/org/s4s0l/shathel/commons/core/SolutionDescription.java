@@ -17,11 +17,12 @@ import java.util.stream.Collectors;
 public class SolutionDescription {
     private final Parameters overrides;
     private final SolutionFileModel model;
-    private final Map<String, String> parameters = new HashMap<>();
+    private final Map<String, String> parameters;
 
     public SolutionDescription(Parameters overrides, SolutionFileModel model) {
         this.overrides = overrides;
         this.model = model;
+        this.parameters = Parameters.getNormalizedParameterNames(model.getSolutionParameters());
     }
 
     public EnvironmentDescription getEnvironmentDescription(String envName) {
@@ -56,11 +57,9 @@ public class SolutionDescription {
     public Map<String, String> getAsEnvironmentVariables() {
         Map<String, String> ret = new HashMap<>(getEnvs());
         ret.put(Parameters.parameterNameToEnvName("shathel.solution.name"), getName());
-        parameters.entrySet()
-                .forEach(x ->
-                        ret.put(
-                                Parameters.parameterNameToEnvName("shathel.solution." + x.getKey()),
-                                getParameter(x.getKey()).orElse(null)));
+        parameters.forEach((key, value) -> ret.put(
+                Parameters.parameterNameToEnvName("shathel.solution." + key),
+                getParameter(key).orElse(null)));
         String thisEnvPrefix = "shathel.solution.";
         overrides.getAllParameters().stream()
                 .filter(it -> it.startsWith(thisEnvPrefix))
