@@ -128,16 +128,22 @@ class ComposeFileModel {
             if (it.value == null) {
                 it.value = [:]
             }
-            (it.value.external ?: false) == false
+            (!(it.value.external ?: false))
         }
-        .each {
+        ?.each {
             it.value.labels = (it.value.labels ?: [:])
             it.value.labels << [(key): value]
         }
     }
 
     void addLabelToVolumes(String key, String value) {
-        parsedYml.volumes?.each {
+        parsedYml.volumes?.findAll {
+            if (it.value == null) {
+                it.value = [:]
+            }
+            (!(it.value.external ?: false))
+        }
+        ?.each {
             if (it.value == null) {
                 it.value = [:]
             }

@@ -56,6 +56,9 @@ class ComposeFileModelTest extends Specification {
               labels:
                 label: value        
         volumes:
+          volume0:
+            external:
+                name: extName  
           volume1:
           volume2:
             labels:
@@ -84,6 +87,7 @@ class ComposeFileModelTest extends Specification {
         res.services.service2.deploy.labels  == [label:'value',sss:'sss']
         res.volumes.volume1.labels == [vvv:'vvv']
         res.volumes.volume2.labels == [label:'value',vvv:'vvv']
+        res.volumes.volume0.labels == null
         res.networks.network1.labels == null
         res.networks.network2.labels == [nnn:'nnn']
         res.networks.network3.labels == [label:'value',nnn:'nnn']
