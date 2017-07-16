@@ -27,6 +27,10 @@
 * shathel.solution.ivy_repos
 
 ## Environment level settings
+
+We set them as shathel.env.{env}.net but they are accessible as shathel.env.net
+in enrichers
+
 * shathel.env.{env}.net
 * shathel.env.{env}.init //wtf??
 * shathel.env.{env}.registry //deprecated
