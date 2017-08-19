@@ -1,3 +1,4 @@
+import org.s4s0l.shathel.commons.core.security.SafeStorageImpl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
@@ -89,7 +90,8 @@ class CryptoSpec extends Specification {
         new SecureRandom([1, 2, 3, 4, 5, 6] as byte[]).nextBytes(iv)
 
         println salt
-//        removeCryptographyRestrictions()
+        removeCryptographyRestrictions()
+        SafeStorageImpl.class.getName()
         xxx()
 
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");

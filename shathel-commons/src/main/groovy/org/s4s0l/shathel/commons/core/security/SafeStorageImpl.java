@@ -10,6 +10,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
@@ -30,17 +31,37 @@ public class SafeStorageImpl implements SafeStorage {
             LOGGER.debug("Cryptography restrictions removal not needed");
         } else {
             try {
-                Field field = Class.forName("javax.crypto.JceSecurity").getDeclaredField("isRestricted");
-                field.setAccessible(true);
-                field.set(null, java.lang.Boolean.FALSE);
+                try {
+                    Class jceSecurity = Class.forName("javax.crypto.JceSecurity");
+                    Field isRestricted = jceSecurity.getDeclaredField("isRestricted");
+                    isRestricted.setAccessible(true);
+                    isRestricted.set(null, false);
+                    isRestricted.setAccessible(false);
+                } catch (ClassNotFoundException e) { // not an OpenJDK ~ JVM
+                    LOGGER.debug("unable to enable unlimited-strength crypto " + e);
+                } catch (Exception e) {
+                    Class jceSecurity = Class.forName("javax.crypto.JceSecurity");
+                    Field isRestricted = jceSecurity.getDeclaredField("isRestricted");
+                    if (Boolean.TRUE.equals(isRestricted.get(null))) {
+                        if (Modifier.isFinal(isRestricted.getModifiers())) {
+                            Field modifiers = Field.class.getDeclaredField("modifiers");
+                            modifiers.setAccessible(true);
+                            modifiers.setInt(isRestricted, isRestricted.getModifiers() & ~Modifier.FINAL);
+                        }
+                        isRestricted.setAccessible(true);
+                        isRestricted.setBoolean(null, false); // isRestricted = false;
+                        isRestricted.setAccessible(false);
+                    }
+                }
             } catch (Exception ex) {
                 LOGGER.warn("Unable to remove Cryptography restrictions", ex);
             }
         }
+
     }
 
-//    private static final String CRYPTO_TYPE = "AES/GCM/NoPadding";
-        private static final String CRYPTO_TYPE = "AES/CBC/PKCS5Padding";
+    //    private static final String CRYPTO_TYPE = "AES/GCM/NoPadding";
+    private static final String CRYPTO_TYPE = "AES/CBC/PKCS5Padding";
     private static final int AES_KEY_SIZE = 256; // in bits
     private static final int GCM_TAG_LENGTH = 16; // in bytes
     private static final byte[] DEFAULT_SALT = new byte[]{124, -21, -54, -120, 56, 27, -2, -67, -8, 121, -113, -21, -72, -53, 125, 124};

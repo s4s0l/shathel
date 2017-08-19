@@ -40,7 +40,7 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         then:
         expectedEnvs == envs
         process.status
-        process.output.contains("127.0.0.1")
+        process.output.contains("localhost")
         new File(targetDir, "out.txt").text == "[\"192.168.92.4\"]"
     }
 

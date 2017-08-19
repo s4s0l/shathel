@@ -30,7 +30,7 @@ class SshTunelManagerImplTest extends Specification {
         knownHosts.delete()
         SshKeys keys = new SshKeyProvider(getRootDir(), "someone@somewhere").keys
         def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
-        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
+        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys docker.io/panubo/sshd")
         Thread.sleep(5000)
 
         when:
@@ -54,7 +54,7 @@ class SshTunelManagerImplTest extends Specification {
         knownHosts.delete()
         SshKeys keys = new SshKeyProvider(getRootDir(), "someone@somewhere").keys
         def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
-        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
+        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys docker.io/panubo/sshd")
         Thread.sleep(5000)
 
         when:
@@ -80,7 +80,7 @@ class SshTunelManagerImplTest extends Specification {
         def tunelManager = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
         def tunelManager2 = new SshTunelManagerImpl(getRootDir(), "root", 3333, knownHosts)
 
-        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys macropin/sshd")
+        def id = new DockerWrapper().containerCreate("-d --name TestSshTunelServer --rm -p 2224:22 -v ${keys.publicKey.absolutePath}:/root/.ssh/authorized_keys docker.io/panubo/sshd")
         Thread.sleep(5000)
 
         when:
