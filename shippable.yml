@@ -3,7 +3,7 @@ jdk:
   - oraclejdk8
 env:
   global:
-    - DOCKER_VERSION=1.12.6 COMPOSE_VERSION=1.9.0 BINTRAY_USER=sasol DIND4J_VERSION=1.6
+    - DOCKER_VERSION=1.12.6 COMPOSE_VERSION=1.9.0 BINTRAY_USER=sasol DIND4J_VERSION=1.9
     - secure: OE2KRt9auAest3tMJUOgnbAn11R6squpYrVH+1j3MtsP7SwwzGVdvTC98H2iIfomgq+a1Gp/a+vAXb85aNE+ZdLuGpCFs1Pgug2yL99SLUNt7ZLmUs3gPS/V5jN6MUKHxB0aGs9o0eQ9abWMS4P4tFj7675PYIUJKV8AkDX975nkLsn9dScd8r9UBsb6nCaoAlzQWBB7KOg2wEOJS2RnUkE6P5O03Gle/y/hYtAF1OI5F44n3TEkMFOxuq1/1CqB9HH7+AvbGOc+5Fy4GpHODIq1UGhuReS79xK7HTfTfwiJofmYxsw5LYIwHUba4oJKK7vThVxXmZ4Lh+meXkkm2g==
     - secure: jbt8nWObKfbScKwqiftu8Vl4XeLkDZW+SpTRI8EH0UohhGETBZlz3ZSUyjQgOBKYesac+9eA8LxqRa68fvbllxMtZNcIK8ThrCIsXsMsavE3qHNAdZvUDKD181TlacVjAKDMms0zX2DnK+cbnvfbML7FAl6swYFcDDvlXNozuKgIShkrXKQebmn+qwNs1xMvXRvvsr9Yla44oPTrvnIiu/i9ExcQWrnb9UNpP5I2eTJmGaeMEBHmtY3Shts96HQqbh732DbmvzzOBK7D1H13t7DkKAF9ASycaThJtucampOsrtq3LBqzmQ2ddaQjhTvU/oSKNL5W3CuUnOLzRcwZ4g==
 
@@ -20,10 +20,10 @@ build:
     - >
       docker run --privileged -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm sasol/dind4j:${DIND4J_VERSION}
       ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test --info --stacktrace
-  on_failure:
-    - docker logs -f DindTest-dev-manager-2
-    - docker logs -f DindTest-dev-manager-1
-    - docker logs -f DindTest-dev-worker-1
+#  on_failure:
+#    - docker logs -f DindTest-dev-manager-2
+#    - docker logs -f DindTest-dev-manager-1
+#    - docker logs -f DindTest-dev-worker-1
   on_success:
     - >
       (
