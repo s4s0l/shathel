@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  project1:
+    image: project(:project0)
+    ports:
+      - 8085:8080
+  project2:
+    image: project(:project2):project2
+    ports:
+      - 9095:8080
+  project02:
+      image: project(:project2)
+      ports:
+        - 7075:8080
+

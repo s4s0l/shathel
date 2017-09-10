@@ -1,3 +1,4 @@
 rootProject.name = "multi-project"
+include 'project0'
 include 'project1'
 include 'project2'

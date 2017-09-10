@@ -16,6 +16,7 @@ class ShathelPlugin implements Plugin<Project> {
     void apply(Project project) {
         initRequirements(project)
 
+        preprocessShathelPrepareTasks(project)
         project.afterEvaluate {
             createDockerTasks(project)
             finalizeDockerTasks(project)
@@ -72,30 +73,45 @@ class ShathelPlugin implements Plugin<Project> {
         }
     }
 
+    private void preprocessShathelPrepareTasks(Project project) {
+        ShathelExtension extension = project.extensions.findByName("shathel")
+        if (new File(project.file(extension.sourceRoot), "shthl-stack.yml").exists()) {
+            ShathelPrepareTaskSettings shathelPrepareTask = new ShathelPrepareTaskSettings(project)
+            List<String> otherProjectDeps = shathelPrepareTask.getOtherProjectDependencies()
+            otherProjectDeps
+                    .findAll { pp -> pp != project.path }
+                    .unique()
+                    .each { xx ->
+//                println("${project.name} Evaluation depends on $xx")
+                project.evaluationDependsOn(xx)
+            }
+        }
+    }
+
     private ShathelPrepareTask finalizePrepareTasks(Project project) {
         ShathelExtension extension = project.extensions.findByName("shathel")
         def prepareTasks = project.tasks.withType(ShathelPrepareTask).collect {
             it
         }
-        if (prepareTasks.find {it.settings.exported} == null) {
-            if (!new File(project.file(extension.sourceRoot), "shthl-stack.yml").exists()) {
-                return null
-            }
-
-            ShathelPrepareTask shathelPrepareTask = project.task("shathelPrepare", type: ShathelPrepareTask) {
-                settings {
-                    exported = true
+        if (prepareTasks.find { it.settings.exported } == null) {
+            if (new File(project.file(extension.sourceRoot), "shthl-stack.yml").exists()) {
+//                println("Prepare a/dded in project ${project.name}")
+                ShathelPrepareTask shathelPrepareTask = project.task("shathelPrepare", type: ShathelPrepareTask) {
+                    settings {
+                        exported = true
+                    }
                 }
-            }
-            extension.runAroundTasks.each {
-                shathelPrepareTask.runAround(it)
+                extension.runAroundTasks.each {
+                    shathelPrepareTask.runAround(it)
 
+                }
+                extension.prepareForTasks.each {
+                    shathelPrepareTask.prepareFor(it)
+                }
+                prepareTasks << shathelPrepareTask
             }
-            extension.prepareForTasks.each {
-                shathelPrepareTask.prepareFor(it)
-            }
-            prepareTasks << shathelPrepareTask
         }
+
         prepareTasks.each {
             it.finalizeConfiguration()
         }

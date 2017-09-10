@@ -1,0 +1,8 @@
+apply plugin: 'shathel'
+
+shathel {
+    image {
+        context { from(bootRepackage) { into 'app' } }
+    }
+    runAroundTasks += tasks.withType(Test)
+}

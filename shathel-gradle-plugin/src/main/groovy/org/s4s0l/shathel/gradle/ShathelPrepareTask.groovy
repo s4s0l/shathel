@@ -14,8 +14,6 @@ import org.yaml.snakeyaml.Yaml
  * @author Marcin Wielgus
  */
 class ShathelPrepareTask extends DefaultTask {
-    def dockerTargetRegexp = /\s*project\(((:[^:\)]*)+)\)((:[^:]+)*)\s*/
-    def shathelTargetRegexp = /\s*project\(((:[^:\)]*)+)\)\s*/
     private ShathelPrepareTaskSettings settings;
 
 
@@ -36,11 +34,12 @@ class ShathelPrepareTask extends DefaultTask {
 
     }
 
+
     private void finalizeAddDependenciesFromCompose() {
         Task selfTask = this
         ComposeFileModel cfm = ComposeFileModel.load(new File(settings.from, "stack/docker-compose.yml"))
         cfm.mapImages { imageFromFile ->
-            def dMatch = imageFromFile =~ dockerTargetRegexp
+            def dMatch = imageFromFile =~ settings.dockerTargetRegexp
             if (dMatch.matches()) {
                 String projectLocator = dMatch[0][1]
                 String image = dMatch[0][3]
@@ -68,18 +67,12 @@ class ShathelPrepareTask extends DefaultTask {
         }
     }
 
+
     private void finalizeAddDependenciesFromStack() {
         Task selfTask = this
-        StackFileModel sfm = StackFileModel.load(new File(settings.from, "shthl-stack.yml"))
-        sfm.getDependencies().collect {
-            it.gav =~ shathelTargetRegexp
-        }.findAll {
-            it.matches()
-        }.collect {
-            it[0][1]
-        }.each {
+        settings.getDependenciesFromStack().each {
             //todo zdaje sie ze raczej powinno sie poiterowac po taskach i znalesc wyeksportowany
-            def otherTask = project.project(it).tasks.getByName('shathelPrepare');
+            def otherTask = project.project(it).tasks.getByName('shathelPrepare')
             selfTask.dependsOn otherTask
         }
     }
@@ -88,7 +81,8 @@ class ShathelPrepareTask extends DefaultTask {
         return settings
     }
 
-    def prepareFor(Task task){
+
+    def prepareFor(Task task) {
         def startTask = project.task("shathelNotify-${task.name}", dependsOn: this, type: ShathelNotifyingTask) {
             tasksToNotify = [task]
         }
@@ -125,7 +119,7 @@ class ShathelPrepareTask extends DefaultTask {
         def sfmFile = new File(settings.to, "shthl-stack.yml")
         def parsedYml = new Yaml().load(sfmFile.text)
         parsedYml['shathel-stack'].dependencies = parsedYml['shathel-stack'].dependencies?.collectEntries {
-            def mm = it.key =~ shathelTargetRegexp
+            def mm = it.key =~ settings.shathelTargetRegexp
             if (mm.matches()) {
                 def projectDep = mm[0][1]
                 def theProject = project.project(projectDep)
@@ -157,12 +151,11 @@ class ShathelPrepareTask extends DefaultTask {
     }
 
 
-
     private void buildFixImages() {
         def cfmFile = new File(settings.to, "stack/docker-compose.yml")
         ComposeFileModel cfm = ComposeFileModel.load(cfmFile)
         cfm.mapImages { imageFromFile ->
-            def dMatch = imageFromFile =~ dockerTargetRegexp
+            def dMatch = imageFromFile =~ settings.dockerTargetRegexp
             if (dMatch.matches()) {
                 String projectLocator = dMatch[0][1]
                 String image = dMatch[0][3]
@@ -252,4 +245,37 @@ class ShathelPrepareTaskSettings {
         }
         throw new RuntimeException("No such method: ${name}")
     }
+
+    List<String> getDependenciesFromCompose() {
+        List<String> ret = []
+        ComposeFileModel cfm = ComposeFileModel.load(new File(from, "stack/docker-compose.yml"))
+        cfm.mapImages { imageFromFile ->
+            def dMatch = imageFromFile =~ dockerTargetRegexp
+            if (dMatch.matches()) {
+                String projectLocator = dMatch[0][1]
+                ret += projectLocator
+            }
+            imageFromFile
+        }
+        ret
+    }
+
+    List<String> getDependenciesFromStack() {
+        StackFileModel sfm = StackFileModel.load(new File(from, "shthl-stack.yml"))
+        sfm.getDependencies().collect {
+            it.gav =~ shathelTargetRegexp
+        }.findAll {
+            it.matches()
+        }.collect {
+            (String) (it[0][1])
+        }
+    }
+
+
+    List<String> getOtherProjectDependencies() {
+        getDependenciesFromCompose() + getDependenciesFromStack()
+    }
+    def dockerTargetRegexp = /\s*project\(((:[^:\)]*)+)\)((:[^:]+)*)\s*/
+    def shathelTargetRegexp = /\s*project\(((:[^:\)]*)+)\)\s*/
+
 }
