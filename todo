@@ -1,6 +1,29 @@
+1. lokalizacja paczek w pluginie w katalogu shathel
+
+2. dodać evaluation depends on jak dodajemy zależność miedzy projektami
+
+3. Prepare task settings w globalnych settingsach
+
+4. ładowanie propertisów z pliku private.{env}.properties
+5. ładowanie propertisów z plicu private.{env}.properties.enc
+6. szyfrowanie pliku private.{env}.properties za pomocą hasła safe password
+
+
+
+
+* MULTIPLE stacks in one project - av is taken from project not yml
+    * shathel: crateDb -
+    * shathel: mechanizm include dla paczki
+    * shathel: mapping file location dodac do core i konfigurowalenie go wlaczyc
+
+
+    * shathel: volumes:x:external - rozdupia labelki!
+
+
+
+
 
 TODO: authentiacation proxy... dconf + własne metadata service?
-
 
 TODO: Password manager
 
@@ -10,7 +33,6 @@ TODO: Zabezpieczyć repo
 
 
 
-TODO: integracja z gitowym storage
 TODO: full cleanup: docker volume rm $(docker volume ls -q | grep play) + wywalenie lokalnych danych
 TODO: Zrobic paczke dla spring admina
 

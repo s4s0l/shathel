@@ -22,54 +22,12 @@ import org.s4s0l.shathel.commons.ssh.SshTunelManagerImpl
 class ShathelOperationTask extends DefaultTask {
 
 
-    protected Parameters getShathelParameters() {
-        ShathelExtension extension = getExtension()
-        def paramsWithDefault = extension.shathelParams.collectEntries {
-            [(Parameters.getNormalizedParameterName(it.key.toString())): it.value.toString()]
-        }
-        paramsWithDefault.putIfAbsent(CommonParams.SHATHEL_ENV, "local")
-        String envName = paramsWithDefault[CommonParams.SHATHEL_ENV]
-        paramsWithDefault.putIfAbsent("shathel.env.${envName}.dependenciesDir".toString(), getDependenciesDir().absolutePath)
-        paramsWithDefault.putIfAbsent(CommonParams.SHATHEL_DIR, new File(project.buildDir, ".shathel").absolutePath)
-        paramsWithDefault[CommonParams.SHATHEL_DIR] = absolutize(paramsWithDefault.get(CommonParams.SHATHEL_DIR))
-        if (!new File("${paramsWithDefault[CommonParams.SHATHEL_DIR]}/shathel-solution.yml").exists()) {
-            paramsWithDefault['shathel.solution.name'] = "shathel-gradle-${project.getName()}".toString()
-        }
-        Parameters.fromMapWithSysPropAndEnv(paramsWithDefault)
-
-
-    }
-
-    private String absolutize(String it) {
-        if (new File(it).isAbsolute()) {
-            return new File(it).absolutePath
-        } else {
-            return new File(project.projectDir, it).absolutePath
-        }
-    }
-
-    File getShathelDir() {
-        return new File(getShathelParameters().getParameter(CommonParams.SHATHEL_DIR).get())
-    }
-
-    String getShathelEnvironmentName() {
-        return getShathelParameters().getParameter(CommonParams.SHATHEL_ENV).get()
-    }
-
-    File getShathelMappingsDir() {
-        new File(project.rootProject.buildDir, "shathel-mappings")
-    }
-
     File getShathelCurrentStackDir() {
         def dependencies = taskDependencies.getDependencies(this)
         def prepareTasks = dependencies.findAll { it instanceof ShathelPrepareTask }
         assert prepareTasks.size() == 1: "Operation tasks can be dependant only on one prepare task!"
         ShathelPrepareTask prepareTask = prepareTasks.head()
         return prepareTask.settings.to
-    }
-
-    File getDependenciesDir() {
-        new File(project.rootProject.buildDir, "shathel-dependencies")
     }
 
 
@@ -79,18 +37,18 @@ class ShathelOperationTask extends DefaultTask {
     }
 
     Solution getShathelSolution() {
-        def params = getShathelParameters()
+        def params = getExtension().getShathelParameters()
         def extensions = DefaultExtensionContext.create(params, [
-                new LocalOverriderDownloader(getShathelMappingsDir(), getShathelCurrentStackDir())
+                new LocalOverriderDownloader(getExtension().getShathelMappingsDir(), getShathelCurrentStackDir())
         ])
         def shathel = new Shathel(params, extensions)
-        def storage = shathel.initStorage(shathelDir, false)
+        def storage = shathel.initStorage(getExtension().shathelDir, false)
         return shathel.getSolution(storage)
     }
 
 
     Stack getShathelCurrentStack(Solution solution) {
-        def environment = solution.getEnvironment(getShathelEnvironmentName())
+        def environment = solution.getEnvironment(getExtension().getShathelEnvironmentName())
         if (!environment.isInitialized()) {
             environment.initialize()
         }
@@ -100,14 +58,14 @@ class ShathelOperationTask extends DefaultTask {
 
     Map<String, String> getDefaultPropsToLeave() {
         [
-                "shathel.plugin.local.override.mappings"                    : getShathelMappingsDir().getAbsolutePath(),
-                "shathel.plugin.local.override.current"                     : getShathelCurrentStackDir().getAbsolutePath(),
-                "shathel.plugin.current.gav"                                : new StackReference(project.group, project.name, project.version).gav,
-                "shathel.plugin.current"                                    : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
-                (CommonParams.SHATHEL_ENV)                                  : shathelEnvironmentName,
-                "shathel.env.${getShathelEnvironmentName()}.dependenciesDir": getDependenciesDir().absolutePath,
-                "shathel.env.${getShathelEnvironmentName()}.init"           : "true",
-                (CommonParams.SHATHEL_DIR)                                  : getShathelDir()
+                "shathel.plugin.local.override.mappings"                                   : getExtension().getShathelMappingsDir().getAbsolutePath(),
+                "shathel.plugin.local.override.current"                                    : getShathelCurrentStackDir().getAbsolutePath(),
+                "shathel.plugin.current.gav"                                               : new StackReference(project.group, project.name, project.version).gav,
+                "shathel.plugin.current"                                                   : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
+                (CommonParams.SHATHEL_ENV)                                                 : getExtension().shathelEnvironmentName,
+                "shathel.env.${getExtension().getShathelEnvironmentName()}.dependenciesDir": getExtension().getDependenciesDir().absolutePath,
+                "shathel.env.${getExtension().getShathelEnvironmentName()}.init"           : "true",
+                (CommonParams.SHATHEL_DIR)                                                 : getExtension().getShathelDir()
         ]
     }
 
@@ -204,7 +162,7 @@ class ShathelDestroyTask extends ShathelOperationTask {
     @TaskAction
     void build() {
         def solution = getShathelSolution()
-        def environment = solution.getEnvironment(getShathelEnvironmentName())
+        def environment = solution.getEnvironment(getExtension().getShathelEnvironmentName())
         environment.destroy()
     }
 }

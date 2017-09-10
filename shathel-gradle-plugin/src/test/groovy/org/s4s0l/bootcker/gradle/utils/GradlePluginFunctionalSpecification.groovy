@@ -123,7 +123,7 @@ class TemporaryDirectory extends ExternalResource {
     String projectName;
 
     TemporaryDirectory(TestName name) {
-        this(new File(System.getenv("LOCAL_BUILD_DIR")), name);
+        this(new File(System.getenv("LOCAL_BUILD_DIR").toString()), name);
     }
 
     TemporaryDirectory(File parentFolder, TestName name) {

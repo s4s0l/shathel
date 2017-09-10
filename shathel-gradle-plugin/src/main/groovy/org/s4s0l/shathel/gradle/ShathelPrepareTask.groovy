@@ -115,7 +115,7 @@ class ShathelPrepareTask extends DefaultTask {
         }
         buildFixImages()
         if (settings.exported) {
-            saveMappingForProject(project)
+            saveMappingForProject()
         }
         buildFixDependencies()
 
@@ -129,7 +129,7 @@ class ShathelPrepareTask extends DefaultTask {
             if (mm.matches()) {
                 def projectDep = mm[0][1]
                 def theProject = project.project(projectDep)
-                def gav = saveMappingForProject(theProject)
+                def gav = new StackReference(theProject.group, theProject.name, theProject.version).gav
                 [(gav): it.value]
             } else {
                 return [(it.key): it.value]
@@ -143,8 +143,9 @@ class ShathelPrepareTask extends DefaultTask {
      * @param project
      * @return gav ov project
      */
-    static String saveMappingForProject(Project theProject) {
-        def stackMappingsDir = new File(theProject.rootProject.buildDir, "shathel-mappings")
+    String saveMappingForProject() {
+        Project theProject = project
+        def stackMappingsDir = settings.extension.getShathelMappingsDir()
         stackMappingsDir.mkdirs()
         def thePlugin = theProject.getTasks().withType(ShathelPrepareTask).findAll {
             it.settings.exported
@@ -154,6 +155,8 @@ class ShathelPrepareTask extends DefaultTask {
         new File(stackMappingsDir, gav).text = thePlugin.settings.to.absolutePath
         return reference.getGav()
     }
+
+
 
     private void buildFixImages() {
         def cfmFile = new File(settings.to, "stack/docker-compose.yml")
@@ -219,10 +222,13 @@ class ShathelPrepareTaskSettings {
 
     ShathelPrepareTaskSettings(Project project) {
         this.project = project
-        ShathelExtension extension = project.extensions.findByName("shathel") ?: new ShathelExtension(project)
-        this.from = project.file(extension.sourceRoot)
-        this.to = new File(project.buildDir, "shathel-stack")
+        this.from = project.file(getExtension().sourceRoot)
+        this.to = new File(getExtension().shathelTargetDir, project.name)
         this.tokens = [VERSION: project.version]
+    }
+
+    ShathelExtension getExtension() {
+        project.extensions.findByName("shathel") ?: new ShathelExtension(project)
     }
 
     def propertyMissing(String name) {

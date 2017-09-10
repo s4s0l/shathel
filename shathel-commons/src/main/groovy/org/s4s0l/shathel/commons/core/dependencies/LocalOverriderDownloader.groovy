@@ -30,6 +30,7 @@ class LocalOverriderDownloader implements StackDependencyDownloader {
 
         def gav = reference.getGav().replaceAll("[^a-zA-Z0-9]", "_")
         def gavFile = new File(stackMappingsDir, gav)
+        println "Searching for dependency in ${gavFile.absolutePath}"
         if (!gavFile.exists()) {
             return Optional.empty()
         }
