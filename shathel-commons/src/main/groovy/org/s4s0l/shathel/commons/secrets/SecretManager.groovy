@@ -199,7 +199,7 @@ class SecretManager implements SecretManagerApi {
                 .map { new File(it).bytes }
                 .orElseGet {
             parameters.getParameter(secretName.toLowerCase() + "_secret_value")
-                    .map { encryptor.decrypt(it) }
+                    .map { encryptor.isCrypted(it) ? encryptor.decrypt(it) : it}
                     .map { it.bytes }
                     .orElseGet {
                 if (defaultValue == null) {
