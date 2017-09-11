@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.secrets
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.ParameterProvider
+import org.s4s0l.shathel.commons.core.security.SimpleEncryptor
 import org.s4s0l.shathel.commons.docker.DockerClientWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,11 +19,13 @@ class SecretManager implements SecretManagerApi {
     final Logger LOGGER = LoggerFactory.getLogger(SecretManager.class)
     private final ParameterProvider parameters
     private final DockerClientWrapper dockerWrapper
+    private final SimpleEncryptor encryptor
 
 
-    SecretManager(ParameterProvider parameters, DockerClientWrapper dockerWrapper) {
+    SecretManager(ParameterProvider parameters, DockerClientWrapper dockerWrapper, SimpleEncryptor encryptor) {
         this.parameters = parameters
         this.dockerWrapper = dockerWrapper
+        this.encryptor = encryptor
     }
 
     @TypeChecked
@@ -196,6 +199,7 @@ class SecretManager implements SecretManagerApi {
                 .map { new File(it).bytes }
                 .orElseGet {
             parameters.getParameter(secretName.toLowerCase() + "_secret_value")
+                    .map { encryptor.decrypt(it) }
                     .map { it.bytes }
                     .orElseGet {
                 if (defaultValue == null) {

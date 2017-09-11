@@ -34,7 +34,7 @@ class LocalSwarmApiFacade implements ExecutableApiFacade {
     @TypeChecked
     @CompileStatic
     SecretManagerApi getSecretManager() {
-        return new SecretManager(context.getEnvironmentDescription(), getManagerNodeClient())
+        return new SecretManager(context.getEnvironmentDescription(), getManagerNodeClient(), context.safeStorage)
     }
 
 

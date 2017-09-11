@@ -62,7 +62,7 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
 
     @Override
     SecretManagerApi getSecretManager() {
-        return new SecretManager(packageContext.getEnvironmentDescription(), getManagerNodeClient())
+        return new SecretManager(packageContext.getEnvironmentDescription(), getManagerNodeClient(), packageContext.getSafeStorage())
     }
 
     SshOperations getSshOperaions() {
