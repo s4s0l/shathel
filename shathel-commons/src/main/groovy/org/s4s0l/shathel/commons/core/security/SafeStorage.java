@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * @author Marcin Wielgus
  */
-public interface SafeStorage {
+public interface SafeStorage extends SimpleEncryptor{
     void readFile(String key, File copyTo);
 
     void writeFile(String key, File f);
@@ -20,4 +20,6 @@ public interface SafeStorage {
     OutputStream outputStream(String key);
 
     Optional<InputStream> inputStream(String key);
+
+
 }

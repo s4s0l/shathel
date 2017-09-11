@@ -74,6 +74,13 @@ class AbstractShellIntegrationTest extends FeatureSpec with BeforeAndAfterAll {
     assert(res.getResult.asInstanceOf[String].trim == expected.stripMargin.trim)
   }
 
+  def assertCmd(command: String)(assertion: String => Unit): Unit = {
+    LOGGER.info("RUNNING:" + command)
+    var res = shell.executeCommand(command)
+    assert(res.isSuccess)
+    assertion(res.getResult.asInstanceOf[String].trim)
+  }
+
   def assertCmdResult(command: String, expected: AnyRef): Unit = {
     LOGGER.info("RUNNING:" + command)
     var res = shell.executeCommand(command)

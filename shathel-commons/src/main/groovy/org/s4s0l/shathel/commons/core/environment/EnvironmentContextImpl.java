@@ -84,11 +84,11 @@ public class EnvironmentContextImpl implements EnvironmentContext {
 
     @Override
     public Map<String, String> getAsEnvironmentVariables() {
-        Map<String, String> ret = new HashMap<>();
-        ret.putAll(getSolutionDescription().getAsEnvironmentVariables());
-        ret.putAll(getEnvironmentDescription().getAsEnvironmentVariables());
-        ret.put(Parameters.parameterNameToEnvName("shathel.env.solution.name"), getContextName());
-        return ret;
+        Map<String, String> tmp = new HashMap<>();
+        tmp.putAll(getSolutionDescription().getAsEnvironmentVariables());
+        tmp.putAll(getEnvironmentDescription().getAsEnvironmentVariables());
+        tmp.put(Parameters.parameterNameToEnvName("shathel.env.solution.name"), getContextName());
+        return safeStorage.fixValues(tmp);
     }
 
     private File ensureExists(File f) {

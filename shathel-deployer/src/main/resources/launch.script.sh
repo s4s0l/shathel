@@ -131,7 +131,7 @@ else
     echo "Unable to find Java"
     exit 1
 fi
-
+echo "JAVA TO BE USED:${javaexe}"
 arguments=(-Dsun.misc.URLClassPath.disableJarChecking=true $JAVA_OPTS -jar "$jarfile" $RUN_ARGS "$@")
 
 # Action functions

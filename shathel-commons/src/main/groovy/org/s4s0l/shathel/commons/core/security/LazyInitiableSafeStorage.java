@@ -53,4 +53,16 @@ public class LazyInitiableSafeStorage implements SafeStorage {
     public Optional<InputStream> inputStream(String key) {
         return get().inputStream(key);
     }
+
+    @Override
+    public String crypt(char [] value) {
+        return get().crypt(value);
+    }
+
+    @Override
+    public String decrypt(String value) {
+        return get().decrypt(value);
+    }
+
+
 }

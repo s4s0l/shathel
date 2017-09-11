@@ -1,14 +1,13 @@
 package org.s4s0l.shathel.deployer
 
-import java.io.File
 import java.util.stream.Collectors
 
+import jline.console.ConsoleReader
 import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.storage.Storage
 import org.s4s0l.shathel.deployer.DeployerParameters.ShathelCommandContext
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
-import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -23,15 +22,27 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
   @CliCommand(value = Array("environment use"), help = "Sets current env")
   def init(
             @CliOption(key = Array(""), mandatory = true, help = "Environment name to use")
-            environment: String
+            environment: String,
+            @CliOption(key = Array("pass"), mandatory = false, help = "Ask for safe password",
+              specifiedDefaultValue = "true", unspecifiedDefaultValue = "false")
+            pass: Boolean
           ): String = {
-    shathel(Map[String, String]().asJava, builder())(
+    val ma: Map[String, String] = if (pass) {
+      val passKey = s"shathel.env.$environment.safePassword"
+      val cr = new ConsoleReader()
+      val pwd = cr.readLine('*')
+      Map(passKey -> pwd)
+    } else {
+      Map[String, String]()
+    }
+
+    shathel(ma.asJava, builder())(
       context => {
         val storage = storageCommands.getStorage(context)
         val solution = context.shathel.getSolution(storage)
-        if (!solution.getEnvironments().contains(environment)) {
-          throw new RuntimeException(s"Environment ${environment} not found possible environments are:" +
-            s" ${solution.getEnvironments().stream().collect(Collectors.joining(", "))}")
+        if (!solution.getEnvironments.contains(environment)) {
+          throw new RuntimeException(s"Environment $environment not found possible environments are:" +
+            s" ${solution.getEnvironments.stream().collect(Collectors.joining(", "))}")
         }
         "ok"
       })
@@ -76,7 +87,7 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
       "initialized" -> Try(environment.isInitialized).getOrElse(false),
       "started" -> Try(environment.isStarted).getOrElse(false),
       "verified" -> Try {
-        environment.verify();
+        environment.verify()
         true
       }.getOrElse(false)))
   }

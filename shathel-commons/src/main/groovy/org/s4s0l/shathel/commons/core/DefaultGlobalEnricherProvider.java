@@ -2,6 +2,8 @@ package org.s4s0l.shathel.commons.core;
 
 import org.s4s0l.shathel.commons.core.environment.*;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
+import org.s4s0l.shathel.commons.core.security.SafeStorage;
+import org.s4s0l.shathel.commons.core.security.SimpleEncryptor;
 import org.s4s0l.shathel.commons.core.stack.StackDependency;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
@@ -85,8 +87,9 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         @Override
         protected void execute(EnricherExecutableParams params) {
             Map<String, String> environment = params.getEnvironment();
-            environment.putAll(params.getStack().getEnvs());
-            environment.putAll(params.getEnvironmentContext().getAsEnvironmentVariables());
+            SimpleEncryptor safeStorage = params.getEnvironmentContext().getSafeStorage();
+            environment.putAll(safeStorage.fixValues(params.getStack().getEnvs()));
+            environment.putAll(safeStorage.fixValues(params.getEnvironmentContext().getAsEnvironmentVariables()));
         }
     }
 

@@ -1,12 +1,4 @@
-1. lokalizacja paczek w pluginie w katalogu shathel
 
-2. dodać evaluation depends on jak dodajemy zależność miedzy projektami
-
-3. Prepare task settings w globalnych settingsach (tokeny!)
-
-4. ładowanie propertisów z pliku private.{env}.properties
-5. ładowanie propertisów z plicu private.{env}.properties.enc
-6. szyfrowanie pliku private.{env}.properties za pomocą hasła safe password
 
 
 
@@ -40,3 +32,14 @@ TODO: dodananie nodea ponad minimum -> musi ogarnac mounty zanim sie doda do swa
 
 TODO DINDY nie da sie stop start: Error starting daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid
     tak sie dzieje jak sie killnie dodac fixa na to
+
+
+=======================================================================================
+DONE:
+1. lokalizacja paczek w pluginie w katalogu shathel
+2. dodać evaluation depends on jak dodajemy zależność miedzy projektami
+3. Prepare task settings w globalnych settingsach (tokeny!)
+
+4. ładowanie propertisów z pliku private.{env}.properties
+5. ładowanie propertisów z plicu private.{env}.properties.enc
+6. szyfrowanie pliku private.{env}.properties za pomocą hasła safe password

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-gradle :shathel-deployer:install
+./gradlew :shathel-deployer:install
 
 export SHATHEL_SOLUTION_FILE_BASE_DIR=$(pwd)/../shathel-stacks
 export SHATHEL_SOLUTION_FILE_ENV_BASE_DIR=$(pwd)/../shathel-envs
@@ -10,7 +10,7 @@ export SHATHEL_ENV=local
 
 
 export SHATHEL_ENV_LOCAL_FORCEFUL=true
-export SHATHEL_ENV_LOCAL_SAFEPASSWORD=HelloWorld
+#export SHATHEL_ENV_LOCAL_SAFEPASSWORD=HelloWorld
 
 export SHATHEL_ENV_VBOX_TYPE=remote
 export SHATHEL_ENV_VBOX_GAV=./virtualbox

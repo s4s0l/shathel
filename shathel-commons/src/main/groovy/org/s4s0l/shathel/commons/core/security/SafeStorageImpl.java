@@ -11,9 +11,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -27,7 +31,15 @@ public class SafeStorageImpl implements SafeStorage {
     private static final Logger LOGGER = getLogger(SafeStorageImpl.class);
 
     static {
-        if (!"Java(TM) SE Runtime Environment".equals(System.getProperty("java.runtime.name"))) {
+        String RUNTIME = System.getProperty("java.runtime.name");
+        int maxKeyLen = 0;
+        try {
+            maxKeyLen = Cipher.getMaxAllowedKeyLength("AES");
+        } catch (Exception e) {
+            throw new RuntimeException("wtf??", e);
+        }
+        if (maxKeyLen > 512 ||
+                (!"Java(TM) SE Runtime Environment".equals(RUNTIME) && !"OpenJDK Runtime Environment".equals(RUNTIME))) {
             LOGGER.debug("Cryptography restrictions removal not needed");
         } else {
             try {
@@ -42,15 +54,18 @@ public class SafeStorageImpl implements SafeStorage {
                 } catch (Exception e) {
                     Class jceSecurity = Class.forName("javax.crypto.JceSecurity");
                     Field isRestricted = jceSecurity.getDeclaredField("isRestricted");
+                    isRestricted.setAccessible(true);
                     if (Boolean.TRUE.equals(isRestricted.get(null))) {
                         if (Modifier.isFinal(isRestricted.getModifiers())) {
                             Field modifiers = Field.class.getDeclaredField("modifiers");
                             modifiers.setAccessible(true);
                             modifiers.setInt(isRestricted, isRestricted.getModifiers() & ~Modifier.FINAL);
                         }
-                        isRestricted.setAccessible(true);
-                        isRestricted.setBoolean(null, false); // isRestricted = false;
-                        isRestricted.setAccessible(false);
+                        Field isRestricted2 = jceSecurity.getDeclaredField("isRestricted");
+                        isRestricted2.setAccessible(true);
+                        isRestricted2.setAccessible(true);
+                        isRestricted2.setBoolean(null, false); // isRestricted = false;
+                        isRestricted2.setAccessible(false);
                     }
                 }
             } catch (Exception ex) {
@@ -216,4 +231,48 @@ public class SafeStorageImpl implements SafeStorage {
             throw new RuntimeException(e);
         }
     }
+
+    private byte[] toBytes(char[] chars) {
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
+        Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
+        return bytes;
+    }
+
+    @Override
+    public String crypt(char[] value) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1);
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(byteArrayOutputStream, getEncryptCipher());
+            cipherOutputStream.write(toBytes(value));
+            cipherOutputStream.flush();
+            cipherOutputStream.close();
+            byte[] src = byteArrayOutputStream.toByteArray();
+            return "{enc}" + java.util.Base64.getEncoder().encodeToString(src);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to crypt value", e);
+        }
+    }
+
+    @Override
+    public String decrypt(String value) {
+        try {
+            if (isCrypted(value)) {
+                byte[] decoded = java.util.Base64.getDecoder().decode(value.substring(5));
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decoded);
+                CipherInputStream cipherInputStream = new CipherInputStream(byteArrayInputStream, getDecriptionCipher());
+                byte[] decrypted = IOUtils.toByteArray(cipherInputStream);
+                return new String(decrypted, "utf8");
+            } else {
+                return value;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to decrypt value", e);
+        }
+    }
+
+
 }

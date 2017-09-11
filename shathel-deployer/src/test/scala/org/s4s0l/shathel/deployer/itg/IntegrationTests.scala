@@ -1,5 +1,7 @@
 package org.s4s0l.shathel.deployer.itg
 
+import java.io.File
+
 import org.s4s0l.shathel.commons.utils.Utils
 
 /**
@@ -15,92 +17,92 @@ class IntegrationTests extends AbstractShellIntegrationTest {
   //    }
   //  }
 
-//
+  //
   // its just a spec for how should it work
   // feature("Nodes") {
-//    scenario("listing and labelling nodes") {
-//      assertCmdSuccess("environment init")
-//      assertCmdSuccess("node label --name localhost --labels --force")
-//      assertCmdYmlResult("node ls",
-//        """
-//          |- name: integrationtests-local-manager-1
-//          |  role: manager
-//          |  publicIp: 127.0.0.1
-//          |  privateIp: 127.0.0.1
-//          |  labels: {}
-//        """)
-//      assertCmdYmlResult("node inspect --name integrationtests-local-manager-1",
-//        """
-//          |name: integrationtests-local-manager-1
-//          |role: manager
-//          |publicIp: 127.0.0.1
-//          |privateIp: 127.0.0.1
-//          |labels: {}
-//        """)
-//      assertCmdYmlResult("node label --name 1 --labels aaa=aaa",
-//        """aaa: aaa
-//        """)
-//      assertCmdYmlResult("node label --name 1",
-//        """aaa: aaa
-//        """)
-//      assertCmdYmlResult("node label --name manager-1 --labels aaa=bbb,bbb=BBB",
-//        """aaa: bbb
-//          |bbb: BBB
-//        """)
-//      assertCmdYmlResult("node label --name manager-1 --labels aaa=ccc",
-//        """aaa: ccc
-//          |bbb: BBB
-//        """)
-//      assertCmdYmlResult("node label --name manager-1 --labels aaa=,bbb=CCC",
-//        """bbb: CCC""")
-//      assertCmdResult("node label manager-1 --labels bbb=", "{}")
-//      assertCmdResult("node label --name localhost --labels --force", "{}")
-//      assertCmdYmlResult("node label --name 1 --labels aaa=aaa", """aaa: aaa""")
-//      assertCmdYmlResult("node label --name 1 --labels ccc=ccc --force", "ccc: ccc")
-//      assertCmdYmlResult("node label --name 1 --labels --force", "")
-//    }
-//  }
-//
-//
-//  feature("Volumes") {
-//    scenario("listing and deleting volumes") {
-//      assertCmdSuccess("environment init")
-//      assertCmdSuccess("stack purge")
-//      assertCmdSuccess("stack start org.s4s0l.shathel:volume1:1.0")
-//      //      Print warning if has different labels
-//      assertCmdYmlResult("volume ls",
-//        """volumeName:
-//          |   - node: nodeName
-//          |     driver: local
-//          |     labels:
-//          |       a: b
-//          |       c: b
-//        """)
-//      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName",
-//        """volumeName:
-//          |   - node: nodeName
-//          |     stack: org.s4s0l.shathel:volume1:1.0
-//          |     driver: local
-//          |     labels:
-//          |       a: b
-//          |       c: b
-//        """)
-//      assertCmdSuccess("stack purge")
-//      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName",
-//        """volumeName:
-//          |   - node: nodeName
-//          |     stack: org.s4s0l.shathel:volume1:1.0
-//          |     driver: local
-//          |     labels:
-//          |       a: b
-//          |       c: b
-//        """)
-//      assertCmdYmlResult("volume rm --stack volume1:1.0 --node nodeName", "status: ok")
-//      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName", "")
-//      assertCmdSuccess("stack start org.s4s0l.shathel:volume1:1.0")
-//      assertCmdYmlResult("volume purge", "status: ok")
-//    }
-//  }
+  //    scenario("listing and labelling nodes") {
+  //      assertCmdSuccess("environment init")
+  //      assertCmdSuccess("node label --name localhost --labels --force")
+  //      assertCmdYmlResult("node ls",
+  //        """
+  //          |- name: integrationtests-local-manager-1
+  //          |  role: manager
+  //          |  publicIp: 127.0.0.1
+  //          |  privateIp: 127.0.0.1
+  //          |  labels: {}
+  //        """)
+  //      assertCmdYmlResult("node inspect --name integrationtests-local-manager-1",
+  //        """
+  //          |name: integrationtests-local-manager-1
+  //          |role: manager
+  //          |publicIp: 127.0.0.1
+  //          |privateIp: 127.0.0.1
+  //          |labels: {}
+  //        """)
+  //      assertCmdYmlResult("node label --name 1 --labels aaa=aaa",
+  //        """aaa: aaa
+  //        """)
+  //      assertCmdYmlResult("node label --name 1",
+  //        """aaa: aaa
+  //        """)
+  //      assertCmdYmlResult("node label --name manager-1 --labels aaa=bbb,bbb=BBB",
+  //        """aaa: bbb
+  //          |bbb: BBB
+  //        """)
+  //      assertCmdYmlResult("node label --name manager-1 --labels aaa=ccc",
+  //        """aaa: ccc
+  //          |bbb: BBB
+  //        """)
+  //      assertCmdYmlResult("node label --name manager-1 --labels aaa=,bbb=CCC",
+  //        """bbb: CCC""")
+  //      assertCmdResult("node label manager-1 --labels bbb=", "{}")
+  //      assertCmdResult("node label --name localhost --labels --force", "{}")
+  //      assertCmdYmlResult("node label --name 1 --labels aaa=aaa", """aaa: aaa""")
+  //      assertCmdYmlResult("node label --name 1 --labels ccc=ccc --force", "ccc: ccc")
+  //      assertCmdYmlResult("node label --name 1 --labels --force", "")
+  //    }
+  //  }
+  //
+  //
+  //  feature("Volumes") {
+  //    scenario("listing and deleting volumes") {
+  //      assertCmdSuccess("environment init")
+  //      assertCmdSuccess("stack purge")
+  //      assertCmdSuccess("stack start org.s4s0l.shathel:volume1:1.0")
+  //      //      Print warning if has different labels
+  //      assertCmdYmlResult("volume ls",
+  //        """volumeName:
+  //          |   - node: nodeName
+  //          |     driver: local
+  //          |     labels:
+  //          |       a: b
+  //          |       c: b
+  //        """)
+  //      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName",
+  //        """volumeName:
+  //          |   - node: nodeName
+  //          |     stack: org.s4s0l.shathel:volume1:1.0
+  //          |     driver: local
+  //          |     labels:
+  //          |       a: b
+  //          |       c: b
+  //        """)
+  //      assertCmdSuccess("stack purge")
+  //      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName",
+  //        """volumeName:
+  //          |   - node: nodeName
+  //          |     stack: org.s4s0l.shathel:volume1:1.0
+  //          |     driver: local
+  //          |     labels:
+  //          |       a: b
+  //          |       c: b
+  //        """)
+  //      assertCmdYmlResult("volume rm --stack volume1:1.0 --node nodeName", "status: ok")
+  //      assertCmdYmlResult("volume ls --stack volume1:1.0 --node nodeName", "")
+  //      assertCmdSuccess("stack start org.s4s0l.shathel:volume1:1.0")
+  //      assertCmdYmlResult("volume purge", "status: ok")
+  //    }
+  //  }
 
 
   feature("Stacks") {
@@ -383,6 +385,14 @@ class IntegrationTests extends AbstractShellIntegrationTest {
            |shathel.solution.name=Test
         """)
       assert(assertCmdSuccess("parameters list --not-set 1").split("\n").length > 10)
+    }
+
+    scenario("Encrypting Decrypting") {
+      var encoded: String = null
+      assertCmd(s"encrypt --file ${new File("src/test/resources/filetoencrypt.txt").getAbsolutePath}") { out =>
+        encoded = out
+      }
+      assertCmdResult(s"decrypt --value ${encoded}", "HiddenData")
     }
 
 

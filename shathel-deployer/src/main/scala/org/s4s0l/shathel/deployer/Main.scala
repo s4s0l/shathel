@@ -41,6 +41,9 @@ class Main {
   def EnvironmentCommands: EnvironmentCommands = new EnvironmentCommands(ParametersCommands, StorageCommands)
 
   @Bean
+  def EncriptionCommands: EncriptionCommands = new EncriptionCommands(ParametersCommands, EnvironmentCommands)
+
+  @Bean
   def StackCommands: StackCommands = new StackCommands(ParametersCommands, EnvironmentCommands)
 
   @Bean
