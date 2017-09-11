@@ -1,5 +1,7 @@
 version: 1
 shathel-stack:
+  envs:
+    x: "@TOKEN_SAMPLE@"
   gav: org.s4s0l.shathel.gradle.sample:simple-project:@VERSION@
   dependencies:
 #      org.s4s0l.shathel:shathel-stack-core:0.0.6:

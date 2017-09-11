@@ -21,9 +21,11 @@ class ShathelPackagerPluginIntegrationTest extends org.s4s0l.bootcker.gradle.uti
         file("build/shathel-dockers/simple-project/Dockerfile").text.contains("1.2.3-SNAPSHOT")
         //TODO parse yml and check throughl;y
         file("build/shathel-stacks/simple-project/shthl-stack.yml").text.contains("gav: org.s4s0l.shathel.gradle.sample:simple-project:1.2.3-SNAPSHOT")
+        file("build/shathel-stacks/simple-project/shthl-stack.yml").text.contains("TOKEN_VALUE")
         file("build/shathel-stacks/simple-project/stack/docker-compose.yml").text.contains("context: ./dockerfiles/dummyExtra")
         file("build/shathel-stacks/simple-project/stack/docker-compose.yml").text.contains("context: ./dockerfiles/simple-project")
         file("build/shathel-stacks/simple-project/stack/docker-compose.yml").text.contains("dockerfile: Dockerfile2")
+        file("build/shathel-stacks/simple-project/stack/docker-compose.yml").text.contains("TOKEN_VALUE")
 
         file("build/shathel-stacks/simple-project/stack/dockerfiles/dummyExtra/Dockerfile2").exists()
         file("build/shathel-stacks/simple-project/stack/dockerfiles/simple-project/Dockerfile").exists()

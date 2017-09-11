@@ -15,6 +15,7 @@ class ShathelExtension {
     List<? extends Task> runAroundTasks = []
     List<? extends Task> prepareForTasks = []
     Map<String,String> shathelParams = [:]
+    Map<String,String> tokens = [:]
 
     ShathelExtension(Project project) {
         this.project = project
@@ -23,6 +24,7 @@ class ShathelExtension {
     def image(String name, Closure c) {
         images << [(name): new ShathelDockerTaskSettings(name, project).configure(c)]
     }
+
 
     def image(Closure c) {
         image(ShathelDockerTask.getDefaultDockerImageName(project), c)

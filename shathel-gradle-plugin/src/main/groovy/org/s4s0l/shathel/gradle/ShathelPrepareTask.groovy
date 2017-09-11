@@ -100,11 +100,17 @@ class ShathelPrepareTask extends DefaultTask {
 
     @TaskAction
     void build() {
+        def finalTokens = getSettings().finalTokens
+
         project.copy {
             from getSettings().from
             into getSettings().to
             from(new File(getSettings().from, "shthl-stack.yml")) {
-                filter(ReplaceTokens, tokens: getSettings().tokens)
+                filter(ReplaceTokens, tokens: finalTokens)
+            }
+            from(new File(getSettings().from, "stack/docker-compose.yml")) {
+                filter(ReplaceTokens, tokens: finalTokens)
+                into "stack"
             }
         }
         buildFixImages()
@@ -218,6 +224,11 @@ class ShathelPrepareTaskSettings {
         this.from = project.file(getExtension().sourceRoot)
         this.to = new File(getExtension().shathelTargetDir, project.name)
         this.tokens = [VERSION: project.version]
+    }
+
+
+    def Map<String, String> getFinalTokens() {
+        getExtension().tokens + tokens
     }
 
     ShathelExtension getExtension() {

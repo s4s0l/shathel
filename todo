@@ -2,7 +2,7 @@
 
 2. dodać evaluation depends on jak dodajemy zależność miedzy projektami
 
-3. Prepare task settings w globalnych settingsach
+3. Prepare task settings w globalnych settingsach (tokeny!)
 
 4. ładowanie propertisów z pliku private.{env}.properties
 5. ładowanie propertisów z plicu private.{env}.properties.enc
