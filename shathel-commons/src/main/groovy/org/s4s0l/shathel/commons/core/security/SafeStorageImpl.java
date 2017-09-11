@@ -113,13 +113,28 @@ public class SafeStorageImpl implements SafeStorage {
             File ivFile = new File(rootDir, "/.iv");
             if (ivFile.exists()) {
                 iv = ResourceGroovyMethods.getBytes(ivFile);
+                try {
+                    Optional<String> s = readValue("password-verification");
+                    if (!s.isPresent()) {
+                        writeValue("password-verification", "ok");
+                    } else {
+                        if (!s.get().equals("ok")) {
+                            throw new RuntimeException("Seems like password has changed");
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("provided safe password seems invalid...", e);
+                }
             } else {
                 iv = new byte[16];
                 new SecureRandom(DEFAULT_SALT).nextBytes(iv);
                 ResourceGroovyMethods.setBytes(ivFile, iv);
+                writeValue("password-verification", "ok");
             }
+
+
         } catch (Exception e) {
-            throw new RuntimeException("Unable to create Safe Storage", e);
+            throw new RuntimeException("Unable to create Safe Storage: " + e.getMessage(), e);
         }
     }
 

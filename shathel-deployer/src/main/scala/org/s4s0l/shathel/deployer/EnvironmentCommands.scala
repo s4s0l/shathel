@@ -49,6 +49,9 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
     shathel(builder().environment(environment).build().asJava, builder())(
       context => {
         val (_, _, environment) = getEnvironment(context)
+        if (!environment.getEnvironmentContext.getSafeStorage.readValue("password-verification").isPresent) {
+          throw new RuntimeException("password invalid?")
+        }
         inspectResult(environment)
       })
 
