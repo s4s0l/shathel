@@ -28,6 +28,8 @@ shathel-solution:
       MANDATORY_PARAM: MANDATORY_PARAM
   environments:
     local:
+      envs:
+        FROM_ENV: FROM_ENV_VALUE
       type: local-swarm
       build-allowed: true
       domain: localhost
@@ -65,6 +67,7 @@ shathel-solution:
         "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_SIZE")
         "1" == execInAnyTask(environment, "variables_service", "printenv ENV_MGM_QUORUM")
         "FROM_SHATHEL_FILE_STACK" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_STACK")
+        "FROM_ENV_VALUE" == execInAnyTask(environment, "variables_service", "printenv FROM_ENV")
         "FROM_SHATHEL_FILE_SOLUTION" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_FILE_SOLUTION")
         "mydomain.com" == execInAnyTask(environment, "variables_service", "printenv DNS")
         "XxX" == execInAnyTask(environment, "variables_service", "printenv FROM_SHATHEL_PARAM")

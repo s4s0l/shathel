@@ -17,11 +17,13 @@ public class EnvironmentDescription implements ParameterProvider {
     private final String name;
     private final String type;
     private final Map<String, String> parameters;
+    private final Map<String, String> envs;
 
-    public EnvironmentDescription(Parameters overrides, String name, String type, Map<String, String> parameters) {
+    public EnvironmentDescription(Parameters overrides, String name, String type, Map<String, String> parameters,Map<String, String> envs) {
         this.overrides = overrides;
         this.name = name;
         this.type = type;
+        this.envs = envs;
         this.parameters = Parameters.getNormalizedParameterNames(parameters);
     }
 
@@ -55,7 +57,7 @@ public class EnvironmentDescription implements ParameterProvider {
 
 
     public Map<String, String> getAsEnvironmentVariables() {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(envs);
 
         parameters.entrySet()
                 .forEach(x ->

@@ -64,6 +64,27 @@ in enrichers
 * shathel.env.{env}.{secretName}_secret_path
 * shathel.env.{env}.{secretName}_secret_value
 
+
+## How does it map to yml
+```
+version: 1
+shathel-solution:
+  sample1: value1
+  envs:
+    SAMPLE2: value2
+  environments:
+    local:
+      sample3: value3
+      envs:
+        SAMPLE4: value4 
+```
+will set:
+* shathel.solution.sample1
+* SAMPLE2
+* shathel.env.local.sample3
+* SAMPLE4
+
+
 ## Gradle tests variables
 * shathel.plugin.ip
 * shathel.plugin.{stackName}.{serviceName}.{targetPort}

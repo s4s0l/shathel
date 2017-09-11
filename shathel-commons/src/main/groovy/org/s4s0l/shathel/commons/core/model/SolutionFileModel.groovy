@@ -20,10 +20,14 @@ class SolutionFileModel {
     }
 
     SolutionFileModel(Object parsedYml) {
-        this.parsedYml = parsedYml;         \
-                 if (this.parsedYml.version != 1) {
+        this.parsedYml = parsedYml;          \
+                  if (this.parsedYml.version != 1) {
             throw new RuntimeException("Invalid stack version number")
         }
+    }
+
+    Map<String,String> getEnvironmentEnvs(String name) {
+        return parsedYml['shathel-solution']['environments'][name]['envs'] ?: [:]
     }
 
     Map<String, String> getEnvironment(String name) {
@@ -32,7 +36,7 @@ class SolutionFileModel {
                 name: name,
                 type: e.type.toString() //dummy npe based verification, TODO
         ] << e;
-        params.collectEntries {
+        params.findAll { it.key != 'envs' }.collectEntries {
             [(it.key): it.value?.toString()]
         }
     }
@@ -41,9 +45,11 @@ class SolutionFileModel {
         parsedYml['shathel-solution']['name']
     }
 
-    Map<String,String> getSolutionParameters(){
-        Map<String,Object> mapped = parsedYml['shathel-solution']
-        mapped.findAll {it.value instanceof String}.collectEntries {[(it.key): it.value?.toString()]}
+    Map<String, String> getSolutionParameters() {
+        Map<String, Object> mapped = parsedYml['shathel-solution']
+        mapped.findAll { it.value instanceof String }.collectEntries {
+            [(it.key): it.value?.toString()]
+        }
     }
 
     Set<String> getEnvironments() {
@@ -55,7 +61,7 @@ class SolutionFileModel {
         if (stack['envs'] == null) {
             stack['envs'] = [:]
         }
-        return ['envs'  : stack['envs'],
+        return ['envs': stack['envs'],
                 'params': stack.findAll { it.key != 'envs' }]
     }
 
