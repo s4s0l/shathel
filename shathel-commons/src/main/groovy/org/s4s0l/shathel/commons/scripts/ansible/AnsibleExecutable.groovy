@@ -69,7 +69,7 @@ class AnsibleExecutable implements NamedExecutable {
                         "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
                     }.join(",\n")
             +"}"
-
+            extraVarsFile.deleteOnExit()
             def out = ansible.play(script.getBaseDirectory(),
                     ansibleScriptContext,
                     env,

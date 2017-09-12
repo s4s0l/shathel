@@ -49,7 +49,11 @@ class PackerExecutable implements NamedExecutable {
                 case ProcessorCommand.APPLY:
                     def extraVarsFile = new File(econtext.tempDirectory, "packer-extra-vars.json")
                     try {
-                        extraVarsFile.text = "{" + env.collect {
+                        extraVarsFile.text = "{" + env.findAll {
+                            //sometime secret values are files, that may be for eg jsons itself
+                            //this is a lame workaround
+                            !it.key.endsWith("_secret_value")
+                        }.collect {
                             "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
                         }.join(",\n") + "}"
                         context.put("result", packer.run(workingDir, "build -var-file=${extraVarsFile.absolutePath} ${script.scriptFileLocation.get().absolutePath}", env))

@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory
 @TypeChecked
 @CompileStatic
 class TerraformExecutable implements NamedExecutable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TerraformExecutable.class);
+    private static
+    final Logger LOGGER = LoggerFactory.getLogger(TerraformExecutable.class);
     private final TypedScript script
     private final TerraformWrapper terraform
 
