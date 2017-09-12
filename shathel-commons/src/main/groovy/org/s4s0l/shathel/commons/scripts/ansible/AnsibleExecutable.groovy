@@ -31,7 +31,6 @@ class AnsibleExecutable implements NamedExecutable {
     }
 
 
-
     @Override
     void execute(Map<String, Object> context) {
         if (context.get("result") == null) {
@@ -60,9 +59,16 @@ class AnsibleExecutable implements NamedExecutable {
         def extraVarsFile = new File(econtext.tempDirectory, "ansible-extra-vars.json")
         try {
 
-            extraVarsFile.text = "{" + env.collect {
-                "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
-            }.join(",\n") + "}"
+            extraVarsFile.text = "{" +
+                    env.findAll {
+                        //sometime secret values are files, that may be for eg jsons itself
+                        //this is a lame workaround
+                        !it.key.endsWith("_secret_value")
+                    }
+                    .collect {
+                        "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
+                    }.join(",\n")
+            +"}"
 
             def out = ansible.play(script.getBaseDirectory(),
                     ansibleScriptContext,
