@@ -52,7 +52,7 @@ class PackerExecutable implements NamedExecutable {
                         extraVarsFile.text = "{" + env.findAll {
                             //sometime secret values are files, that may be for eg jsons itself
                             //this is a lame workaround
-                            !it.key.endsWith("_secret_value")
+                            !it.key.toLowerCase().endsWith("_secret_value") && !it.key.toLowerCase().contains("safepassword")
                         }.collect {
                             "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
                         }.join(",\n") + "}"
