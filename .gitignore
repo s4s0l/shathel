@@ -16,3 +16,5 @@ sandbox/terraform-do/private
 sandbox/vagrant/private
 /private.properties
 sample-gradle-projects/multi-project-vbox/project2/solution/vboxplugin
+/.project
+/.settings

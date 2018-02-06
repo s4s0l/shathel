@@ -19,7 +19,7 @@ build:
     - docker pull sasol/dind4j:${DIND4J_VERSION}
     - >
       docker run --privileged -w /build -v ${SHIPPABLE_BUILD_DIR}:/build --rm sasol/dind4j:${DIND4J_VERSION}
-      ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test --info --stacktrace
+      ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache clean test :shathel-deployer:dockerBuild --info --stacktrace
 #  on_failure:
 #    - docker logs -f DindTest-dev-manager-2
 #    - docker logs -f DindTest-dev-manager-1
@@ -36,5 +36,5 @@ build:
       -e BINTRAY_KEY=$BINTRAY_KEY
       -e GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
       sasol/dind4j:${DIND4J_VERSION} ./gradlew --no-daemon --project-cache-dir=.cache --gradle-user-home=.cache
-      -Pversion="$GIT_TAG_NAME" --info bintrayUpload uploadGithubRelease
+      -Pversion="$GIT_TAG_NAME" --info bintrayUpload uploadGithubRelease :shathel-deployer:dockerPush
       ) || (echo "SKIPPED")

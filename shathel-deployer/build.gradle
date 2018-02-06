@@ -43,6 +43,32 @@ task(type: GitHubReleaseUploadAsset, dependsOn: assemble, "uploadGithubRelease")
     )
 }
 
+task(type: Copy, dependsOn: assemble, "dockerPrepare") {
+    from("src/main/docker") {
+    }
+    from("$project.buildDir/libs/") {
+        include "$project.name-${project.version}.jar"
+        rename { x ->
+            "shathel-deployer"
+        }
+    }
+    into "$project.buildDir/docker"
+}
+task(type: Exec, dependsOn: dockerPrepare, "dockerBuild") {
+    workingDir "$project.buildDir/docker"
+    commandLine "docker","build", "-t", "sasol/shathel:${project.version}", "."
+    inputs.dir("$project.buildDir/docker")
+    outputs.file("$project.buildDir/docker.done")
+    doLast {
+        file("$project.buildDir/docker.done").text = java.util.UUID.randomUUID().toString()
+    }
+}
+task(type: Exec, dependsOn: dockerBuild, "dockerPush") {
+    workingDir "$project.buildDir/docker"
+    commandLine "docker","push", "sasol/shathel:${project.version}"
+}
+
+
 apply from: '../gradle/integration.gradle'
 
 install.dependsOn assemble
