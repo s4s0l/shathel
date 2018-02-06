@@ -63,7 +63,12 @@ task(type: Exec, dependsOn: dockerPrepare, "dockerBuild") {
         file("$project.buildDir/docker.done").text = java.util.UUID.randomUUID().toString()
     }
 }
-task(type: Exec, dependsOn: dockerBuild, "dockerPush") {
+task(type: Exec, "dockerLogin") {
+    workingDir "$project.buildDir/docker"
+    commandLine "docker","login","-u", System.getenv("DOCKER_HUB_USER"), "-p",System.getenv("DOCKER_HUB_PASS")
+}
+
+task(type: Exec, dependsOn: [dockerBuild,dockerLogin], "dockerPush") {
     workingDir "$project.buildDir/docker"
     commandLine "docker","push", "sasol/shathel:${project.version}"
 }
