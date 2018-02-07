@@ -62,9 +62,9 @@ public class Shathel {
     }
 
     private FileStorage createFileStorage(File f) {
-        if (new File(f, ".git").exists()) {
-            throw new RuntimeException("git storage unsupported?");
-        }
+//        if (new File(f, ".git").exists()) {
+//            throw new RuntimeException("git storage unsupported?");
+//        }
         return new FileStorage(f);
     }
 
