@@ -15,7 +15,7 @@ public class SwarmPullingEnricher extends EnricherExecutable {
     protected void execute(EnricherExecutableParams params) {
 
         ComposeFileModel model = params.getModel();
-        boolean pull = params.getEnvironment().getOrDefault("SHATHEL_ENV_PULl", "true").equals("true");
+        boolean pull = params.getEnvironment().getOrDefault("SHATHEL_ENV_PULL", "true").equals("true");
         EnricherExecutableParams.Provisioners provisioners = params.getProvisioners();
         if (pull) {
             model.mapImages((image) -> {
