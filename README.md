@@ -5,3 +5,5 @@
 [![Bintray](https://img.shields.io/bintray/v/sasol-oss/maven/shathel-deployer.svg?style=plastic)](https://bintray.com/sasol-oss/maven/shathel-deployer)
 
 Docker provisioner/continous-delivery platform build around docker-machine and packages created with gradle.
+
+Can be foud also on https://gitlab.com/sasol/shathel
