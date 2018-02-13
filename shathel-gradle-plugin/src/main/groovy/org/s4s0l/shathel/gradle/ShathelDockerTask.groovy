@@ -1,6 +1,5 @@
 package org.s4s0l.shathel.gradle
 
-import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -8,10 +7,40 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskAction
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 
-/**
- * @author Marcin Wielgus
- */
+class ShathelDockerPushTask extends DefaultTask {
+    private ShathelDockerTask dockerTask
 
+    ShathelDockerTask getDockerTask() {
+        return dockerTask
+    }
+
+    void setDockerTask(ShathelDockerTask dockerTask) {
+        this.dockerTask = dockerTask
+        dependsOn(dockerTask)
+        finalizeConfiguration()
+    }
+
+    @TaskAction
+    void build() {
+        def config = dockerTask.settings
+
+        if (config.build) {
+            if (dockerTask.isPushingSomewhere()) {
+                config.combinedTags.each {
+                    dockerTask.getWrapper().push(it)
+                }
+            }
+        }
+        project.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file.push").text = UUID.randomUUID().toString()
+    }
+
+    void finalizeConfiguration() {
+        def config = dockerTask.settings
+        this.inputs.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file")
+        this.outputs.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file.push")
+    }
+
+}
 
 class ShathelDockerTask extends DefaultTask {
 
@@ -55,6 +84,11 @@ class ShathelDockerTask extends DefaultTask {
         }
         this.dependsOn prepareTask
 
+        if (isPushingSomewhere()) {
+            ShathelDockerPushTask pushTask = project.task("shathelDockerPush-${config.imageName}", type: ShathelDockerPushTask)
+            pushTask.setDockerTask(this)
+        }
+
         this.inputs.dir(config.targetDir)
         this.outputs.dir(config.targetDir)
         this.outputs.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file")
@@ -70,11 +104,6 @@ class ShathelDockerTask extends DefaultTask {
         def contextPath = project.file(config.targetDir)
         if (config.build) {
             getWrapper().buildAndTag(contextPath, config.dockerFile, config.args, config.combinedTags)
-            if (isPushingSomewhere()) {
-                config.combinedTags.each {
-                    getWrapper().push(it)
-                }
-            }
         }
         project.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file").text = UUID.randomUUID().toString()
     }

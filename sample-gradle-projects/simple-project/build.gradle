@@ -60,6 +60,7 @@ shathel {
     image {
         context { from(bootRepackage) { into 'app' } }
         push = true
+        repos = ["registry.gitlab.com/sasol/shathel"]
     }
 
     image("dummyExtra") {
