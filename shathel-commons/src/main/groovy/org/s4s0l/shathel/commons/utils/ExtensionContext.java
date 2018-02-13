@@ -16,7 +16,7 @@ public class ExtensionContext {
     @Singular
     private final List<ExtensionInterface> extensions;
 
-    ExtensionContext(List<ExtensionInterface> extensions) {
+    public ExtensionContext(List<ExtensionInterface> extensions) {
         this.extensions = extensions;
 
         //Ugly but will work for now until i get rid of lombok

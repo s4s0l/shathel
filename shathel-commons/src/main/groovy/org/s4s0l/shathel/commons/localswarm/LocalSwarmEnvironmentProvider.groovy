@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.localswarm
 import org.s4s0l.shathel.commons.core.DefaultSettingsImporterExporter
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription
 import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider
 
 /**
@@ -17,9 +18,9 @@ class LocalSwarmEnvironmentProvider implements EnvironmentProvider {
     }
 
     @Override
-    Environment getEnvironment(EnvironmentContext environmentContext) {
+    Environment getEnvironment(EnvironmentDescription environmentDescription, EnvironmentContext environmentContext) {
         DefaultSettingsImporterExporter machineSettingsImporterExporter = new DefaultSettingsImporterExporter()
-        return new LocalSwarmEnvironment(new LocalSwarmEnvironmentContextImpl(environmentContext), machineSettingsImporterExporter)
+        return new LocalSwarmEnvironment(new LocalSwarmEnvironmentContextImpl(environmentDescription,environmentContext), machineSettingsImporterExporter)
     }
 
 

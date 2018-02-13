@@ -8,7 +8,7 @@
 
 ## Solution level settings
 * shathel.solution.name
-
+* shathel.solution.forceful
 * shathel.solution.docker_version 
 * shathel.solution.file_default_version
 * shathel.solution.file_default_group
@@ -25,6 +25,13 @@
 * shathel.solution.ivy_settings
 * shathel.solution.ivy_repo_id
 * shathel.solution.ivy_repos
+* shathel.solution.ivy_user
+* shathel.solution.ivy_pass
+* shathel.solution.ivy_host
+* shathel.solution.ivy_realm
+* shathel.solution.docker_user
+* shathel.solution.docker_pass
+* shathel.solution.docker_host
 
 ## Environment level settings
 
@@ -32,9 +39,6 @@ We set them as shathel.env.{env}.net but they are accessible as shathel.env.net
 in enrichers
 
 * shathel.env.{env}.net
-* shathel.env.{env}.init //wtf??
-* shathel.env.{env}.registry //deprecated
-* shathel.env.{env}.forceful
 * shathel.env.{env}.dependenciesDir
 * shathel.env.{env}.dataDir
 * shathel.env.{env}.safeDir

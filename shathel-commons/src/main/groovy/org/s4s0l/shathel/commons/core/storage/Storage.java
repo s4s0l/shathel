@@ -9,7 +9,7 @@ import java.io.File;
  */
 public interface Storage {
 
-    File getDependencyCacheDirectory(ParameterProvider parameterProvider, String env);
+    File getDependencyCacheDirectory(ParameterProvider parameterProvider);
 
     File getDataDirectory(ParameterProvider parameterProvider, String env);
 

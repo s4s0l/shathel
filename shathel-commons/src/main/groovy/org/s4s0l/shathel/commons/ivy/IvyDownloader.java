@@ -14,9 +14,11 @@ import org.apache.ivy.core.settings.IvyVariableContainerImpl;
 import org.apache.ivy.core.settings.XmlSettingsParser;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.resolver.ChainResolver;
+import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import org.apache.ivy.plugins.resolver.URLResolver;
 import org.apache.ivy.util.AbstractMessageLogger;
 import org.apache.ivy.util.Message;
+import org.apache.ivy.util.url.CredentialsStore;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.dependencies.StackDependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver;
@@ -38,17 +40,21 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class IvyDownloader implements StackDependencyDownloader {
-    private static final Logger LOGGER = getLogger(IvyDownloader.class);
-    public static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.solution.ivy_default_version";
-    public static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.solution_ivy_default_group";
+    private static final String SHATHEL_IVY_DEFAULT_VERSION = "shathel.solution.ivy_default_version";
+    private static final String SHATHEL_IVY_DEFAULT_GROUP = "shathel.solution_ivy_default_group";
     public static final String SHATHEL_IVY_SETTINGS = "shathel.solution.ivy_settings";
 
-    public static final String SHATHEL_IVY_REPOS_ID = "shathel.solution.ivy_repo_id";
-    public static final String SHATHEL_IVY_REPOS = "shathel.solution.ivy_repos";
+    private static final String SHATHEL_IVY_REPOS_ID = "shathel.solution.ivy_repo_id";
+    private static final String SHATHEL_IVY_REPOS = "shathel.solution.ivy_repos";
+    private static final String SHATHEL_IVY_USER = "shathel.solution.ivy_user";
+    private static final String SHATHEL_IVY_PASS = "shathel.solution.ivy_pass";
+    private static final String SHATHEL_IVY_HOST = "shathel.solution.ivy_host";
+    private static final String SHATHEL_IVY_REALM = "shathel.solution.ivy_realm";
     public static final String DEFAULT_GROUP = "org.s4s0l.shathel";
-    public static final String DEFAULT_REPOS = "http://repo1.maven.org/maven2/,https://dl.bintray.com/sasol-oss/maven/";
-    public static final String PATTERN_SUFFIX = "[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]";
-    final Parameters parameters;
+    private static final String DEFAULT_REPOS = "http://repo1.maven.org/maven2/,https://dl.bintray.com/sasol-oss/maven/";
+    private static final String DEFAULT_IDS = "maven,sasol";
+    private static final String PATTERN_SUFFIX = "[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]";
+    private final Parameters parameters;
 
     public IvyDownloader(Parameters parameters) {
         this.parameters = parameters;
@@ -141,19 +147,31 @@ public class IvyDownloader implements StackDependencyDownloader {
             }
         }).orElseGet(() -> {
             IvySettings ivySettings = createEmptyIvySettings();
-            ChainResolver cresolver = new ChainResolver();
-            cresolver.setName(parameters.getParameter(SHATHEL_IVY_REPOS_ID).orElse("default"));
-            String repos = parameters.getParameter(SHATHEL_IVY_REPOS)
-                    .orElse(DEFAULT_REPOS);
-            String[] split = repos.split(",");
-            for (int j = 0; j < split.length; j++) {
-                String repo = split[j].trim();
-                String id = "repo-" + j;
-                URLResolver resolver = getUrlResolver(id, repo);
-                cresolver.add(resolver);
+
+
+            ChainResolver cResolver = new ChainResolver();
+            cResolver.setName("default");
+            String[] repos = parameters.getParameter(SHATHEL_IVY_REPOS).orElse(DEFAULT_REPOS).split(",");
+            String[] ids = parameters.getParameter(SHATHEL_IVY_REPOS_ID).orElse(DEFAULT_IDS).split(",");
+
+            for (int j = 0; j < repos.length; j++) {
+                String repo = repos[j].trim();
+                String id = ids[j];
+                URLResolver resolver = getIbibBiblioResolver(id, repo);
+                cResolver.add(resolver);
             }
-            ivySettings.addResolver(cresolver);
-            ivySettings.setDefaultResolver(cresolver.getName());
+            ivySettings.addResolver(cResolver);
+            ivySettings.setDefaultResolver("default");
+
+            Optional<String> user = parameters.getParameter(SHATHEL_IVY_USER);
+            Optional<String> pass = parameters.getParameter(SHATHEL_IVY_PASS);
+            Optional<String> host = parameters.getParameter(SHATHEL_IVY_HOST);
+            Optional<String> realm = parameters.getParameter(SHATHEL_IVY_REALM);
+
+            if (user.isPresent() && pass.isPresent() && host.isPresent() && realm.isPresent()) {
+                CredentialsStore.INSTANCE.addCredentials(realm.get(), host.get(), user.get(), pass.get());
+            }
+
             return ivySettings;
         });
 
@@ -169,6 +187,14 @@ public class IvyDownloader implements StackDependencyDownloader {
         return new IvySettings(variableContainer);
     }
 
+    private IBiblioResolver getIbibBiblioResolver(String name, String root) {
+        IBiblioResolver ret = new IBiblioResolver();
+        ret.setName(name);
+        ret.setM2compatible(true);
+        ret.setRoot(root);
+        return ret;
+    }
+
     private URLResolver getUrlResolver(String repoId, String pattern) {
         pattern = pattern.endsWith("/") ? pattern + "/" : pattern;
         URLResolver resolver = new URLResolver();
@@ -181,7 +207,7 @@ public class IvyDownloader implements StackDependencyDownloader {
 
     private Optional<StackReference> getReference(StackLocator locator) {
         String group = parameters.getParameter(SHATHEL_IVY_DEFAULT_GROUP).orElse(DEFAULT_GROUP);
-        String version = parameters.getParameter(SHATHEL_IVY_DEFAULT_VERSION).orElseGet(() -> Utils.getShathelVersion());
+        String version = parameters.getParameter(SHATHEL_IVY_DEFAULT_VERSION).orElseGet(Utils::getShathelVersion);
         return new ReferenceResolver(group, version).resolve(locator);
     }
 

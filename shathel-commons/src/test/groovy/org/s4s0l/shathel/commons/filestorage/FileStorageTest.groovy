@@ -18,8 +18,8 @@ class FileStorageTest extends Specification {
         given:
         FileStorage fs = create("${rootDir}/1" )
         def params = MapParameters.builder().parameters([
-                'dataDir'          : 'data_x',
-                'tempDir'           : f('tmp_x').absolutePath
+                'shathel.solution.dataDir'          : 'data_x',
+                'shathel.solution.tempDir'           : f('tmp_x').absolutePath
         ]).build()
 
         when:

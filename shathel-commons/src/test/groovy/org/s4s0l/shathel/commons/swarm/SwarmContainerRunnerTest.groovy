@@ -3,7 +3,6 @@ package org.s4s0l.shathel.commons.swarm
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
@@ -36,8 +35,8 @@ class SwarmContainerRunnerTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:updateing:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:updateing:1.0"))
+        def command = stack.createStartCommand(false,environment)
         solution.run(command)
 
         then:
@@ -45,8 +44,8 @@ class SwarmContainerRunnerTest extends BaseIntegrationTest {
 
 
         when:
-        stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:updateing:2.0"))
-        command = stack.createStartCommand(false)
+        stack = solution.openStack( new StackReference("org.s4s0l.shathel:updateing:2.0"))
+        command = stack.createStartCommand(false,environment)
         solution.run(command)
 
         then:

@@ -8,6 +8,7 @@ import org.s4s0l.shathel.commons.core.DefaultSettingsImporterExporter
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription
 import org.s4s0l.shathel.commons.core.environment.EnvironmentProvider
 import org.s4s0l.shathel.commons.core.model.EnvironmentFileModel
 import org.s4s0l.shathel.commons.remoteswarm.RemoteEnvironment
@@ -49,8 +50,8 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
     }
 
     @Override
-    Environment getEnvironment(EnvironmentContext environmentContext) {
-        RemoteEnvironmentPackageContext packageContext = createPackageContext(environmentContext)
+    Environment getEnvironment(EnvironmentDescription environmentDescription,EnvironmentContext environmentContext) {
+        RemoteEnvironmentPackageContext packageContext = createPackageContext(environmentDescription, environmentContext)
         DefaultSettingsImporterExporter machineSettingsImporterExporter = new DefaultSettingsImporterExporter();
         RemoteEnvironmentAccessManager accessManager = createAccessManager(packageContext)
         RemoteEnvironmentApiFacade facade = new RemoteEnvironmentApiFacade(accessManager, packageContext)
@@ -61,11 +62,11 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
         return re;
     }
 
-    private RemoteEnvironmentPackageContext createPackageContext(EnvironmentContext environmentContext) {
-        String gav = environmentContext.getEnvironmentDescription().getParameter("gav").orElseThrow {
+    private RemoteEnvironmentPackageContext createPackageContext(EnvironmentDescription environmentDescription, EnvironmentContext environmentContext) {
+        String gav = environmentDescription.getEnvironmentParameter("gav").orElseThrow {
             new RuntimeException("Remote environment needs gav parameter")
         }
-        Optional<Boolean> forceful = environmentContext.getEnvironmentDescription().getParameterAsBoolean("forceful");
+        Optional<Boolean> forceful = environmentDescription.getSolution().getSolutionParameterAsBoolean("forceful")
         File packagerRoot = extensionContext.lookupAll(EnvironmentPackageDownloader).map {
             it.download(new StackLocator(gav), environmentContext.dependencyCacheDirectory, forceful.orElse(false))
         }.filter {
@@ -74,12 +75,12 @@ class RemoteEnvironmentProvider implements EnvironmentProvider {
             new RuntimeException("Unable to find environment package $gav")
         }.get()
         def packageDesc = new RemoteEnvironmentPackageDescription(EnvironmentFileModel.load(new File(packagerRoot, "shthl-env.yml")), packagerRoot)
-        RemoteEnvironmentPackageContext packageContext = new RemoteEnvironmentPackageContextImpl(environmentContext, packageDesc)
+        RemoteEnvironmentPackageContext packageContext = new RemoteEnvironmentPackageContextImpl(environmentContext, environmentDescription, packageDesc)
         packageContext
     }
 
     private RemoteEnvironmentAccessManager createAccessManager(RemoteEnvironmentPackageContext packageContext) {
-        def email = packageContext.environmentDescription.getParameter("email").orElse("someone@${packageContext.contextName}".toString())
+        def email = packageContext.getEmail()
 
         File controlSocketsLocation = packageContext.tempDirectory
         if (controlSocketsLocation.absolutePath.size() >= (108 - 18)) {

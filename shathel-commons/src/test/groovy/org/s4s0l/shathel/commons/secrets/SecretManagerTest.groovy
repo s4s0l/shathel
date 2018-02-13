@@ -1,13 +1,8 @@
 package org.s4s0l.shathel.commons.secrets
 
 import org.s4s0l.shathel.commons.Shathel
-import org.s4s0l.shathel.commons.core.Solution
-import org.s4s0l.shathel.commons.core.Stack
-import org.s4s0l.shathel.commons.core.StackOperations
-import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
@@ -44,8 +39,8 @@ class SecretManagerTest
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:secret-consumer:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:secret-consumer:1.0"))
+        def command = stack.createStartCommand(false,environment)
         solution.run(command)
 
 
@@ -57,7 +52,7 @@ class SecretManagerTest
 
         when:
         System.setProperty("shathel.env.local.shathel_some_pass_secret_value", "dummy")
-        environment.environmentApiFacade.secretManager.secretUpdate("shathel_some_pass", null)
+        environment.environmentApiFacade.secretManager.secretUpdate("shathel_some_pass", (File)null)
 
 
         then:
@@ -70,7 +65,7 @@ class SecretManagerTest
 
 
         when:
-        def command2 = stack.createStopCommand(true, true)
+        def command2 = stack.createStopCommand(true, true,environment)
         solution.run(command2)
 
         then:
@@ -80,7 +75,7 @@ class SecretManagerTest
         when:
         //because swarm has lag in destroying networks
         Thread.sleep(10000)
-        command = stack.createStartCommand(false)
+        command = stack.createStartCommand(false,environment)
         solution.run(command)
 
 

@@ -32,8 +32,8 @@ class RemoteEnvironmentController {
     boolean isInitialized() {
         verifyMandatoryParams()
         accessManager.checkPreConditions()
-        int mCount = processorContext.getEnvironmentDescription().managersCount
-        int wCount = processorContext.getEnvironmentDescription().workersCount
+        int mCount = processorContext.managersCount
+        int wCount = processorContext.workersCount
         def nodes = apiFacade.nodes
         return mCount == nodes.findAll { it.role == "manager" }.size() &&
                 wCount == nodes.findAll { it.role == "worker" }.size() &&
@@ -55,22 +55,22 @@ class RemoteEnvironmentController {
     }
 
     private RemoteEnvironmentProcessor getImageScript() {
-        def imageScript = processors.create(processorContext.description.imagePreparationScript)
+        def imageScript = processors.create(processorContext.imagePreparationScript)
         imageScript
     }
 
     private RemoteEnvironmentProcessor getInfrastructureScript() {
-        def script = processors.create(processorContext.description.infrastructureScript)
+        def script = processors.create(processorContext.infrastructureScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSetupScript() {
-        def script = processors.create(processorContext.description.setupScript)
+        def script = processors.create(processorContext.setupScript)
         script
     }
 
     private RemoteEnvironmentProcessor getSwarmScript() {
-        def script = processors.create(processorContext.description.swarmScript)
+        def script = processors.create(processorContext.swarmScript)
         script
     }
 
@@ -79,8 +79,8 @@ class RemoteEnvironmentController {
     }
 
     private void verifyMandatoryParams() {
-        def variables = processorContext.asEnvironmentVariables
-        def mandatory = processorContext.description.mandatoryEnvs
+        def variables = createEnvs()
+        def mandatory = processorContext.mandatoryEnvs
         def missingMessage = mandatory.findAll {
             variables.get(it.key) == null
         }.collect {

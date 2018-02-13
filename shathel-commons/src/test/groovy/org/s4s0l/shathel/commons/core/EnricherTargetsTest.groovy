@@ -43,8 +43,8 @@ class EnricherTargetsTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:enricher3:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack(new StackReference("org.s4s0l.shathel:enricher3:1.0"))
+        def command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 1
@@ -52,8 +52,8 @@ class EnricherTargetsTest extends BaseIntegrationTest {
 
         when:
         solution.run(command)
-        stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:enricher1:1.0"))
-        command = stack.createStartCommand(false)
+        stack = solution.openStack( new StackReference("org.s4s0l.shathel:enricher1:1.0"))
+        command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 2

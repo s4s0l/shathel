@@ -2,23 +2,18 @@ package org.s4s0l.lshathel.testutils;
 
 import org.immutables.value.Value;
 import org.s4s0l.shathel.commons.DefaultExtensionContext;
+import org.s4s0l.shathel.commons.ExtensionContextsProvider;
 import org.s4s0l.shathel.commons.Shathel;
 import org.s4s0l.shathel.commons.core.CommonParams;
-import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.Solution;
 import org.s4s0l.shathel.commons.core.Stack;
-import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.environment.Environment;
+import org.s4s0l.shathel.commons.core.environment.EnvironmentContextInternal;
 import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
-import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marcin Wielgus
@@ -33,8 +28,8 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
     }
 
     @Value.Lazy
-    default ExtensionContext extensionContext() {
-        return DefaultExtensionContext.create(parameters(), extensions());
+    default ExtensionContextsProvider extensionContext() {
+        return DefaultExtensionContext.create(extensions());
     }
 
     @Value.Derived
@@ -55,9 +50,8 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
     @Value.Derived
     default Environment environment() {
         Environment e = solution().getEnvironment(shathelEnv());
-        boolean initEnabled = e.getEnvironmentContext()
-                .getEnvironmentDescription()
-                .getParameterAsBoolean("init")
+        boolean initEnabled = ((EnvironmentContextInternal)e.getEnvironmentContext())
+                .getEnvironmentParameterAsBoolean("init")
                 .orElse(true);
         if (initEnabled && !e.isInitialized()) {
             e.initialize();
@@ -66,19 +60,19 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
     }
 
     default Stack stack(String gav) {
-        return solution().openStack(environment(), new StackLocator(gav));
+        return solution().openStack( new StackLocator(gav));
     }
 
 
     default void start(String gav, boolean withOptional) {
         Stack stack = stack(gav);
-        solution().run(stack.createStartCommand(withOptional));
+        solution().run(stack.createStartCommand(withOptional, environment()));
     }
 
 
     default void stop(String gav, boolean withDependencies, boolean withOptional) {
         Stack stack = stack(gav);
-        solution().run(stack.createStopCommand(withDependencies, withOptional));
+        solution().run(stack.createStopCommand(withDependencies, withOptional,environment()));
     }
 
 }

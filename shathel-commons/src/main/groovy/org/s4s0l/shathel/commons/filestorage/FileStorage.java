@@ -12,14 +12,15 @@ public class FileStorage implements Storage {
 
     private final File root;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public FileStorage(File root) {
         root.mkdirs();
         this.root = root;
     }
 
     private File get(ParameterProvider parameterProvider, String type, File defaultDir) {
-        return parameterProvider.getParameter(type + "Dir")
-                .map(v -> new File(v))
+        return parameterProvider.getParameter("shathel.solution." + type + "Dir")
+                .map(File::new)
                 .map(f -> f.isAbsolute() ? f : new File(root, f.getPath()))
                 .orElse(defaultDir);
     }
@@ -30,7 +31,7 @@ public class FileStorage implements Storage {
     }
 
     @Override
-    public File getDependencyCacheDirectory(ParameterProvider parameterProvider, String env) {
+    public File getDependencyCacheDirectory(ParameterProvider parameterProvider) {
         return ensureExists(get(parameterProvider,  "dependencies", new File(root, ".dependency-cache")));
     }
 
@@ -59,6 +60,7 @@ public class FileStorage implements Storage {
         return ensureExists(get(parameterProvider, env, "temp"));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private File ensureExists(File f) {
         f.mkdirs();
         return f;
@@ -81,7 +83,7 @@ public class FileStorage implements Storage {
         }
     }
 
-    private final static boolean isAncestor(File offspring, File ancestor) {
+    private static boolean isAncestor(File offspring, File ancestor) {
         return offspring.getAbsolutePath().startsWith(ancestor.getAbsolutePath());
     }
 

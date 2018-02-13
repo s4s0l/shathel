@@ -75,7 +75,7 @@ class RemoteEnvironment implements Environment {
         controller.verify()
     }
 
-    private String getSafeStorageKey() {
+    private static String getSafeStorageKey() {
         return "machines"
     }
 
@@ -108,7 +108,7 @@ class RemoteEnvironment implements Environment {
 
     @Override
     EnvironmentContainerRunner getContainerRunner() {
-        return new SwarmContainerRunner(getEnvironmentApiFacade().getManagerNodeWrapper())
+        return new SwarmContainerRunner(getEnvironmentApiFacade().getManagerNodeWrapper(), getEnvironmentContext().dockerLoginInfo)
     }
 
     @Override
@@ -126,13 +126,13 @@ class RemoteEnvironment implements Environment {
         //TODO: register enrichers
         return Arrays.<NamedExecutable> asList(
                 //TODO: parametrize remote data directory - should come from envdesc
-                new SwarmMountingPermissionsEnricher("/shathel-data", this.apiFacade.sshOperaions),
-                new SwarmMountingEnricher("/shathel-data", this.apiFacade.sshOperaions),
+                new SwarmMountingPermissionsEnricher("/shathel-data", this.apiFacade.sshOperations),
+                new SwarmMountingEnricher("/shathel-data", this.apiFacade.sshOperations),
                 new SwarmPullingEnricher(),
                 new SecretsEnricher(),
                 new MandatoryEnvironmentsValidator(),
                 new SwarmStickyVolumeEnricher()
-        );
+        )
     }
 
     @Override

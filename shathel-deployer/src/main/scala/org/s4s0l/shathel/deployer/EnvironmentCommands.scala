@@ -168,10 +168,6 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
     val solution = context.shathel.getSolution(storage)
 
     val environment = solution.getEnvironment(context.environment())
-    val initEnv = environment.getEnvironmentContext.getEnvironmentDescription.getParameterAsBoolean("init").orElse(false)
-    if (initEnv && !environment.isInitialized) {
-      environment.initialize()
-    }
     (storage, solution, environment)
   }
 }

@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.swarm;
 
+import org.s4s0l.shathel.commons.core.DockerLoginInfo;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunnerContext;
 import org.s4s0l.shathel.commons.core.environment.StackCommand;
@@ -19,12 +20,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class SwarmContainerRunner implements EnvironmentContainerRunner, EnvironmentContainerRunnerContext {
-    public static final int RUNNING_CHECK_TRIES = 120;
-    public static final int RUNNING_CHECK_INTERVAL_SECS = 1;
+    private static final int RUNNING_CHECK_TRIES = 120;
+    private static final int RUNNING_CHECK_INTERVAL_SECS = 1;
     private static final Logger LOGGER = getLogger(SwarmContainerRunner.class);
+    private final Optional<DockerLoginInfo> dockerLogin;
 
-    public SwarmContainerRunner(DockerWrapper docker) {
+    public SwarmContainerRunner(DockerWrapper docker, Optional<DockerLoginInfo> dockerLogin) {
         this.docker = docker;
+        this.dockerLogin = dockerLogin;
     }
 
     @Override
@@ -35,6 +38,7 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
     @Override
     public void startContainers(StackCommand command, File composeFile) {
         LOGGER.info("Running: {} ({}).", command.getDescription().getGav(), command.getType().toString());
+        dockerLogin.ifPresent(docker::login);
         docker.stackDeploy(composeFile, command.getDescription().getDeployName(), command.getEnvironment());
 
         //waiting for startup
@@ -59,7 +63,7 @@ public class SwarmContainerRunner implements EnvironmentContainerRunner, Environ
                 String status = "updating";
                 Map map = docker.serviceInspect(serviceName);
                 Map updateStatus = (Map) map.get("UpdateStatus");
-                if(updateStatus == null){
+                if (updateStatus == null) {
                     //this happens when service is removed?!?
                     //todo: rethink how to handle - remove by hand?
                     //for now lets just ignore it, new behaviour from 17.04

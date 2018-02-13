@@ -1,10 +1,8 @@
 package org.s4s0l.shathel.commons.swarm
 
 import org.s4s0l.shathel.commons.Shathel
-import org.s4s0l.shathel.commons.core.environment.StackIntrospection
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
@@ -38,8 +36,8 @@ class SwarmStackIntrospectionProviderTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, reference)
-        solution.run(stack.createStartCommand(false))
+        def stack = solution.openStack( reference)
+        solution.run(stack.createStartCommand(false,environment))
         def introspection = environment.getIntrospectionProvider().getStackIntrospection(reference)
 
         then:

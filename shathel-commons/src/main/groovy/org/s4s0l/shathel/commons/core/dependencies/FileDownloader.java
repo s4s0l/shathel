@@ -1,17 +1,13 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
 import org.apache.commons.io.FileUtils;
-import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.IoUtils;
 import org.s4s0l.shathel.commons.utils.Utils;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Marcin Wielgus
@@ -45,8 +41,7 @@ public class FileDownloader {
 
 
     public Optional<File> download(StackLocator reference, File directory, boolean forceful) {
-        Optional<File> search = search(reference, directory, forceful);
-        return search;
+        return search(reference, directory, forceful);
     }
 
     protected Optional<StackReference> getReference(StackLocator locator) {
@@ -56,7 +51,7 @@ public class FileDownloader {
     }
 
 
-    protected Optional<File> search(StackLocator locator, File directory, boolean forceful) {
+    private Optional<File> search(StackLocator locator, File directory, boolean forceful) {
         Optional<StackReference> reference = getReference(locator);
         if (reference.isPresent()) {
             Optional<File> file = searchAsReference(reference.get());
@@ -70,7 +65,7 @@ public class FileDownloader {
         return searchAsFile(new File(locator.getLocation()));
     }
 
-    protected Optional<File> searchAsReference(StackReference stackReference) {
+    Optional<File> searchAsReference(StackReference stackReference) {
         Optional<File> search = searchAsFile(new File(stackReference.getName() + "-" + stackReference.getVersion()));
         if (!search.isPresent()) {
             search = searchAsFile(new File(stackReference.getName() + "-" + stackReference.getVersion() + "-shathel"));
@@ -82,9 +77,8 @@ public class FileDownloader {
         return search;
     }
 
-    private static final Logger LOGGER = getLogger(FileStackDependencyDownloader.class);
 
-    protected Optional<File> searchAsLocalMavenRepo(StackReference stackReference, File destination, boolean forceful) {
+    private Optional<File> searchAsLocalMavenRepo(StackReference stackReference, File destination, boolean forceful) {
         String path = stackReference.getGroup().replace(".", "/");
         path = path + "/" + stackReference.getName();
         path = path + "/" + stackReference.getVersion();
@@ -109,7 +103,7 @@ public class FileDownloader {
         return Optional.empty();
     }
 
-    protected Optional<File> searchAsFile(File locationFile) {
+    private Optional<File> searchAsFile(File locationFile) {
         if (!locationFile.isAbsolute()) {
             locationFile = new File(getBaseSearchPath(), locationFile.getPath());
         }

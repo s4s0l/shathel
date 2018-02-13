@@ -42,7 +42,7 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
              map: java.util.Map[String, String]
            ): String = {
     runCommand(name, inspect, inspectLong, map)((s, c) => {
-      s.createStartCommand(withOptional)
+      s.createStartCommand(withOptional, c)
     })
   }
 
@@ -114,18 +114,18 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
             @CliOption(key = Array("params"), mandatory = false, help = "see parameters add command for details")
             map: java.util.Map[String, String]
           ): String = {
-    runCommand(name, inspect, inspectLong, map)((s, c) => s.createStopCommand(withDependencies, withOptional))
+    runCommand(name, inspect, inspectLong, map)((s, c) => s.createStopCommand(withDependencies, withOptional, c))
   }
 
 
   private def runCommand(name: String, inspect: Boolean, inspectLong: Boolean,
                          map: util.Map[String, String])
-                        (factory: (Stack, DeployerParameters.ShathelCommandContext) => StackOperations): String = {
+                        (factory: (Stack, Environment) => StackOperations): String = {
     shathel(map, builder())(
       context => {
         val (storage, solution, environment) = environmentCommands.getEnvironment(context)
-        val openStack = solution.openStack(environment, new StackLocator(name))
-        val command = factory(openStack, context)
+        val openStack = solution.openStack(new StackLocator(name))
+        val command = factory(openStack, environment)
 
         if (inspect) {
           return response(this.inspect(command, inspectLong))
@@ -145,7 +145,8 @@ class StackCommands(parametersCommands: ParametersCommands, environmentCommands:
   }
 
 
-  private def inspect(command: StackOperations, inspectLong: Boolean): Seq[util.Map[String, AnyRef]] = {
+  private def inspect(command: StackOperations, inspectLong: Boolean)
+  : mutable.Seq[util.Map[String, AnyRef]] = {
     def arrayToMap = collection.breakOut[Seq[StackCommand], (String, util.Map[String, AnyRef]), Map[String, util.Map[String, AnyRef]]]
 
     def display = (p: NamedExecutable) => p.getName

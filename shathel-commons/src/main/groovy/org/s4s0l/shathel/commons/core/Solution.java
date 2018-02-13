@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core;
 
+import org.s4s0l.shathel.commons.ExtensionContextsProvider;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyDownloaderRegistry;
 import org.s4s0l.shathel.commons.core.dependencies.DependencyManager;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
@@ -13,21 +14,24 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
  * @author Marcin Wielgus
  */
 public class Solution {
-    private final ExtensionContext extensionContext;
+    private final ExtensionContextsProvider extensionContextsProvider;
     private final Parameters params;
     private final Storage storage;
 
-    public Solution(ExtensionContext extensionContext, Parameters params, Storage storage) {
-        this.extensionContext = extensionContext;
+    public Solution(ExtensionContextsProvider extensionContextsProvider, Parameters params, Storage storage) {
+        this.extensionContextsProvider = extensionContextsProvider;
         this.params = params;
         this.storage = storage;
+    }
+
+    private ExtensionContext getExtensionContext() {
+        return extensionContextsProvider.create(getSolutionDescription().getParameters());
     }
 
     public Set<String> getEnvironments() {
@@ -39,61 +43,61 @@ public class Solution {
         EnvironmentDescription environmentDescription = solutionDescription.getEnvironmentDescription(environmentName);
         String type = environmentDescription.getType();
 
-        EnvironmentProvider environmentProvider = extensionContext
+        EnvironmentProvider environmentProvider = getExtensionContext()
                 .lookupOneMatching(EnvironmentProvider.class, x -> x.getType().equals(type))
                 .get();
 
-        String name = environmentDescription.getName();
+        String name = environmentDescription.getEnvironmentName();
 
-        File safeDirectory = storage.getSafeDirectory(environmentDescription, name);
+        File safeDirectory = storage.getSafeDirectory(environmentDescription.getParameters(), name);
 
         LazyInitiableSafeStorage safeStorage = new LazyInitiableSafeStorage(() ->
-                extensionContext.lookupOne(SafeStorageProvider.class).get().getSafeStorage(safeDirectory, name));
+                getExtensionContext().lookupOne(SafeStorageProvider.class).get().getSafeStorage(safeDirectory, name));
 
 
         EnvironmentContext environmentContext = new EnvironmentContextImpl(environmentDescription, solutionDescription,
                 safeStorage, storage);
 
-        return environmentProvider.getEnvironment(environmentContext);
+        return environmentProvider.getEnvironment(environmentDescription, environmentContext);
     }
 
-    public SolutionDescription getSolutionDescription() {
+    private SolutionDescription getSolutionDescription() {
         SolutionFileModel model = SolutionFileModel.load(storage.getConfiguration());
         return new SolutionDescription(params, model);
     }
 
-    public Stack openStack(Environment e, StackReference reference) {
-        return openStack(e, new StackLocator(reference));
+    public Stack openStack(StackReference reference) {
+        return openStack(new StackLocator(reference));
     }
 
-    public Stack openStack(Environment e, StackLocator reference) {
-        e.verify();
-        DependencyManager dependencyManager = getDependencyManager(e);
-        return new Stack(extensionContext, reference, dependencyManager, e);
+    public Stack openStack(StackLocator reference) {
+
+        Boolean forcefulDownloader = getSolutionDescription().getParameters().getParameterAsBoolean("shathel.solution.forceful").orElse(false);
+        DependencyManager dependencyManager = getDependencyManager(forcefulDownloader);
+        return new Stack(getExtensionContext(), reference, dependencyManager);
     }
 
     public StackOperations getPurgeCommand(Environment environment) {
         List<StackIntrospection> rootStacks = environment.getIntrospectionProvider().getAllStacks().getRootStacks();
         StackOperations.Builder builder = StackOperations.builder(environment);
         for (StackIntrospection rootStack : rootStacks) {
-            Stack stack = openStack(environment, rootStack.getReference());
-            StackOperations stopCommand = stack.createStopCommand(true, true);
+            Stack stack = openStack(rootStack.getReference());
+            StackOperations stopCommand = stack.createStopCommand(true, true, environment);
             builder.add(stopCommand.getCommands());
         }
         return builder.build();
     }
 
     public void run(StackOperations schedule) {
-        new StackProvisionerExecutor(schedule, extensionContext).execute();
+        new StackProvisionerExecutor(schedule, getExtensionContext()).execute();
     }
 
 
-    private DependencyManager getDependencyManager(Environment e) {
-        Optional<Boolean> forceful = e.getEnvironmentContext().getEnvironmentDescription().getParameterAsBoolean("forceful");
-        DependencyDownloaderRegistry dependencyDownloaderRegistry = new DependencyDownloaderRegistry(extensionContext);
+    private DependencyManager getDependencyManager(boolean forcefull) {
+        DependencyDownloaderRegistry dependencyDownloaderRegistry = new DependencyDownloaderRegistry(getExtensionContext());
         return new DependencyManager(
-                e.getEnvironmentContext().getDependencyCacheDirectory(),
-                dependencyDownloaderRegistry, getSolutionDescription(), forceful.orElse(false));
+                storage.getDependencyCacheDirectory(getSolutionDescription().getParameters()),
+                dependencyDownloaderRegistry, getSolutionDescription(), forcefull);
     }
 
 

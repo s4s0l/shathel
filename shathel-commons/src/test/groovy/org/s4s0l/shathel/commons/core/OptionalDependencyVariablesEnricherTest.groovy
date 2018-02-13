@@ -52,8 +52,8 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:dependency:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency:1.0"))
+        def command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 3
@@ -72,8 +72,8 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
         when:
         //But when some optional dependency is already running it should be reflected in env vars
-        stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:dependency1:1.0"))
-        command = stack.createStartCommand(false)
+        stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency1:1.0"))
+        command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 1
@@ -93,32 +93,32 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
 
         when:
-        command = stack.createStopCommand(true, false)
+        command = stack.createStopCommand(true, false,environment)
 
         then:
         command.commands.size() == 2 //todo: it should be only one because dependency2 is used by root stack...
 
         when:
-        command = stack.createStopCommand(true, true)
+        command = stack.createStopCommand(true, true,environment)
 
         then:
         command.commands.size() == 4 //todo: same as above should be 1 also it shows it includes nonexistent stacks
 
         when:
-        stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:dependency:1.0"))
-        command = stack.createStopCommand(false, false)
+        stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency:1.0"))
+        command = stack.createStopCommand(false, false,environment)
 
         then:
         command.commands.size() == 1
 
         when:
-        command = stack.createStopCommand(true, false)
+        command = stack.createStopCommand(true, false,environment)
 
         then:
         command.commands.size() == 3 //todo: should be 1 because 2&3 are still needed by dependency1
 
         when:
-        command = stack.createStopCommand(true, true)
+        command = stack.createStopCommand(true, true,environment)
 
         then:
         command.commands.size() == 5
@@ -145,8 +145,8 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:dependency1:1.0"))
-        def command = stack.createStartCommand(true)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency1:1.0"))
+        def command = stack.createStartCommand(true,environment)
 
         then:
         command.commands.size() == 4
@@ -163,8 +163,8 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         environment.getIntrospectionProvider().allStacks.stacks.size() == 4
 
         when:
-        stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:dependency:1.0"))
-        command = stack.createStartCommand(true)
+        stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency:1.0"))
+        command = stack.createStartCommand(true,environment)
 
         then:
         command.commands.size() == 1

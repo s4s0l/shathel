@@ -16,7 +16,7 @@ class LocalOverriderDownloader implements StackDependencyDownloader {
         this.projectStackDir = projectStackDir
     }
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(LocalOverriderDownloader.class);
+    final Logger LOGGER = LoggerFactory.getLogger(LocalOverriderDownloader.class)
 
     @Override
     Optional<File> download(StackLocator locator, File directory, boolean forceful) {
@@ -26,7 +26,7 @@ class LocalOverriderDownloader implements StackDependencyDownloader {
         if (!locator.getReference().isPresent()) {
             return Optional.empty()
         }
-        def reference = locator.getReference().get();
+        def reference = locator.getReference().get()
 
         def gav = reference.getGav().replaceAll("[^a-zA-Z0-9]", "_")
         def gavFile = new File(stackMappingsDir, gav)

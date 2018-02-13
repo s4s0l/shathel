@@ -14,9 +14,6 @@ import org.s4s0l.shathel.commons.swarm.BuildingEnricher
 import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator
 import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner
 import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider
-import org.slf4j.Logger
-
-import static org.slf4j.LoggerFactory.getLogger
 
 /**
  * @author Marcin Wielgus
@@ -24,7 +21,6 @@ import static org.slf4j.LoggerFactory.getLogger
 @TypeChecked
 @CompileStatic
 class LocalSwarmEnvironment implements Environment {
-    private static final Logger LOGGER = getLogger(LocalSwarmEnvironment.class)
     private final LocalSwarmEnvironmentContext context
     private final DockerWrapper dockerWrapper = new DockerWrapper()
     private final LocalSwarmApiFacade apiFacade
@@ -65,7 +61,7 @@ class LocalSwarmEnvironment implements Environment {
                             .toString()
             )
         } catch (IOException e) {
-            throw new RuntimeException("Unable to create ansible inventory!")
+            throw new RuntimeException("Unable to create ansible inventory!",e)
         }
 
     }
@@ -137,7 +133,7 @@ class LocalSwarmEnvironment implements Environment {
 
     @Override
     EnvironmentContainerRunner getContainerRunner() {
-        return new SwarmContainerRunner(getDockerWrapper())
+        return new SwarmContainerRunner(getDockerWrapper(), getEnvironmentContext().dockerLoginInfo)
     }
 
     @Override
@@ -162,7 +158,7 @@ class LocalSwarmEnvironment implements Environment {
 
     @Override
     AnsibleScriptContext getAnsibleScriptContext() {
-        boolean ansibleEnabled = context.getEnvironmentDescription().getParameterAsBoolean("ansible_enabled").orElse(false)
+        boolean ansibleEnabled = context.getEnvironmentParameterAsBoolean("ansible_enabled").orElse(false)
         return ansibleEnabled ? getEnabledAnsibleContext() : getDisabledAnsibleContext()
 
     }
@@ -175,7 +171,7 @@ class LocalSwarmEnvironment implements Environment {
 
     private AnsibleScriptContext getDisabledAnsibleContext() {
         new AnsibleScriptContext("In local swarm environment ansible is disabled, " +
-                "set 'ansible_enabled' to true in environment or SHATHEL_ENV_${context.environmentDescription.name.toUpperCase()}_ANSIBLE_ENABLED env var to 'true'. " +
-                "Sudo password might be also needed, set it with SHATHEL_ENV_${context.environmentDescription.name.toUpperCase()}_ANSIBLE_BECOME_PASSWORD")
+                "set 'ansible_enabled' to true in environment or SHATHEL_ENV_${context.getEnvironmentName().toUpperCase()}_ANSIBLE_ENABLED env var to 'true'. " +
+                "Sudo password might be also needed, set it with SHATHEL_ENV_${context.getEnvironmentName().toUpperCase()}_ANSIBLE_BECOME_PASSWORD")
     }
 }

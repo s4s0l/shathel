@@ -1,15 +1,13 @@
 package org.s4s0l.shathel.commons.core.dependencies;
 
-import org.apache.commons.io.FileUtils;
 import org.s4s0l.shathel.commons.core.SolutionDescription;
+import org.s4s0l.shathel.commons.core.environment.StackIntrospection;
 import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider;
 import org.s4s0l.shathel.commons.core.model.StackFileModel;
 import org.s4s0l.shathel.commons.core.stack.*;
-import org.s4s0l.shathel.commons.utils.IoUtils;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,9 +51,9 @@ public class DependencyManager {
     }
 
     public List<StackDescription> getSidekicks(StackTreeDescription tree, StackIntrospectionProvider.StackIntrospections stackIntrospections) {
-        return stackIntrospections.getStacks().stream().map(x -> x.getReference())
+        return stackIntrospections.getStacks().stream().map(StackIntrospection::getReference)
                 .filter(x -> !tree.contains(x))
-                .map(x -> getStackDescription(dependenciesDir, x, desc1 -> desc1.getVersion()))
+                .map(x -> getStackDescription(dependenciesDir, x, StackReference::getVersion))
                 .collect(Collectors.toList());
     }
 
@@ -78,16 +76,16 @@ public class DependencyManager {
 
     private StackDescription getStackDescription(File dependenciesDir, StackLocator ref) {
         Optional<File> first = downloader.getDownloaders()
-                .map(it -> it.download(ref, dependenciesDir, forcefull))
-                .filter(it -> it.isPresent())
-                .map(it -> it.get())
+                .map(it -> it.download( ref, dependenciesDir, forcefull))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .findFirst();
         return first
                 .map(it -> {
                     File stackFile = new File(it, "shthl-stack.yml");
                     StackFileModel load = StackFileModel.load(stackFile);
                     StackReference stackReference = new StackReference(load.getGav());
-                    return new StackDescriptionImpl(load, new StackResources(it), solutionDescription.getSolutionStackDescription(stackReference));
+                    return new StackDescriptionImpl(load, new StackResources(it), solutionDescription.getSolutionStackEnvs(stackReference));
                 }).orElseThrow(() -> new RuntimeException("Unable to locate stack " + ref.getLocation()));
     }
 

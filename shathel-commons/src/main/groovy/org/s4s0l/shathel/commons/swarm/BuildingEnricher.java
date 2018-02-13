@@ -52,6 +52,7 @@ public class BuildingEnricher extends EnricherExecutable {
             String tag = repoPrefix + imageName + ":" + stack.getReference().getVersion();
             File contextDir = new File(stack.getStackResources().getComposeFileDirectory(), context);
             provisioners.add("build-and-tag:" + contextDir.getAbsolutePath(), executionContext -> {
+                paramz.getEnvironmentContext().getDockerLoginInfo().ifPresent(dockerForManagementNode::login);
                 dockerForManagementNode.buildAndTag(
                         contextDir,
                         dockerfile, args, tag);

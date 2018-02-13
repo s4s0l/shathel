@@ -68,8 +68,8 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
 
         //        SIDEKICK INSTALLATION
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:sidekick:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:sidekick:1.0"))
+        def command = stack.createStartCommand(false,environment)
         solution.run(command)
 
 
@@ -79,8 +79,8 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
         //        SIDEKICK INSTALLATION
 
         when:
-        stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        command = stack.createStartCommand(false);
+        stack = solution.openStack( new StackReference("test.group:dummy:2.0"))
+        command = stack.createStartCommand(false,environment);
 
         then:
         stack != null
@@ -106,14 +106,14 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
         new File(root, "local/enriched/shathel-core-stack-1.2.3-shathel/pre-provision").text == "Done"
 
         when:
-        command = stack.createStartCommand(false)
+        command = stack.createStartCommand(false,environment)
 
         then:
         command != null
         command.commands.size() == 1
 
         when:
-        def stopCommand = stack.createStopCommand(true, true)
+        def stopCommand = stack.createStopCommand(true, true,environment)
 
         then:
         stopCommand != null
@@ -124,7 +124,7 @@ class LocalSwarmEnvironmentTest extends BaseIntegrationTest {
         solution.run(stopCommand)
 
         then:
-        stack.createStartCommand(false).commands.size() == 2
+        stack.createStartCommand(false,environment).commands.size() == 2
 
 
         onEnd()

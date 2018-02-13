@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.environment.EnvironmentDescription
 
 
 /**
@@ -14,13 +15,30 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
 
     @Delegate
     private final EnvironmentContext environmentContext
+    @Delegate
     private final RemoteEnvironmentPackageDescription description
+    private final EnvironmentDescription environmentDescription
 
     RemoteEnvironmentPackageContextImpl(EnvironmentContext environmentContext,
+                                        EnvironmentDescription environmentDescription,
                                         RemoteEnvironmentPackageDescription description) {
         this.environmentContext = environmentContext
         this.description = description
+        this.environmentDescription = environmentDescription
     }
+
+    Optional<String> getEnvironmentParameter(String name) {
+        return environmentDescription.getEnvironmentParameter(name)
+    }
+
+    Optional<Integer> getEnvironmentParameterAsInt(String name) {
+        return environmentDescription.getEnvironmentParameterAsInt(name)
+    }
+
+    Optional<Boolean> getEnvironmentParameterAsBoolean(String name) {
+        return environmentDescription.getEnvironmentParameterAsBoolean(name)
+    }
+
 
     EnvironmentContext getEnvironmentContext() {
         return environmentContext
@@ -31,10 +49,7 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
         return description.remoteUser
     }
 
-    @Override
-    RemoteEnvironmentPackageDescription getDescription() {
-        return description
-    }
+
 
     @Override
     File getKeysDirectory() {
@@ -57,9 +72,15 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
     }
 
     @Override
+    String getEmail() {
+        return environmentDescription.getEnvironmentParameter("email").orElse("someone@${contextName}".toString())
+    }
+
+    @Override
     Map<String, String> getAsEnvironmentVariables() {
         Map<String, String> ret = new HashMap<>()
         ret.putAll(environmentContext.asEnvironmentVariables)
+        addCalculatedEnvironmentVariables(ret)
         ret.putAll([
                 "SHATHEL_ENVPACKAGE_VERSION"          : description.version,
                 "SHATHEL_ENVPACKAGE_SETTINGS_DIR"     : settingsDirectory.absolutePath,
@@ -74,8 +95,39 @@ class RemoteEnvironmentPackageContextImpl implements RemoteEnvironmentPackageCon
         return ret
     }
 
-    private File ensureExists(File f) {
+    private static File ensureExists(File f) {
         f.mkdirs()
         return f
+    }
+
+
+    int getNodesCount() {
+        return getManagersCount() + getWorkersCount()
+    }
+
+    int getManagersCount() {
+        return environmentDescription.getEnvironmentParameterAsInt("managers")
+                .orElse(1)
+    }
+
+    int getWorkersCount() {
+        return environmentDescription.getEnvironmentParameterAsInt("workers")
+                .orElse(0)
+    }
+
+    private void addCalculatedEnvironmentVariables(Map<String, String> ret) {
+        int size = getNodesCount()
+        int quorum = (int) Math.floor((size / 2).toDouble()) + 1
+
+        ret.put("SHATHEL_ENV_SIZE", "" + size)
+        ret.put("SHATHEL_ENV_QUORUM", "" + quorum)
+
+        int msize = getManagersCount()
+        int mquorum = (int) Math.floor((msize / 2).toDouble()) + 1
+
+        ret.put("SHATHEL_ENV_MGM_SIZE", "" + msize)
+        ret.put("SHATHEL_ENV_MGM_QUORUM", "" + mquorum)
+        ret.put("SHATHEL_ENV_DOMAIN", environmentDescription.getEnvironmentParameter("domain")
+                .orElse("localhost"))
     }
 }

@@ -25,9 +25,14 @@ public interface Parameters extends ParameterProvider {
     }
 
     static Map<String, String> getNormalizedParameterNames(Map<String, String> parameters) {
+        return getNormalizedParameterNames(parameters, null);
+    }
+
+    static Map<String, String> getNormalizedParameterNames(Map<String, String> parameters, String keyPrefx) {
         Map<String, String> ret = new HashMap<>();
+        String prefix = keyPrefx == null ? "" : keyPrefx;
         for (Map.Entry<String, String> e : parameters.entrySet()) {
-            ret.put(Parameters.getNormalizedParameterName(e.getKey().toString()), e.getValue().toString());
+            ret.put(Parameters.getNormalizedParameterName(prefix + e.getKey().toString()), e.getValue().toString());
         }
         return ret;
     }
@@ -39,7 +44,7 @@ public interface Parameters extends ParameterProvider {
     Set<String> getAllParameters();
 
     static Parameters fromMapWithSysPropAndEnv(Map<String, String> map) {
-        return MapParameters.builder().parameters(map).build().hiddenBySystemProperties().hiddenByVariables();
+        return new MapParameters(map).hiddenBySystemProperties().hiddenByVariables();
     }
 
     class EnvParameters implements Parameters {

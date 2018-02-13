@@ -17,8 +17,6 @@ class FileEnvironmentPackageDownloader extends FileDownloader implements Environ
     final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_env_default_group"
     public static
     final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_env_base_dir"
-    private static
-    final Logger LOGGER = getLogger(FileEnvironmentPackageDownloader.class)
     private final ParameterProvider params
 
     FileEnvironmentPackageDownloader(ParameterProvider params) {

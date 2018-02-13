@@ -83,8 +83,8 @@ shathel-solution:
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("test.group:dummy:2.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("test.group:dummy:2.0"))
+        def command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 2

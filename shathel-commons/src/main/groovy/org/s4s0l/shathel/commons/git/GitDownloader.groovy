@@ -4,11 +4,9 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.apache.commons.io.FileUtils
 import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver
-import org.s4s0l.shathel.commons.core.dependencies.StackDependencyDownloader
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.utils.ExecWrapper
-import org.s4s0l.shathel.commons.utils.Utils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,16 +18,16 @@ import org.slf4j.LoggerFactory
 abstract class GitDownloader {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitDownloader.class)
 
-    abstract String getDefaultGroup();
+    abstract String getDefaultGroup()
 
-    abstract String getDefaultVersion();
+    abstract String getDefaultVersion()
 
 
     Optional<File> download(StackLocator locator, File directory, boolean forceful) {
         Optional<StackReference> resolvedReference
         resolvedReference = resolveReference(locator)
         if (!resolvedReference.isPresent()) {
-            return Optional.empty();
+            return Optional.empty()
         }
         def reference = resolvedReference.get()
         if (reference.group.startsWith("git@")) {
@@ -72,11 +70,11 @@ abstract class GitDownloader {
     }
 
 
-    def exec(File f, String command) {
+    static def exec(File f, String command) {
         git().executeForOutput(f, command)
     }
 
-    private ExecWrapper git() {
+    private static ExecWrapper git() {
         new ExecWrapper(LOGGER, "git")
     }
 
@@ -84,7 +82,7 @@ abstract class GitDownloader {
 }
 
 class GitRef {
-    private final StackReference reference;
+    private final StackReference reference
 
     GitRef(StackReference reference) {
         this.reference = reference
@@ -101,7 +99,7 @@ class GitRef {
     }
 
     String repoName() {
-        reference.group.substring(reference.group.lastIndexOf("/") + 1);
+        reference.group.substring(reference.group.lastIndexOf("/") + 1)
     }
 
     File getDirectoryInRepo(File repoDir) {

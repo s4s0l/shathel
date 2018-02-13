@@ -11,6 +11,7 @@ import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.Stack
 import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
+import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.environment.StackIntrospection
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.ssh.SshTunelManagerImpl
@@ -31,14 +32,14 @@ class ShathelOperationTask extends DefaultTask {
     }
 
 
-    private ShathelExtension getExtension() {
+    ShathelExtension getExtension() {
         ShathelExtension extension = project.extensions.findByName("shathel") ?: new ShathelExtension(project)
         extension
     }
 
     Solution getShathelSolution() {
         def params = getExtension().getShathelParameters()
-        def extensions = DefaultExtensionContext.create(params, [
+        def extensions = DefaultExtensionContext.create( [
                 new LocalOverriderDownloader(getExtension().getShathelMappingsDir(), getShathelCurrentStackDir())
         ])
         def shathel = new Shathel(params, extensions)
@@ -46,27 +47,32 @@ class ShathelOperationTask extends DefaultTask {
         return shathel.getSolution(storage)
     }
 
-
-    Stack getShathelCurrentStack(Solution solution) {
-        def environment = solution.getEnvironment(getExtension().getShathelEnvironmentName())
+    Environment getEnvironment() {
+        def environment = getShathelSolution().getEnvironment(getExtension().getShathelEnvironmentName())
         if (!environment.isInitialized()) {
             environment.initialize()
         }
-        return solution.openStack(environment, new StackLocator(LocalOverriderDownloader.CURRENT_PROJECT_LOCATION))
+        environment
+    }
+
+    static Stack getShathelCurrentStack(Solution solution) {
+        return solution.openStack(new StackLocator(LocalOverriderDownloader.CURRENT_PROJECT_LOCATION))
     }
 
 
     Map<String, String> getDefaultPropsToLeave() {
         [
-                "shathel.plugin.local.override.mappings"                                   : getExtension().getShathelMappingsDir().getAbsolutePath(),
-                "shathel.plugin.local.override.current"                                    : getShathelCurrentStackDir().getAbsolutePath(),
-                "shathel.plugin.current.gav"                                               : new StackReference(project.group, project.name, project.version).gav,
-                "shathel.plugin.current"                                                   : LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
-                (CommonParams.SHATHEL_ENV)                                                 : getExtension().shathelEnvironmentName,
-                "shathel.env.${getExtension().getShathelEnvironmentName()}.dependenciesDir": getExtension().getDependenciesDir().absolutePath,
-                "shathel.env.${getExtension().getShathelEnvironmentName()}.init"           : "true",
-                (CommonParams.SHATHEL_DIR)                                                 : getExtension().getShathelDir()
-        ]
+                "shathel.plugin.local.override.mappings": getExtension().getShathelMappingsDir().getAbsolutePath(),
+                "shathel.plugin.local.override.current": getShathelCurrentStackDir().getAbsolutePath(),
+                "shathel.plugin.current.gav": new StackReference(project.group.toString(), project.name.toString(), project.version.toString()).gav,
+                "shathel.plugin.current": LocalOverriderDownloader.CURRENT_PROJECT_LOCATION,
+                (CommonParams.SHATHEL_ENV): getExtension().shathelEnvironmentName,
+                ("shathel.env.${getExtension().getShathelEnvironmentName()}.dependenciesDir".toString()): getExtension().getDependenciesDir().absolutePath,
+                ("shathel.env.${getExtension().getShathelEnvironmentName()}.init".toString()): "true",
+                (CommonParams.SHATHEL_DIR): getExtension().getShathelDir()
+        ].collectEntries {
+            [(it.key.toString()): it.value.toString()]
+        } as Map<String, String>
     }
 
 }
@@ -98,15 +104,15 @@ class ShathelStartTask extends ShathelOperationTask {
     boolean withOptionalDependencies = false
 
 
-    protected void notifyTasks(Stack stack) {
+    protected void notifyTasks(Environment e) {
         def propsToleaveForOthers = [:]
-        def allStacks = stack.environment.introspectionProvider.allStacks.stacks
+        def allStacks = e.introspectionProvider.allStacks.stacks
         for (StackIntrospection allStack : allStacks) {
             for (StackIntrospection.Service service : allStack.getServices()) {
                 String servicePrefix = service.getServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_"
                 String fullNamePrefix = service.getFullServiceName().replaceAll("[^0-9a-zA-Z]", "_").toUpperCase() + "_"
                 for (Map.Entry<Integer, Integer> entry : service.getPortMapping().entrySet()) {
-                    String tunneledPort = stack.environment.environmentApiFacade.openPublishedPort(entry.getValue())
+                    String tunneledPort = e.environmentApiFacade.openPublishedPort(entry.getValue())
                     def shortKey = Parameters.getNormalizedParameterName("shathel.plugin." + servicePrefix + entry.getKey())
                     def longKey = Parameters.getNormalizedParameterName("shathel.plugin." + fullNamePrefix + entry.getKey())
                     propsToleaveForOthers.put(shortKey, tunneledPort)
@@ -126,10 +132,11 @@ class ShathelStartTask extends ShathelOperationTask {
     @TaskAction
     void build() {
         def solution = getShathelSolution()
+        def environment = getEnvironment()
         def stack = getShathelCurrentStack(solution)
-        def command = stack.createStartCommand(withOptionalDependencies)
+        def command = stack.createStartCommand(withOptionalDependencies,environment)
         solution.run(command)
-        notifyTasks(stack)
+        notifyTasks(environment)
 
     }
 
@@ -147,7 +154,7 @@ class ShathelStopTask extends ShathelOperationTask {
         def solution = getShathelSolution()
         def stack = getShathelCurrentStack(solution)
         try {
-            def command = stack.createStopCommand(withDependencies, withOptionalDependencies)
+            def command = stack.createStopCommand(withDependencies, withOptionalDependencies, getEnvironment())
             solution.run(command)
         } finally {
             SshTunelManagerImpl.globalCloseAll()
@@ -161,8 +168,7 @@ class ShathelDestroyTask extends ShathelOperationTask {
 
     @TaskAction
     void build() {
-        def solution = getShathelSolution()
-        def environment = solution.getEnvironment(getExtension().getShathelEnvironmentName())
+        def environment = getEnvironment()
         environment.destroy()
     }
 }

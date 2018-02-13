@@ -46,7 +46,7 @@ class ParametersCommands extends CommandMarker with ParametersKeyProvider with O
     if (paramMap != null) {
       map.putAll(paramMap)
     }
-    parameters.hiddenBy(MapParameters.builder().parameters(map).build())
+    parameters.hiddenBy(new MapParameters(map))
   }
 
   def setParameters(paramMap: java.util.Map[String, String]): Parameters = {

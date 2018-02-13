@@ -13,12 +13,13 @@ public class StackDescriptionImpl implements StackDescription {
 
     private final StackFileModel fileModel;
     private final StackResources stackResources;
-    private final SolutionStackDesctiption solutionStackDesctiption;
+    private final Map<String, String> environments;
 
-    public StackDescriptionImpl(StackFileModel fileModel, StackResources stackResources, SolutionStackDesctiption solutionStackDesctiption) {
+    public StackDescriptionImpl(StackFileModel fileModel, StackResources stackResources,
+                                Map<String, String> environments) {
         this.fileModel = fileModel;
         this.stackResources = stackResources;
-        this.solutionStackDesctiption = solutionStackDesctiption;
+        this.environments = environments;
     }
 
     @Override
@@ -113,8 +114,8 @@ public class StackDescriptionImpl implements StackDescription {
     }
 
     @Override
-    public Map<String, String> getEnvs() {
-        return solutionStackDesctiption.getEnvironments();
+    public Map<String, String> getAsEnvironmentVariables() {
+        return environments;
     }
 
     @Override

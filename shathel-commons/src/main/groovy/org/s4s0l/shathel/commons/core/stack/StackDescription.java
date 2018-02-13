@@ -1,12 +1,14 @@
 package org.s4s0l.shathel.commons.core.stack;
 
+import org.s4s0l.shathel.commons.core.EnvironmentVariabllesContainer;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Marcin Wielgus
  */
-public interface StackDescription {
+public interface StackDescription extends EnvironmentVariabllesContainer {
     String getName();
 
     String getVersion();
@@ -32,8 +34,6 @@ public interface StackDescription {
     boolean isDependantOn(StackReference reference, boolean includeOptional);
 
     String getGav();
-
-    Map<String, String> getEnvs();
 
     Map<String,String> getMandatoryEnvs();
 }

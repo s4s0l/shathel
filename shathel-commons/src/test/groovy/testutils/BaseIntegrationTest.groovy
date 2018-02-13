@@ -75,7 +75,7 @@ abstract class BaseIntegrationTest extends Specification {
         if (solutionDescription != null) {
             new File(getRootDir(), "shathel-solution.yml").text = solutionDescription
         }
-        def extCtxt = DefaultExtensionContext.create(parameters)
+        def extCtxt = DefaultExtensionContext.create()
         return new Shathel(parameters, extCtxt)
     }
 

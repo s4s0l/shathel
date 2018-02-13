@@ -29,7 +29,7 @@ public class StackEnricherExecutor {
     private final boolean withOptional;
     private static final Logger LOGGER = getLogger(StackEnricherExecutor.class);
 
-    public StackEnricherExecutor(ExtensionContext extensionContext, Stack.StackContext stack, boolean withOptional) {
+    StackEnricherExecutor(ExtensionContext extensionContext, Stack.StackContext stack, boolean withOptional) {
         this.extensionContext = extensionContext;
         this.stack = stack;
         this.withOptional = withOptional;
@@ -38,7 +38,7 @@ public class StackEnricherExecutor {
     public StackOperations createStartSchedule() {
         Stream<StackDescription> stream = stack.getStackTreeDescription().stream();
         Stream<StackCommand> stackCommandStream = stream
-                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack, withOptional)))
+                .map(stack -> new SimpleEntry<>(stack, getCommandType(stack)))
                 .filter(e -> e.getValue() != StackCommand.Type.NOOP)
                 .map(e -> createStackCommand(e.getKey(), e.getValue(), withOptional));
 
@@ -103,7 +103,7 @@ public class StackEnricherExecutor {
 
     private StackOperations buildOperations(Stream<StackCommand> stackCommandStream) {
         StackOperations.Builder builder = StackOperations.builder(stack.getEnvironment());
-        stackCommandStream.forEach(x -> builder.add(x));
+        stackCommandStream.forEach(builder::add);
         return builder.build();
     }
 
@@ -118,7 +118,7 @@ public class StackEnricherExecutor {
                 .collect(Collectors.toList());
     }
 
-    private StackCommand.Type getCommandType(StackDescription stackDescription, boolean withOptional) {
+    private StackCommand.Type getCommandType(StackDescription stackDescription) {
         boolean self = stackDescription.getReference().equals(stack.getStackTreeDescription().getRoot().getReference());
 
         Optional<StackIntrospection> introspection = stack.getCurrentlyRunning(stackDescription.getReference());

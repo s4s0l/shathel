@@ -1,6 +1,7 @@
 package org.s4s0l.shathel.commons.docker
 
 import groovy.json.JsonSlurper
+import org.s4s0l.shathel.commons.core.DockerLoginInfo
 import org.s4s0l.shathel.commons.utils.ExecWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -281,7 +282,7 @@ class DockerWrapper {
 
     void stackDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
         LOGGER.debug("docker: deploying stack $deploymentName from ${composeFile.absolutePath}")
-        exec.executeForOutput(composeFile.getParentFile(), environment, "stack deploy --compose-file ${composeFile.absolutePath} $deploymentName")
+        exec.executeForOutput(composeFile.getParentFile(), environment, "stack deploy --with-registry-auth --compose-file ${composeFile.absolutePath} $deploymentName")
     }
 
     void stackUnDeploy(File composeFile, String deploymentName, Map<String, String> environment = [:]) {
@@ -426,6 +427,11 @@ class DockerWrapper {
     void pull(String tag) {
         LOGGER.debug("docker: pulling $tag")
         exec.executeForOutput("pull $tag")
+    }
+
+    void login(DockerLoginInfo loginInfo) {
+        exec.executeForOutput(loginInfo.pass.getBytes(), new File("."), [:],
+                 "login -u ${loginInfo.getUser()} --password-stdin ${loginInfo.registryAddress.orElse("")}")
     }
 
     void swarmNodeSetLabels(String nodeName, Map<String, String> labels) {

@@ -88,8 +88,8 @@ shathel-solution:
         thrown(RuntimeException)
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:volume1:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:volume1:1.0"))
+        def command = stack.createStartCommand(false,environment)
 
         then:
         command.commands.size() == 1

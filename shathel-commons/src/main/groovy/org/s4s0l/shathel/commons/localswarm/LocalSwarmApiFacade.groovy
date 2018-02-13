@@ -4,27 +4,23 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.cert.CertificateManager
 import org.s4s0l.shathel.commons.cert.CertificateManagerImpl
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
+import org.s4s0l.shathel.commons.core.ParameterProvider
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.secrets.SecretManager
 import org.s4s0l.shathel.commons.secrets.SecretManagerApi
-import org.slf4j.Logger
-
-import static org.slf4j.LoggerFactory.getLogger
 
 /**
  * @author Marcin Wielgus
  */
 
 class LocalSwarmApiFacade implements ExecutableApiFacade {
-    private static final Logger LOGGER = getLogger(LocalSwarmApiFacade.class)
     private final DockerWrapper dockerWrapper
-    private final EnvironmentContext context
+    private final LocalSwarmEnvironmentContext context
     private ShathelNode shathelNode
 
-    LocalSwarmApiFacade(DockerWrapper dockerWrapper, EnvironmentContext context) {
+    LocalSwarmApiFacade(DockerWrapper dockerWrapper, LocalSwarmEnvironmentContext context) {
         this.dockerWrapper = dockerWrapper
         this.context = context
     }
@@ -34,7 +30,12 @@ class LocalSwarmApiFacade implements ExecutableApiFacade {
     @TypeChecked
     @CompileStatic
     SecretManagerApi getSecretManager() {
-        return new SecretManager(context.getEnvironmentDescription(), getManagerNodeClient(), context.safeStorage)
+        return new SecretManager(new ParameterProvider() {
+            @Override
+            Optional<String> getParameter(String name) {
+                return context.getEnvironmentParameter(name)
+            }
+        }, getManagerNodeClient(), context.safeStorage)
     }
 
 

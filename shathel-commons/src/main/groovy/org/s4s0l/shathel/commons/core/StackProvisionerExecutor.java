@@ -89,7 +89,8 @@ public class StackProvisionerExecutor {
 
     }
 
-    private void executeProvisioners(File dstStackDir, StackCommand stackCommand, List<StackProvisionerDefinition> postProvisioners) {
+    private void executeProvisioners(File dstStackDir, StackCommand stackCommand,
+                                     List<StackProvisionerDefinition> postProvisioners) {
         for (StackProvisionerDefinition postProvisioner : postProvisioners) {
             NamedExecutable executable = ScriptExecutorProvider
                     .findExecutor(extensionContext, postProvisioner)

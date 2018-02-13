@@ -21,53 +21,39 @@ public class Stack {
     private final ExtensionContext extensionContext;
     private final StackLocator stackReference;
     private final DependencyManager dependencyManager;
-    private final Environment environment;
 
     public Stack(ExtensionContext extensionContext, StackLocator stackReference,
-                 DependencyManager dependencyManager, Environment environment) {
+                 DependencyManager dependencyManager) {
         this.extensionContext = extensionContext;
         this.stackReference = stackReference;
         this.dependencyManager = dependencyManager;
-        this.environment = environment;
     }
 
-    public StackContext getStackContext(boolean withOptional) {
+    private StackContext getStackContext(boolean withOptional,Environment environment) {
         StackIntrospectionProvider.StackIntrospections allStacks = environment.getIntrospectionProvider().getAllStacks();
         StackTreeDescription stackTreeDescription = dependencyManager.downloadDependencies(stackReference, allStacks, withOptional);
         List<StackDescription> sidekicks = dependencyManager.getSidekicks(stackTreeDescription, allStacks);
         return new StackContext(
-                stackTreeDescription, sidekicks, allStacks, environment,
-                allStacks);
+                stackTreeDescription,
+                sidekicks,
+                allStacks,
+                environment);
     }
 
-    public Environment getEnvironment() {
-        return environment;
-    }
-
-
-    public StackOperations createStartCommand(boolean withOptionalDependencies) {
-        return getEnricherExecutor(withOptionalDependencies)
+    public StackOperations createStartCommand(boolean withOptionalDependencies,Environment environment) {
+        return getEnricherExecutor(withOptionalDependencies,environment)
                 .createStartSchedule();
     }
 
-    public StackOperations createStopCommand(boolean withDependencies, boolean withOptional) {
-        return getEnricherExecutor(withOptional)
+    public StackOperations createStopCommand(boolean withDependencies, boolean withOptional,Environment environment) {
+        return getEnricherExecutor(withOptional,environment)
                 .createStopSchedule(withDependencies);
     }
 
-    private StackEnricherExecutor getEnricherExecutor(boolean withOptional) {
-        return new StackEnricherExecutor(extensionContext, getStackContext(withOptional), withOptional);
+    private StackEnricherExecutor getEnricherExecutor(boolean withOptional,Environment environment) {
+        return new StackEnricherExecutor(extensionContext, getStackContext(withOptional,environment), withOptional);
     }
 
-    /**
-     * Please use @{link {@link Solution#run(StackOperations)}}
-     *
-     * @param schedule shedule to be run
-     */
-    @Deprecated
-    public void run(StackOperations schedule) {
-        new StackProvisionerExecutor(schedule, extensionContext).execute();
-    }
 
     public static class StackContext {
         private final StackTreeDescription stackTreeDescription;
@@ -75,11 +61,14 @@ public class Stack {
         private final Environment environment;
         private final StackIntrospectionProvider.StackIntrospections introspections;
 
-        public StackContext(StackTreeDescription stackTreeDescription, List<StackDescription> sidekicks, StackIntrospectionProvider.StackIntrospections stackIntrospections, Environment environment, StackIntrospectionProvider.StackIntrospections introspections) {
+        StackContext(StackTreeDescription stackTreeDescription,
+                     List<StackDescription> sidekicks,
+                     StackIntrospectionProvider.StackIntrospections stackIntrospections,
+                     Environment environment) {
             this.stackTreeDescription = stackTreeDescription;
             this.sidekicks = sidekicks;
             this.environment = environment;
-            this.introspections = introspections;
+            this.introspections = stackIntrospections;
         }
 
         public Environment getEnvironment() {

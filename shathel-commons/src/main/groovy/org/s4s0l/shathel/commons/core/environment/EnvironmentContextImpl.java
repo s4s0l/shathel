@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.commons.core.environment;
 
+import org.s4s0l.shathel.commons.core.DockerLoginInfo;
 import org.s4s0l.shathel.commons.core.Parameters;
 import org.s4s0l.shathel.commons.core.SolutionDescription;
 import org.s4s0l.shathel.commons.core.security.SafeStorage;
@@ -8,11 +9,13 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Marcin Wielgus
  */
 public class EnvironmentContextImpl implements EnvironmentContext {
+
     private final EnvironmentDescription environmentDescription;
     private final SolutionDescription solutionDescription;
     private final SafeStorage safeStorage;
@@ -27,48 +30,51 @@ public class EnvironmentContextImpl implements EnvironmentContext {
     }
 
     @Override
+    public String getEnvironmentName() {
+        return environmentDescription.getEnvironmentName();
+    }
+
+    @Override
     public SafeStorage getSafeStorage() {
         return safeStorage;
     }
 
-    @Override
-    public EnvironmentDescription getEnvironmentDescription() {
+    private EnvironmentDescription getEnvironmentDescription() {
         return environmentDescription;
     }
 
-    @Override
-    public SolutionDescription getSolutionDescription() {
+    private SolutionDescription getSolutionDescription() {
         return solutionDescription;
     }
 
     @Override
     public File getAnsibleInventoryFile() {
-        return new File(getSettingsDirectory(), "ansible-inventory");
+        return new File(getSettingsDirectory(), "sansible-inventory");
     }
 
     @Override
     public File getSettingsDirectory() {
-        return storage.getSettingsDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getSettingsDirectory(getEnvironmentDescription().getParameters(), getEnvironmentDescription().getEnvironmentName());
     }
 
     @Override
     public File getDataDirectory() {
-        return storage.getDataDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getDataDirectory(getEnvironmentDescription().getParameters(), getEnvironmentDescription().getEnvironmentName());
     }
 
     @Override
     public File getTempDirectory() {
-        return storage.getTemptDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getTemptDirectory(getEnvironmentDescription().getParameters(), getEnvironmentDescription().getEnvironmentName());
     }
 
     @Override
     public File getEnrichedDirectory() {
-        return storage.getEnrichedDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getEnrichedDirectory(getEnvironmentDescription().getParameters(), getEnvironmentDescription().getEnvironmentName());
     }
 
     @Override
     public String getContextName() {
-        return (getSolutionDescription().getName() + "-" + getEnvironmentDescription().getName()).toLowerCase();
+        return (getSolutionDescription().getSolutionName() + "-" + getEnvironmentDescription().getEnvironmentName()).toLowerCase();
     }
 
     @Override
@@ -77,8 +83,13 @@ public class EnvironmentContextImpl implements EnvironmentContext {
     }
 
     @Override
+    public Optional<DockerLoginInfo> getDockerLoginInfo() {
+        return solutionDescription.getDockerLoginInfo();
+    }
+
+    @Override
     public File getDependencyCacheDirectory() {
-        return storage.getDependencyCacheDirectory(getEnvironmentDescription(), getEnvironmentDescription().getName());
+        return storage.getDependencyCacheDirectory(getEnvironmentDescription().getParameters());
     }
 
 
@@ -91,6 +102,7 @@ public class EnvironmentContextImpl implements EnvironmentContext {
         return safeStorage.fixValues(tmp);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private File ensureExists(File f) {
         f.mkdirs();
         return f;

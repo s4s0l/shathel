@@ -2,10 +2,8 @@ package org.s4s0l.shathel.commons.swarm
 
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.DefaultGlobalEnricherProvider
-import org.s4s0l.shathel.commons.core.StackOperations
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
@@ -43,12 +41,12 @@ class VolumeManagerTest extends BaseIntegrationTest {
         def volume2Reference = new StackReference("org.s4s0l.shathel:volume2:1.0")
 
         when:
-        def stack = solution.openStack(environment, volume1Reference)
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( volume1Reference)
+        def command = stack.createStartCommand(false,environment)
         solution.run(command)
 
-        stack = solution.openStack(environment, volume2Reference)
-        command = stack.createStartCommand(false)
+        stack = solution.openStack( volume2Reference)
+        command = stack.createStartCommand(false,environment)
         solution.run(command)
 
         then:

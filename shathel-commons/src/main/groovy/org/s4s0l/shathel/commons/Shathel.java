@@ -9,22 +9,21 @@ import org.s4s0l.shathel.commons.filestorage.FileStorage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
-import java.util.Set;
 
 /**
  * @author Marcin Wielgus
  */
 public class Shathel {
     private final Parameters params;
-    private final ExtensionContext context;
+    private final ExtensionContextsProvider extensionContextsProvider;
 
     public Shathel(Parameters params) {
-        this(params, DefaultExtensionContext.create(params));
+        this(params, DefaultExtensionContext.create());
     }
 
-    public Shathel(Parameters params, ExtensionContext context) {
+    public Shathel(Parameters params, ExtensionContextsProvider context) {
         this.params = params;
-        this.context = context;
+        this.extensionContextsProvider = context;
     }
 
     public void verify() {
@@ -69,9 +68,8 @@ public class Shathel {
     }
 
 
-
     public Solution getSolution(Storage storage) {
         storage.verify();
-        return new Solution(context, params, storage);
+        return new Solution(extensionContextsProvider, params, storage);
     }
 }

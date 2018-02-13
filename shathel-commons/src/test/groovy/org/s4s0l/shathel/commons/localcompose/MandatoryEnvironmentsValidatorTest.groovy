@@ -47,8 +47,8 @@ shathel-solution:
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:variables:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack(new StackReference("org.s4s0l.shathel:variables:1.0"))
+        def command = stack.createStartCommand(false, environment)
         solution.run(command)
 
 

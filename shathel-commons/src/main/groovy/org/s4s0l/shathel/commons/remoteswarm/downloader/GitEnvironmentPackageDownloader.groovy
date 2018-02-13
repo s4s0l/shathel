@@ -4,20 +4,16 @@ import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.s4s0l.shathel.commons.git.GitDownloader
 import org.s4s0l.shathel.commons.utils.Utils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * @author Marcin Wielgus
  */
 class GitEnvironmentPackageDownloader extends GitDownloader implements EnvironmentPackageDownloader{
     public static
-    final String SHATHEL_GIT_DEFAULT_VERSION = "shathel.solution.git_env_default_version";
+    final String SHATHEL_GIT_DEFAULT_VERSION = "shathel.solution.git_env_default_version"
     public static
-    final String SHATHEL_GIT_DEFAULT_GROUP = "shathel.solution.git_env_default_group";
+    final String SHATHEL_GIT_DEFAULT_GROUP = "shathel.solution.git_env_default_group"
     public static final String DEFAULT_GROUP = "github.com/s4s0l/shathel-envs"
-    private static
-    final Logger LOGGER = LoggerFactory.getLogger(GitEnvironmentPackageDownloader.class);
     private final Parameters parameters
 
     GitEnvironmentPackageDownloader(Parameters parameters) {
@@ -44,6 +40,6 @@ class GitEnvironmentPackageDownloader extends GitDownloader implements Environme
             def replaced = stackFile.text.replace("\$version", resolveReference(locator).get().version)
             stackFile.text = replaced
         }
-        return ret;
+        return ret
     }
 }

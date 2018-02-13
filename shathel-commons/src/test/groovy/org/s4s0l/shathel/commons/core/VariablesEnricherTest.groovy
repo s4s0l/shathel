@@ -47,7 +47,7 @@ shathel-solution:
 
     def "Variables should be exposed to Stack compose"() {
         given:
-        Shathel sht = shathel(["shathel.env.${environmentName}.domain":"mydomain.com"])
+        Shathel sht = shathel([("shathel.env.${environmentName}.domain".toString()):"mydomain.com"])
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
         if (!environment.isInitialized()) {
@@ -56,8 +56,8 @@ shathel-solution:
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:variables:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:variables:1.0"))
+        def command = stack.createStartCommand(false,environment)
         solution.run(command)
 
 

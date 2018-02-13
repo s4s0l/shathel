@@ -19,7 +19,7 @@ public class DefaultSafeStorageProvider implements SafeStorageProvider {
         String x = "shathel.env." + name + ".safePassword";
         return new SafeStorageImpl(s,
                 parameterProvider.getParameter(x)
-                        .map(pass -> pass.toCharArray())
+                        .map(String::toCharArray)
                         .orElseThrow(() -> new RuntimeException("No password provided for " + x)));
     }
 }

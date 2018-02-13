@@ -55,14 +55,15 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
         Mockito.when(context.getDependencyCacheDirectory()).thenReturn(targetDir)
         Mockito.when(context.getKnownHostsFile()).thenReturn(new File(targetDir, "known_hosts"))
         Mockito.when(context.getAnsibleInventoryFile()).thenReturn(targetDir)
+        Mockito.when(context.getEnvironmentParameterAsBoolean("useglobalvagrant")).thenReturn(Optional.empty())
 
         RemoteEnvironmentProcessorsFactory rep = new RemoteEnvironmentProcessorsFactory(api, extensionContext, context)
 
-        def envs = [DOCKER_NAME: "${getClass().simpleName}"]
+        def envs = [DOCKER_NAME: "${getClass().simpleName}".toString()]
         def expectedMap = [
-                DOCKER_NAME         : "${getClass().simpleName}",
+                DOCKER_NAME         : "${getClass().simpleName}".toString(),
                 VAGRANT_HOME        : new File(targetDir, ".vagrant.d").absolutePath,
-                VAGRANT_VAGRANTFILE : "Vagrantfile",
+                VAGRANT_VAGRANTFILE : "Vagrantfile".toString(),
                 VAGRANT_DOTFILE_PATH: "${targetDir.absolutePath}"]
         when:
         def processor = rep.create(new RemoteEnvironmentScript("vagrant", "Vagrantfile", "gav", getScriptRoot()))
@@ -226,6 +227,6 @@ class RemoteEnvironmentProcessorsFactoryTest extends Specification {
     }
 
     private ExtensionContext getExtensionContext() {
-        DefaultExtensionContext.create(Parameters.fromMapWithSysPropAndEnv([(CommonParams.SHATHEL_DIR): getTargetDir().absolutePath]))
+        DefaultExtensionContext.create().create(Parameters.fromMapWithSysPropAndEnv([(CommonParams.SHATHEL_DIR): getTargetDir().absolutePath]))
     }
 }

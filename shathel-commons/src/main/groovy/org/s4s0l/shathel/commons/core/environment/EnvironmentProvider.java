@@ -10,6 +10,6 @@ import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 public interface EnvironmentProvider extends ExtensionInterface {
     String getType();
 
-    Environment getEnvironment(EnvironmentContext environmentContext);
+    Environment getEnvironment(EnvironmentDescription environmentDescription, EnvironmentContext environmentContext);
 
 }

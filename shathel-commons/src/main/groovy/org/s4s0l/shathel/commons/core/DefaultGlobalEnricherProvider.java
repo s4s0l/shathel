@@ -88,7 +88,7 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         protected void execute(EnricherExecutableParams params) {
             Map<String, String> environment = params.getEnvironment();
             SimpleEncryptor safeStorage = params.getEnvironmentContext().getSafeStorage();
-            environment.putAll(safeStorage.fixValues(params.getStack().getEnvs()));
+            environment.putAll(safeStorage.fixValues(params.getStack().getAsEnvironmentVariables()));
             environment.putAll(safeStorage.fixValues(params.getEnvironmentContext().getAsEnvironmentVariables()));
         }
     }

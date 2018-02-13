@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.remoteswarm.ProcessorCommand
+import org.s4s0l.shathel.commons.remoteswarm.RemoteEnvironmentPackageContext
 import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
@@ -34,15 +35,16 @@ class VagrantExecutable implements NamedExecutable {
         }
         ExecutableResults results = context.get("result") as ExecutableResults
         Optional<ProcessorCommand> command = ProcessorCommand.toCommand(context.get("command") as String ?: ProcessorCommand.APPLY.toString())
-        EnvironmentContext econtext = (EnvironmentContext) context.get("context")
+        RemoteEnvironmentPackageContext econtext = (RemoteEnvironmentPackageContext) context.get("context")
         File workingDir = script.scriptFileLocation.get().getParentFile()
         Map<String, String> env = (Map<String, String>) context.get("env")
         env.putAll([
                 "VAGRANT_DOTFILE_PATH": econtext.settingsDirectory.absolutePath,
                 "VAGRANT_VAGRANTFILE" : script.scriptFileLocation.get().getName(),
         ])
-        boolean localVagrant = econtext.environmentDescription?.getParameterAsBoolean("useglobalvagrant")?.orElse(true)
-        if (!localVagrant) {
+
+        boolean globalVagrant = econtext.getEnvironmentParameterAsBoolean("useglobalvagrant").orElse(false)
+        if (!globalVagrant) {
             env.putAll([
                     "VAGRANT_HOME": new File(econtext.dependencyCacheDirectory, ".vagrant.d").absolutePath
             ])

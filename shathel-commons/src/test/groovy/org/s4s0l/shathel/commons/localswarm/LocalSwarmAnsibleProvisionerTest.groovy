@@ -32,8 +32,8 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
     def "Ansible provisionners should run"() {
         given:
         Shathel sht = shathel([
-                "shathel.env.${environmentName}.target.dir"     : getRootDir().absolutePath,
-                "shathel.env.${environmentName}.ansible.enabled": "true",
+                ("shathel.env.${environmentName}.target.dir".toString()): getRootDir().absolutePath,
+                ("shathel.env.${environmentName}.ansible.enabled".toString()): "true",
         ])
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
@@ -43,8 +43,8 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:ansible:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack(new StackReference("org.s4s0l.shathel:ansible:1.0"))
+        def command = stack.createStartCommand(false, environment)
         solution.run(command)
 
 
@@ -59,7 +59,7 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
     def "Ansible provisionners should not run by default on local swarm"() {
         given:
         Shathel sht = shathel([
-                "shathel.env.${environmentName}.target.dir": getRootDir().absolutePath,
+                ("shathel.env.${environmentName}.target.dir".toString()): getRootDir().absolutePath,
         ])
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
@@ -69,8 +69,8 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
 
 
         when:
-        def stack = solution.openStack(environment, new StackReference("org.s4s0l.shathel:ansible:1.0"))
-        def command = stack.createStartCommand(false)
+        def stack = solution.openStack(new StackReference("org.s4s0l.shathel:ansible:1.0"))
+        def command = stack.createStartCommand(false, environment)
         solution.run(command)
 
 

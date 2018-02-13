@@ -16,8 +16,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class FileStackDependencyDownloader extends FileDownloader implements StackDependencyDownloader {
-    public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
-    public static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
+    private static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
+    private static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_base_dir";
     private static final Logger LOGGER = getLogger(FileStackDependencyDownloader.class);
     private final ParameterProvider params;
@@ -67,7 +67,7 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
 
     @Override
     protected String getDefaultVersion() {
-        return params.getParameter(SHATHEL_FILE_DEFAULT_VERSION).orElseGet(() -> Utils.getShathelVersion());
+        return params.getParameter(SHATHEL_FILE_DEFAULT_VERSION).orElseGet(Utils::getShathelVersion);
     }
 
     @Override

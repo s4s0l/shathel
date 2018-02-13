@@ -3,6 +3,7 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.cert.CertificateManager
+import org.s4s0l.shathel.commons.core.ParameterProvider
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
 import org.s4s0l.shathel.commons.core.environment.ShathelNode
 import org.s4s0l.shathel.commons.docker.DockerWrapper
@@ -62,10 +63,15 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
 
     @Override
     SecretManagerApi getSecretManager() {
-        return new SecretManager(packageContext.getEnvironmentDescription(), getManagerNodeClient(), packageContext.getSafeStorage())
+        return new SecretManager(new ParameterProvider() {
+            @Override
+            Optional<String> getParameter(String name) {
+                return packageContext.getEnvironmentParameter(name)
+            }
+        }, getManagerNodeClient(), packageContext.getSafeStorage())
     }
 
-    SshOperations getSshOperaions() {
+    SshOperations getSshOperations() {
         return accessManager
     }
 
@@ -73,8 +79,6 @@ class RemoteEnvironmentApiFacade implements ExecutableApiFacade {
     CertificateManager getCertificateManager() {
         return accessManager.getCertificateManager()
     }
-
-
 
 
 }

@@ -23,42 +23,57 @@ import org.s4s0l.shathel.commons.utils.ExtensionInterface;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
  */
 public class DefaultExtensionContext {
-    public static ExtensionContext create(Parameters parameterProvider) {
-        return getExtensionContext(parameterProvider, Collections.emptyList());
+    public static ExtensionContextsProvider create() {
+        return getExtensionContext(Collections.emptyList());
     }
 
-    public static ExtensionContext create(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
-        return getExtensionContext(parameterProvider, extraExtensions);
+    public static ExtensionContextsProvider createWithFunctions(List<Function<Parameters, ExtensionInterface>> extraExtensions) {
+        return getExtensionContext(extraExtensions);
     }
 
-    private static ExtensionContext getExtensionContext(Parameters parameterProvider, List<ExtensionInterface> extraExtensions) {
-        ExtensionContext.ExtensionContextBuilder extension = ExtensionContext.builder()
-                .extension(new LocalSwarmEnvironmentProvider())
-                .extension(new RemoteEnvironmentProvider())
-                .extension(new BinaryManagerExtension(parameterProvider))
-                .extension(new GitEnvironmentPackageDownloader(parameterProvider))
-                .extension(new FileEnvironmentPackageDownloader(parameterProvider))
-                .extensions(DefaultBinaryLocators.getDefaultLocators())
-                .extension(new DefaultSafeStorageProvider(parameterProvider))
-                .extension(new DefaultGlobalEnricherProvider())
-                .extension(new GroovyExecutorProvider())
-                .extension(new AnsibleExecutorProvider())
-                .extension(new VagrantExecutorProvider())
-                .extension(new TerraformExecutorProvider())
-                .extension(new PackerExecutorProvider())
-                .extension(new IvyDownloader(parameterProvider))
-                .extension(new GitStackDependencyDownloader(parameterProvider))
-                .extension(new FileStackDependencyDownloader(parameterProvider));
+    public static ExtensionContextsProvider create(List<ExtensionInterface> extraExtensions) {
+        return getExtensionContext(toFunctions(extraExtensions));
+    }
 
-        for (ExtensionInterface extraExtension : extraExtensions) {
+    private static ExtensionContextsProvider getExtensionContext(List<Function<Parameters, ExtensionInterface>> extraExtensions) {
+        ExtensionContextsProvider.ExtensionContextsProviderBuilder extension = ExtensionContextsProvider.builder()
+                .extension(parameterProvider -> new LocalSwarmEnvironmentProvider())
+                .extension(parameterProvider -> new RemoteEnvironmentProvider())
+                .extension(parameterProvider -> new BinaryManagerExtension(parameterProvider))
+                .extension(parameterProvider -> new GitEnvironmentPackageDownloader(parameterProvider))
+                .extension(parameterProvider -> new FileEnvironmentPackageDownloader(parameterProvider))
+                .extensions(DefaultBinaryLocators.getDefaultLocators().stream()
+                        .map(DefaultExtensionContext::toFunction).collect(Collectors.toList()))
+                .extension(parameterProvider -> new DefaultSafeStorageProvider(parameterProvider))
+                .extension(parameterProvider -> new DefaultGlobalEnricherProvider())
+                .extension(parameterProvider -> new GroovyExecutorProvider())
+                .extension(parameterProvider -> new AnsibleExecutorProvider())
+                .extension(parameterProvider -> new VagrantExecutorProvider())
+                .extension(parameterProvider -> new TerraformExecutorProvider())
+                .extension(parameterProvider -> new PackerExecutorProvider())
+                .extension(parameterProvider -> new IvyDownloader(parameterProvider))
+                .extension(parameterProvider -> new GitStackDependencyDownloader(parameterProvider))
+                .extension(parameterProvider -> new FileStackDependencyDownloader(parameterProvider));
+
+        for (Function<Parameters, ExtensionInterface> extraExtension : extraExtensions) {
             extension.extension(extraExtension);
         }
         return extension.build();
+    }
+
+    static Function<Parameters, ExtensionInterface> toFunction(ExtensionInterface iface) {
+        return p -> iface;
+    }
+
+    static List<Function<Parameters, ExtensionInterface>> toFunctions(List<ExtensionInterface> iface) {
+        return iface.stream().map(it -> toFunction(it)).collect(Collectors.toList());
     }
 
 
