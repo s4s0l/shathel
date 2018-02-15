@@ -17,11 +17,11 @@ public interface Parameters extends ParameterProvider {
     }
 
     static String parameterNameToEnvName(String parameterName) {
-        return parameterName.toUpperCase().replaceAll("[^A-Z0-9\\-]", "_");
+        return parameterName.toUpperCase().replaceAll("[^A-Z0-9]", "_");
     }
 
     static String getNormalizedParameterName(String key) {
-        return key.toLowerCase().replaceAll("[^a-z0-9\\-]", ".");
+        return key.toLowerCase().replaceAll("[^a-z0-9]", ".");
     }
 
     static Map<String, String> getNormalizedParameterNames(Map<String, String> parameters) {
