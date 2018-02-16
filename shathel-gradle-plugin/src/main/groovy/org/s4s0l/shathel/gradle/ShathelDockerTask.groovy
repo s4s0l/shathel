@@ -103,6 +103,11 @@ class ShathelDockerTask extends DefaultTask {
         def config = settings
         def contextPath = project.file(config.targetDir)
         if (config.build) {
+            config.combinedTags.each {
+                if (getWrapper().imageExists(it)) {
+                    getWrapper().imageDeleteByTag(it, true)
+                }
+            }
             getWrapper().buildAndTag(contextPath, config.dockerFile, config.args, config.combinedTags)
         }
         project.file(project.buildDir.path + "/shathel-dockers/${config.imageName}.file").text = UUID.randomUUID().toString()

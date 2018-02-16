@@ -41,7 +41,7 @@ class ShathelPackagerPluginIntegrationTest extends GradlePluginFunctionalSpecifi
 
         then:
         file("build/libs/simple-project-1.2.3-SNAPSHOT-shathel.zip").exists()
-        new DockerWrapper().exec.executeForOutput("image ls -q registry.gitlab.com/sasol/shathel/simple-project:1.2.3-SNAPSHOT").trim().length() == 12
+        new DockerWrapper().imageExists("registry.gitlab.com/sasol/shathel/simple-project:1.2.3-SNAPSHOT")
 
         when:
         run "test"

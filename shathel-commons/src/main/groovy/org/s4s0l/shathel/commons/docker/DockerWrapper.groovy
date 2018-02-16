@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory
  */
 class DockerWrapper {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(DockerWrapper.class);
+    final Logger LOGGER = LoggerFactory.getLogger(DockerWrapper.class)
 
-    final ExecWrapper exec;
+    final ExecWrapper exec
 
     DockerWrapper() {
         this(new ExecWrapper(LOGGER, 'docker'))
@@ -21,7 +21,7 @@ class DockerWrapper {
 
 
     DockerWrapper(ExecWrapper execWrapper) {
-        exec = execWrapper;
+        exec = execWrapper
     }
 
     /**
@@ -119,7 +119,7 @@ class DockerWrapper {
         }
         dockerIds.collect {
             String inspect = exec.executeForOutput("inspect ${it}")
-            def val = new JsonSlurper().parseText(inspect);
+            def val = new JsonSlurper().parseText(inspect)
             def ret = [:]
             ret << val[0].Config.Labels
             ret << [name: val[0].Name]
@@ -153,7 +153,7 @@ class DockerWrapper {
      */
     List<Map<String, String>> servicesLabels(String filter) {
         def output = exec.executeForOutput("service ls -f $filter")
-        def parsed = parseServiceLsOutput(output);
+        def parsed = parseServiceLsOutput(output)
 
         parsed.collect {
             String inspect = exec.executeForOutput("service inspect ${it.key}")
@@ -180,7 +180,7 @@ class DockerWrapper {
 
     Map serviceInspect(String serviceName) {
         String inspect = exec.executeForOutput("service inspect ${serviceName}")
-        def val = new JsonSlurper().parseText(inspect);
+        def val = new JsonSlurper().parseText(inspect)
         return val[0]
     }
     /**
@@ -231,7 +231,7 @@ class DockerWrapper {
      */
     Map daemonInfo() {
         def output = exec.executeForOutput("info", "-f", "{{ json . }}")
-        return new JsonSlurper().parseText(output);
+        return new JsonSlurper().parseText(output)
     }
 
     /**
@@ -256,7 +256,7 @@ class DockerWrapper {
                 .findAll { it[0] != "ID" }
                 .collectEntries {
             def x = it[3] =~ /([0-9]+)/
-            def count = Integer.parseInt(x[0][1]);
+            def count = Integer.parseInt(x[0][1])
             def expectedCount = Integer.parseInt(x[1][1])
             def ratio = expectedCount == 0 ? 0 : count / expectedCount
             [(it[1]): [
@@ -405,6 +405,14 @@ class DockerWrapper {
 
     String containerCreate(String s) {
         exec.executeForOutput("run $s").readLines().last()
+    }
+
+    void imageDeleteByTag(String tag, boolean forceful) {
+        exec.executeForOutput("image rm ${forceful ? '-f' : ''} ${tag}").trim().length() >= 12
+    }
+
+    boolean imageExists(String tag) {
+        exec.executeForOutput("image ls -q ${tag}").trim().length() >= 12
     }
 
     void buildAndTag(File file, String dockerfile, Map<String, String> args, String tag) {
