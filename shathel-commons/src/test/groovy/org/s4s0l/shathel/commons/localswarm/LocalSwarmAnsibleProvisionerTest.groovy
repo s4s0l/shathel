@@ -18,6 +18,7 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
 
     def cleanupEnvironment() {
         [new File(getRootDir(), "out1.txt"),
+         new File(getRootDir(), "out1-1.txt"),
          new File(getRootDir(), "out2.txt")].each {
             if (it.exists())
                 it.delete()
@@ -32,8 +33,9 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
     def "Ansible provisionners should run"() {
         given:
         Shathel sht = shathel([
-                ("shathel.env.${environmentName}.target.dir".toString()): getRootDir().absolutePath,
+                ("shathel.env.${environmentName}.target.dir".toString())     : getRootDir().absolutePath,
                 ("shathel.env.${environmentName}.ansible.enabled".toString()): "true",
+                ("shathel.env.${environmentName}.xxx".toString())            : "xxx",
         ])
         def solution = sht.getSolution(sht.initStorage(getRootDir(), false))
         def environment = solution.getEnvironment(environmentName)
@@ -50,8 +52,8 @@ class LocalSwarmAnsibleProvisionerTest extends BaseIntegrationTest {
 
         then:
         new File(getRootDir(), "out1.txt").text == "[\"127.0.0.1\"]"
+        new File(getRootDir(), "out1-1.txt").text == "xxx=xxx"
         new File(getRootDir(), "out2.txt").text == "[\"127.0.0.1\"]"
-
         onEnd()
 
     }

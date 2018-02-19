@@ -8,3 +8,4 @@
          path: "{{shathel_env_target_dir}}"
          state: directory
     - copy: content="{{ groups['shathel_manager_hosts'] }}" dest="{{shathel_env_target_dir}}/out1.txt"
+    - copy: content="xxx={{ shathel_env_xxx }}" dest="{{shathel_env_target_dir}}/out1-1.txt"

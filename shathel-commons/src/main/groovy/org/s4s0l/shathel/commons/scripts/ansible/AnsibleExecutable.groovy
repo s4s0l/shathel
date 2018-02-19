@@ -1,11 +1,12 @@
 package org.s4s0l.shathel.commons.scripts.ansible
 
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -42,7 +43,7 @@ class AnsibleExecutable implements NamedExecutable {
         AnsibleScriptContext ansibleScriptContext = (AnsibleScriptContext) context.get("ansible")
         if (ansibleScriptContext.disabled) {
             LOGGER.warn("Ansible script is disabled: {}.", ansibleScriptContext.disabledMessage.get())
-            LOGGER.warn("Ansible disabled script was: {}", scriptFile.text);
+            LOGGER.warn("Ansible disabled script was: {}", scriptFile.text)
             return
         }
 
@@ -59,14 +60,16 @@ class AnsibleExecutable implements NamedExecutable {
         def extraVarsFile = new File(econtext.tempDirectory, "ansible-extra-vars.json")
         try {
 
-            extraVarsFile.text = "{" + env.findAll {
+            def extraVarsFileContents = env.findAll {
                 //sometime secret values are files, that may be for eg jsons itself
                 //this is a lame workaround
                 !it.key.toLowerCase().endsWith("_secret_value") && !it.key.toLowerCase().contains("safepassword")
             }
-            .collect {
-                "\t\"${it.key.toLowerCase()}\":\"${it.value}\""
-            }.join(",\n") + "}"
+            .collectEntries {
+                [(it.key.toLowerCase()): "${it.value}".toString()]
+            }
+
+            extraVarsFile.text = JsonOutput.toJson(extraVarsFileContents)
             extraVarsFile.deleteOnExit()
             def out = ansible.play(script.getBaseDirectory(),
                     ansibleScriptContext,

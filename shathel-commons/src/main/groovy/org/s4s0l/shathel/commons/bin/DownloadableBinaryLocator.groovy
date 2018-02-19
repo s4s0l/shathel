@@ -24,13 +24,17 @@ class DownloadableBinaryLocator implements BinaryLocator {
     private final String versionCommand
     private final String versionRegexpr
     private final String url
-
-    DownloadableBinaryLocator(String binaryName, String version, String versionCommand, String versionRegexpr, String url) {
+    private final boolean useGlobalBinary
+/**
+ * If versionCommand is empty no test against binary installed globally is performed
+ */
+    DownloadableBinaryLocator(String binaryName, String version, String versionCommand, String versionRegexpr, String url, boolean useGlobalBinary = true) {
         this.binaryName = binaryName
         this.version = version
         this.versionCommand = versionCommand
         this.versionRegexpr = versionRegexpr
         this.url = url
+        this.useGlobalBinary = useGlobalBinary
     }
 
     @Override
@@ -49,7 +53,7 @@ class DownloadableBinaryLocator implements BinaryLocator {
     @Override
     Optional<String> locate( File binBase) {
 
-        def localVersion = getVersion(binaryName)
+        def localVersion = getLocallyInstalledVersion()
         if (localVersion.isPresent() && localVersion.get() == version) {
             return Optional.of(binaryName)
         }
@@ -72,17 +76,24 @@ class DownloadableBinaryLocator implements BinaryLocator {
 
     @Override
     Optional<String> getVersionFound(File binBase) {
-        getVersion(locate(binBase).get())
+        getVersionFrom(locate(binBase).get())
     }
 
 
-    Optional<String> getVersion(String command) {
+    Optional<String> getLocallyInstalledVersion() {
+        if (!useGlobalBinary) {
+            return Optional.empty()
+        }
+        return getVersionFrom(binaryName)
+    }
+
+    private Optional<String> getVersionFrom(String binaryPath) {
         try {
-            def output = new ExecWrapper(LOGGER, command).executeForOutput(versionCommand)
+            def output = new ExecWrapper(LOGGER, binaryPath).executeForOutput(versionCommand)
             List<String> groups = (output =~ versionRegexpr)[0] as List<String>
             return Optional.of(groups[1])
         } catch (Exception e) {
-            LOGGER.trace("Unable to check version of $binaryName", e)
+            LOGGER.trace("Unable to check version of $binaryPath", e)
         }
         Optional.empty()
     }

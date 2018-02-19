@@ -1,7 +1,6 @@
 package org.s4s0l.shathel.commons.bin
 
 import org.apache.commons.io.FileUtils
-import org.s4s0l.shathel.commons.utils.ExecWrapper
 import spock.lang.Specification
 
 /**
@@ -28,7 +27,8 @@ class DownloadableBinaryLocatorTest extends Specification {
                 "1.0.0",
                 "version",
                 /v(([0-9]+\.?)+)/,
-                "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip"
+                "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip",
+                false //on manjaro there is a packer app that has nothing to do with hashicorps one
         )
 
         then:
@@ -44,7 +44,7 @@ class DownloadableBinaryLocatorTest extends Specification {
         when:
         DownloadableBinaryLocator locator = new DownloadableBinaryLocator(
                 "openssl",
-                ("openssl version".execute().text =~ /(([0-9]+\.?)+)/)[0][1],
+                (("openssl version".execute().text =~ /(([0-9]+\.?)+)/)[0][1]).toString(),
                 "version",
                 /(([0-9]+\.?)+)/,
                 "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip"

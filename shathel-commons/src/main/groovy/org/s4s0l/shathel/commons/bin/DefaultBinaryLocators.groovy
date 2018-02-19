@@ -24,7 +24,8 @@ class DefaultBinaryLocators {
                         "1.0.0",
                         "version",
                         /v(([0-9]+\.?)+)/,
-                        "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip"
+                        "https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip",
+                        false
                 ),
                 new DownloadableBinaryLocator(
                         "terraform",
