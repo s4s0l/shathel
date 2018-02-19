@@ -3,9 +3,6 @@ package org.s4s0l.shathel.commons.remoteswarm.downloader
 import org.s4s0l.shathel.commons.core.ParameterProvider
 import org.s4s0l.shathel.commons.core.dependencies.FileDownloader
 import org.s4s0l.shathel.commons.utils.Utils
-import org.slf4j.Logger
-
-import static org.slf4j.LoggerFactory.getLogger
 
 /**
  * @author Marcin Wielgus
@@ -41,8 +38,11 @@ class FileEnvironmentPackageDownloader extends FileDownloader implements Environ
     }
 
     @Override
-    protected File getBaseSearchPath() {
-        return new File(params.getParameter(SHATHEL_FILE_BASE_DIR).orElse("."))
+    protected List<File> getBaseSearchPath() {
+        def paths = params.getParameter(SHATHEL_FILE_BASE_DIR).orElse(".")
+        paths.split(",").findAll { !it.trim().isEmpty() }.collect {
+            new File(it)
+        }
     }
 
     @Override

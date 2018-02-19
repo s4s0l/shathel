@@ -7,6 +7,9 @@ import org.s4s0l.shathel.commons.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,8 +30,8 @@ public class FileDownloader {
     }
 
 
-    protected File getBaseSearchPath() {
-        return new File(".");
+    protected List<File> getBaseSearchPath() {
+        return Collections.singletonList(new File("."));
     }
 
     protected String getDefaultVersion() {
@@ -62,16 +65,16 @@ public class FileDownloader {
                 return file;
             }
         }
-        return searchAsFile(new File(locator.getLocation()));
+        return searchAsFile(locator.getLocation());
     }
 
     Optional<File> searchAsReference(StackReference stackReference) {
-        Optional<File> search = searchAsFile(new File(stackReference.getName() + "-" + stackReference.getVersion()));
+        Optional<File> search = searchAsFile(stackReference.getName() + "-" + stackReference.getVersion());
         if (!search.isPresent()) {
-            search = searchAsFile(new File(stackReference.getName() + "-" + stackReference.getVersion() + "-shathel"));
+            search = searchAsFile(stackReference.getName() + "-" + stackReference.getVersion() + "-shathel");
         }
         if (!search.isPresent()) {
-            search = searchAsFile(new File(stackReference.getName()));
+            search = searchAsFile(stackReference.getName());
         }
 
         return search;
@@ -83,30 +86,42 @@ public class FileDownloader {
         path = path + "/" + stackReference.getName();
         path = path + "/" + stackReference.getVersion();
         path = path + "/" + stackReference.getName() + "-" + stackReference.getVersion() + "-shathel.zip";
-        File f = new File(getBaseSearchPath(), path);
-        if (f.exists()) {
-            File dest = new File(destination, "files/" + stackReference.getStackDirecctoryName());
-            if (dest.exists()) {
-                if (!forceful)
-                    return Optional.of(dest);
-                else {
-                    try {
-                        FileUtils.deleteDirectory(dest);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+        for (File basePath : getBaseSearchPath()) {
+            File f = new File(basePath, path);
+            if (f.exists()) {
+                File dest = new File(destination, "files/" + stackReference.getStackDirecctoryName());
+                if (dest.exists()) {
+                    if (!forceful)
+                        return Optional.of(dest);
+                    else {
+                        try {
+                            FileUtils.deleteDirectory(dest);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
+                IoUtils.unZipIt(f, dest);
+                return Optional.of(dest);
             }
-            IoUtils.unZipIt(f, dest);
-            return Optional.of(dest);
         }
+
         return Optional.empty();
     }
 
-    private Optional<File> searchAsFile(File locationFile) {
-        if (!locationFile.isAbsolute()) {
-            locationFile = new File(getBaseSearchPath(), locationFile.getPath());
+    private Optional<File> searchAsFile(String locationFile) {
+        for (File basePath : getBaseSearchPath()) {
+            File f;
+            if (!Paths.get(locationFile).isAbsolute()) {
+                f = new File(basePath, locationFile);
+            } else {
+                f = new File(locationFile);
+            }
+            Optional<File> ret = verifyFile(f);
+            if (ret.isPresent()) {
+                return ret;
+            }
         }
-        return verifyFile(locationFile);
+        return Optional.empty();
     }
 }

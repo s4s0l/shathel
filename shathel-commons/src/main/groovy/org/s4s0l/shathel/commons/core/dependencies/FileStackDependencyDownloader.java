@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -16,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Marcin Wielgus
  */
 public class FileStackDependencyDownloader extends FileDownloader implements StackDependencyDownloader {
-    private static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
+    public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
     private static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_base_dir";
     private static final Logger LOGGER = getLogger(FileStackDependencyDownloader.class);
@@ -61,8 +63,9 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
     }
 
     @Override
-    protected File getBaseSearchPath() {
-        return new File(params.getParameter(SHATHEL_FILE_BASE_DIR).orElse("."));
+    protected List<File> getBaseSearchPath() {
+        String paths = params.getParameter(SHATHEL_FILE_BASE_DIR).orElse(".");
+        return Arrays.stream(paths.split(",")).filter(it -> !it.trim().isEmpty()).map(File::new).collect(Collectors.toList());
     }
 
     @Override
@@ -74,6 +77,5 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
     protected String getDefaultGroup() {
         return params.getParameter(SHATHEL_FILE_DEFAULT_GROUP).orElse(DEFAULT_GROUP);
     }
-
 
 }
