@@ -49,7 +49,7 @@ public class EnvironmentContextImpl implements EnvironmentContext {
 
     @Override
     public File getAnsibleInventoryFile() {
-        return new File(getSettingsDirectory(), "sansible-inventory");
+        return new File(getSettingsDirectory(), "ansible-inventory");
     }
 
     @Override

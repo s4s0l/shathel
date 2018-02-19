@@ -18,5 +18,6 @@ public class DefaultSettingsImporterExporter implements SettingsImporterExporter
     @Override
     public void loadSettings(InputStream is, File destinationDirectory) {
         IoUtils.unZipIt(is, destinationDirectory);
+        IoUtils.setPerm0600Recursive(destinationDirectory);
     }
 }

@@ -52,7 +52,7 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
         if (!environment.getEnvironmentContext.getSafeStorage.readValue("password-verification").isPresent) {
           throw new RuntimeException("password invalid?")
         }
-        inspectResult(environment)
+        ok()
       })
 
   }

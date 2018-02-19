@@ -3,21 +3,11 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.SettingsImporterExporter
-import org.s4s0l.shathel.commons.core.environment.Environment
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContainerRunner
-import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
-import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.core.environment.StackIntrospectionProvider
+import org.s4s0l.shathel.commons.core.environment.*
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext
 import org.s4s0l.shathel.commons.secrets.SecretsEnricher
-import org.s4s0l.shathel.commons.swarm.MandatoryEnvironmentsValidator
-import org.s4s0l.shathel.commons.swarm.SwarmContainerRunner
-import org.s4s0l.shathel.commons.swarm.SwarmMountingEnricher
-import org.s4s0l.shathel.commons.swarm.SwarmMountingPermissionsEnricher
-import org.s4s0l.shathel.commons.swarm.SwarmPullingEnricher
-import org.s4s0l.shathel.commons.swarm.SwarmStackIntrospectionProvider
-import org.s4s0l.shathel.commons.swarm.SwarmStickyVolumeEnricher
+import org.s4s0l.shathel.commons.swarm.*
 
 /**
  * @author Marcin Wielgus
@@ -91,7 +81,7 @@ class RemoteEnvironment implements Environment {
         String safeStoreKey = getSafeStorageKey()
         Optional<InputStream> inputStream = packageContext.getSafeStorage().inputStream(safeStoreKey)
         if (inputStream.isPresent()) {
-            if (isStarted()) {
+            if (packageContext.getAnsibleInventoryFile().exists() && isStarted()) {
                 stop()
             }
             machineSettingsImporterExporter.loadSettings(inputStream.get(),

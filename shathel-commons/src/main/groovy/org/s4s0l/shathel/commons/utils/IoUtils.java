@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -159,9 +162,6 @@ public class IoUtils {
     }
 
 
-
-
-
     public static boolean isSocketOpened(String host, int port, int timeout) {
         final Socket sock = new Socket();
         try {
@@ -209,5 +209,29 @@ public class IoUtils {
 
     }
 
+
+    public static void setPerm0600Recursive(File f) {
+        Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+        //add owners permission
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        try {
+            setPermsRecursive(f, perms);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to set permissions", e);
+        }
+    }
+
+    public static void setPermsRecursive(File f, Set<PosixFilePermission> perms) throws IOException {
+        if (f.isDirectory()) {
+            perms = new HashSet<>(perms);
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+        }
+        Files.setPosixFilePermissions(f.toPath(), perms);
+        if (f.isDirectory())
+            for (File file : Objects.requireNonNull(f.listFiles())) {
+                setPermsRecursive(file, perms);
+            }
+    }
 
 }
