@@ -7,6 +7,7 @@ import org.s4s0l.shathel.commons.core.Solution
 import org.s4s0l.shathel.commons.core.environment.Environment
 import org.s4s0l.shathel.commons.core.storage.Storage
 import org.s4s0l.shathel.deployer.DeployerParameters.ShathelCommandContext
+import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.shell.core.annotation.{CliCommand, CliOption}
 
 import scala.collection.JavaConverters._
@@ -17,6 +18,8 @@ import scala.util.Try
   */
 class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommands: StorageCommands)
   extends ShathelCommands(parametersCommands) {
+
+  val LOGGER: Logger = LoggerFactory.getLogger(classOf[EnvironmentCommands])
 
 
   @CliCommand(value = Array("environment use"), help = "Sets current env")
@@ -87,12 +90,24 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
 
   private def inspectResult(environment: Environment) = {
     response(Map(
-      "initialized" -> Try(environment.isInitialized).getOrElse(false),
-      "started" -> Try(environment.isStarted).getOrElse(false),
+      "initialized" -> Try(environment.isInitialized).recover {
+        case e: Exception =>
+          LOGGER.warn("initialized check failed with exception", e)
+          false
+      },
+      "started" -> Try(environment.isStarted).recover {
+        case e: Exception =>
+          LOGGER.warn("started check failed with exception", e)
+          false
+      },
       "verified" -> Try {
         environment.verify()
         true
-      }.getOrElse(false)))
+      }.recover {
+        case e: Exception =>
+          LOGGER.warn("verified check failed with exception", e)
+          false
+      }))
   }
 
   @CliCommand(value = Array("environment start"), help = "Performs start of environment")
