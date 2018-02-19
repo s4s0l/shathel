@@ -92,22 +92,22 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
     response(Map(
       "initialized" -> Try(environment.isInitialized).recover {
         case e: Exception =>
-          LOGGER.warn("initialized check failed with exception", e)
+          LOGGER.warn(s"initialized check failed with exception ${e.getMessage}")
           false
-      },
+      }.getOrElse(false),
       "started" -> Try(environment.isStarted).recover {
         case e: Exception =>
-          LOGGER.warn("started check failed with exception", e)
+          LOGGER.warn(s"started check failed with exception ${e.getMessage}")
           false
-      },
+      }.getOrElse(false),
       "verified" -> Try {
         environment.verify()
         true
       }.recover {
         case e: Exception =>
-          LOGGER.warn("verified check failed with exception", e)
+          LOGGER.warn(s"verified check failed with exception ${e.getMessage}")
           false
-      }))
+      }.getOrElse(false)))
   }
 
   @CliCommand(value = Array("environment start"), help = "Performs start of environment")
