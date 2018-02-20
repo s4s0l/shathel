@@ -141,7 +141,7 @@ class ExecWrapper {
         ProcessBuilder builder = new ProcessBuilder(command)
                 .directory(dir)
                 .redirectErrorStream(true)
-        builder.environment() << (environment << env).collectEntries {
+        builder.environment() << (env << environment).collectEntries {
             [(it.key.toString()): it.value.toString()]
         }
         return builder.start()
