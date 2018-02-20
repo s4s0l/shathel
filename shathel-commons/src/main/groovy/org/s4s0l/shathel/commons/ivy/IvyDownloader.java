@@ -20,8 +20,8 @@ import org.apache.ivy.util.AbstractMessageLogger;
 import org.apache.ivy.util.Message;
 import org.apache.ivy.util.url.CredentialsStore;
 import org.s4s0l.shathel.commons.core.Parameters;
-import org.s4s0l.shathel.commons.core.dependencies.StackDependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.ReferenceResolver;
+import org.s4s0l.shathel.commons.core.dependencies.StackDependencyDownloader;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.stack.StackReference;
 import org.s4s0l.shathel.commons.utils.IoUtils;
@@ -127,7 +127,7 @@ public class IvyDownloader implements StackDependencyDownloader {
         extraAttrs.put("m:classifier", "shathel");
 
         DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md,
-                ModuleRevisionId.newInstance(groupId, artifactId, version), force, false, true);
+                ModuleRevisionId.newInstance(groupId, artifactId, version), force, false, false);
         dd.addDependencyConfiguration("default", "default");
         dd.addDependencyArtifact("default", new DefaultDependencyArtifactDescriptor(dd, artifactId, "type", "zip", null, extraAttrs));
         md.addDependency(dd);
@@ -160,6 +160,11 @@ public class IvyDownloader implements StackDependencyDownloader {
                 URLResolver resolver = getIbibBiblioResolver(id, repo);
                 cResolver.add(resolver);
             }
+
+            ivySettings.setBaseDir(new File("/home/sasol/DELETEME"));
+            ivy
+
+
             ivySettings.addResolver(cResolver);
             ivySettings.setDefaultResolver("default");
 
