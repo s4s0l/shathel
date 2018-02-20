@@ -42,7 +42,7 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
 
             //we found but it has wrong version
             if (!isIgnoreVersions() && !foundStack.getVersion().equals(stackReference.getVersion())) {
-                if (!Arrays.asList("$version", "UNKNOWN").contains(foundStack.getVersion())) {
+                if (!Arrays.asList("$version", "UNKNOWN", "DEVELOPER-SNAPSHOT").contains(foundStack.getVersion())) {
                     LOGGER.warn("{} found stack in {}, but in different version, will not pick it up", getClass().getSimpleName(), search.get().getAbsolutePath());
                     search = Optional.empty();
                 }
