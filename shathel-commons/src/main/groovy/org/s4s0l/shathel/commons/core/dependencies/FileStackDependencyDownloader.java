@@ -21,11 +21,16 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
     public static final String SHATHEL_FILE_DEFAULT_VERSION = "shathel.solution.file_default_version";
     private static final String SHATHEL_FILE_DEFAULT_GROUP = "shathel.solution.file_default_group";
     public static final String SHATHEL_FILE_BASE_DIR = "shathel.solution.file_base_dir";
+    public static final String SHATHEL_FILE_IGNORE_VERSION = "shathel.solution.file_ignore_versions";
     private static final Logger LOGGER = getLogger(FileStackDependencyDownloader.class);
     private final ParameterProvider params;
 
     public FileStackDependencyDownloader(ParameterProvider params) {
         this.params = params;
+    }
+
+    private boolean isIgnoreVersions() {
+        return params.getParameter(SHATHEL_FILE_IGNORE_VERSION).orElse("false").equalsIgnoreCase("true");
     }
 
     @Override
@@ -36,7 +41,7 @@ public class FileStackDependencyDownloader extends FileDownloader implements Sta
             StackReference foundStack = new StackReference(model.getGav());
 
             //we found but it has wrong version
-            if (!foundStack.getVersion().equals(stackReference.getVersion())) {
+            if (!isIgnoreVersions() && !foundStack.getVersion().equals(stackReference.getVersion())) {
                 if (!Arrays.asList("$version", "UNKNOWN").contains(foundStack.getVersion())) {
                     LOGGER.warn("{} found stack in {}, but in different version, will not pick it up", getClass().getSimpleName(), search.get().getAbsolutePath());
                     search = Optional.empty();

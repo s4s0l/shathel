@@ -13,6 +13,7 @@
 * shathel.solution.file_default_version
 * shathel.solution.file_default_group
 * shathel.solution.file_base_dir
+* shathel.solution.file_ignore_versions
 * shathel.solution.git_default_version
 * shathel.solution.git_default_group
 * shathel.solution.file_env_default_version
