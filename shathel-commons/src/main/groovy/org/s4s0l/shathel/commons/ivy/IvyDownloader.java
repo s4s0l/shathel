@@ -160,11 +160,6 @@ public class IvyDownloader implements StackDependencyDownloader {
                 URLResolver resolver = getIbibBiblioResolver(id, repo);
                 cResolver.add(resolver);
             }
-
-            ivySettings.setBaseDir(new File("/home/sasol/DELETEME"));
-            ivy
-
-
             ivySettings.addResolver(cResolver);
             ivySettings.setDefaultResolver("default");
 
