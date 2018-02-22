@@ -3,13 +3,17 @@ package org.s4s0l.shathel.commons.core.environment;
 import org.s4s0l.shathel.commons.core.Stack;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
-import org.s4s0l.shathel.commons.scripts.Executable;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
+import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
+import org.s4s0l.shathel.commons.scripts.TypedScript;
+import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class EnricherExecutableParams {
     private final Logger logger;
@@ -121,6 +125,66 @@ public class EnricherExecutableParams {
 
 
     public static class Provisioners extends ArrayList<NamedExecutable> {
+        private final ExtensionContext extensionContext;
+        private final File parentScriptBaseLocation;
+        private final String parentScriptName;
+
+
+        public Provisioners(ExtensionContext scriptProvider, File parentScriptBaseLocation, String parentScriptName) {
+            this.extensionContext = scriptProvider;
+            this.parentScriptBaseLocation = parentScriptBaseLocation;
+            this.parentScriptName = parentScriptName;
+        }
+
+        public void addAnsible(String file) {
+            addAnsible(file, new HashMap<>());
+        }
+
+        public void addAnsible(String file, Map<String, String> additionalEnvironments) {
+
+            Optional<NamedExecutable> ansibleExecutable = ScriptExecutorProvider.findExecutor(extensionContext, new TypedScript() {
+                @Override
+                public String getType() {
+                    return "ansible";
+                }
+
+                @Override
+                public String getScriptContents() {
+                    throw new RuntimeException("no ansible inlining here");
+                }
+
+                @Override
+                public String getScriptName() {
+                    return parentScriptName + ":ansible:" + file;
+                }
+
+                @Override
+                public Optional<File> getScriptFileLocation() {
+                    return Optional.of(new File(parentScriptBaseLocation, file));
+                }
+            });
+            NamedExecutable mapped = ansibleExecutable
+                    .map(x -> new NamedExecutable() {
+                        @Override
+                        public TypedScript getScript() {
+                            return x.getScript();
+                        }
+
+                        @Override
+                        public void execute(Map<String, Object> context) {
+                            new ProvisionerExecutableParams(context).getEnv().putAll(additionalEnvironments);
+                            x.execute(context);
+                        }
+
+                        @Override
+                        public String getName() {
+                            return x.getName();
+                        }
+                    })
+                    .orElseThrow(() -> new RuntimeException("ansible unsupported here?"));
+
+            add(mapped);
+        }
 
         public void add(String provisionerName, ProvisionerExecutable executable) {
             add(new NamedExecutable() {
@@ -132,6 +196,31 @@ public class EnricherExecutableParams {
                 @Override
                 public String getName() {
                     return provisionerName;
+                }
+
+                @Override
+                public TypedScript getScript() {
+                    return new TypedScript() {
+                        @Override
+                        public String getType() {
+                            return "groovy-inlined";
+                        }
+
+                        @Override
+                        public String getScriptContents() {
+                            throw new RuntimeException("no script contents for groovy-inlined script");
+                        }
+
+                        @Override
+                        public String getScriptName() {
+                            return getName();
+                        }
+
+                        @Override
+                        public Optional<File> getScriptFileLocation() {
+                            return Optional.empty();
+                        }
+                    };
                 }
             });
         }

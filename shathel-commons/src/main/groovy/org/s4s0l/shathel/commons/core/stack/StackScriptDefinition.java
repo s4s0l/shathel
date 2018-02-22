@@ -5,7 +5,6 @@ import org.s4s0l.shathel.commons.scripts.TypedScript;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -28,7 +27,6 @@ public class StackScriptDefinition implements TypedScript {
         return getType() + ":" + origin.getReference().getGav() + "/" + getName();
     }
 
-    @Override
     public File getBaseDirectory() {
         return new File(origin.getStackResources().getStackDirectory(), category);
     }

@@ -13,8 +13,9 @@ import org.s4s0l.shathel.commons.utils.ExtensionContext;
 import org.s4s0l.shathel.commons.utils.VersionComparator;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,20 +56,47 @@ public class StackEnricherExecutor {
         return buildOperations(stackCommandStream);
     }
 
+
     private StackCommand createStackCommand(StackDescription stackDescription, StackCommand.Type commandType, boolean withOptional) {
         ComposeFileModel composeModel = stackDescription.getStackResources().getComposeFileModel();
         Map<String, String> environment = new HashMap<>();
         List<NamedExecutable> provisionersExtra;
+        //fixme: Ogólnie całe to szukanie tego katalogu 'parent' jest słabe tu, typedScript powinien mieć psi obowiązek dostarczenia go
         if (commandType.willRun) {
-            provisionersExtra = Streams.concat(
-                    GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext()).stream()
-                            .map(Optional::of),
-                    getEnricherDefinitions(stackDescription).stream()
-                            .map(x -> ScriptExecutorProvider.findExecutor(getExtensionContext(), x)),
-                    stack.getEnvironment().getEnvironmentEnrichers().stream()
-                            .map(Optional::of)
-            ).flatMap(x -> execute(x, composeModel, stackDescription, environment, withOptional).stream())
-                    .collect(Collectors.toList());
+            Stream<NamedExecutable> fromGlobal = GlobalEnricherProvider.getGlobalEnrichers(getExtensionContext())
+                    .stream()
+                    .flatMap(x -> {
+                        File parentScriptsLocation = stackDescription.getStackResources().getStackDirectory();
+                        String parentName = x.getName();
+                        return execute(x, composeModel, stackDescription,
+                                parentScriptsLocation, parentName,
+                                environment, withOptional).stream();
+                    });
+            Stream<NamedExecutable> fromStacks = getEnricherDefinitions(stackDescription).stream()
+                    .flatMap(x -> {
+                        Optional<NamedExecutable> executor = ScriptExecutorProvider.findExecutor(getExtensionContext(), x);
+                        if (executor.isPresent()) {
+                            File parentDir = executor.get().getScript().getScriptFileLocation()
+                                    .map(File::getParentFile)
+                                    .orElseGet(() -> x.getOrigin().getStackResources().getStackDirectory());
+                            String parentName = executor.get().getName();
+                            return execute(executor.get(), composeModel, stackDescription,
+                                    parentDir, parentName,
+                                    environment, withOptional).stream();
+                        } else {
+                            return Stream.empty();
+                        }
+                    });
+            Stream<NamedExecutable> fromEnv = stack.getEnvironment().getEnvironmentEnrichers().stream()
+                    .flatMap(x -> {
+                        //fixme: na logikę tu powinien być katalog paczki, ale że typedscript nie zawiera base dir to dupa na razie
+                        File parentScriptsLocation = stackDescription.getStackResources().getStackDirectory();
+                        String parentName = x.getName();
+                        return execute(x, composeModel, stackDescription,
+                                parentScriptsLocation, parentName,
+                                environment, withOptional).stream();
+                    });
+            provisionersExtra = Streams.concat(fromGlobal, fromStacks, fromEnv).collect(Collectors.toList());
         } else {
             provisionersExtra = Collections.emptyList();
         }
@@ -79,11 +107,13 @@ public class StackEnricherExecutor {
         return extensionContext;
     }
 
-    private List<NamedExecutable> execute(Optional<NamedExecutable> executor,
+    private List<NamedExecutable> execute(NamedExecutable executor,
                                           ComposeFileModel composeModel,
                                           StackDescription stackDescription,
+                                          File parentScriptBaseLocation, String parentScriptName,
                                           Map<String, String> environment, boolean withOptional) {
-        EnricherExecutableParams.Provisioners provisioners = new EnricherExecutableParams.Provisioners();
+        EnricherExecutableParams.Provisioners provisioners = new EnricherExecutableParams.Provisioners(extensionContext,
+                parentScriptBaseLocation, parentScriptName);
         EnricherExecutableParams params = new EnricherExecutableParams(
                 LOGGER,
                 stackDescription,
@@ -92,12 +122,9 @@ public class StackEnricherExecutor {
                 stack, withOptional,
                 provisioners
         );
-
         Map<String, Object> ctxt = params.toMap();
-        if (executor.isPresent()) {
-            LOGGER.info("Enriching with {}.", executor.get().getName());
-            executor.get().execute(ctxt);
-        }
+        LOGGER.info("Enriching with {}.", executor.getName());
+        executor.execute(ctxt);
         return provisioners;
     }
 

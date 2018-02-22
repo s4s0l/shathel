@@ -38,7 +38,6 @@ class RemoteEnvironmentScript implements TypedScript {
         return getType() + ":" + envPackageGav + "/" + name
     }
 
-    @Override
     File getBaseDirectory() {
         return baseDirectory
     }

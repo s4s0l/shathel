@@ -13,7 +13,5 @@ public interface TypedScript {
 
     String getScriptName();
 
-    File getBaseDirectory();
-
     Optional<File> getScriptFileLocation();
 }

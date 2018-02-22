@@ -2,9 +2,9 @@ package org.s4s0l.shathel.commons.scripts.groovy
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
-import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.slf4j.LoggerFactory
 
 /**
@@ -13,15 +13,20 @@ import org.slf4j.LoggerFactory
 @TypeChecked
 @CompileStatic
 class GroovyExecutable implements NamedExecutable {
-    private final TypedScript script;
+    private final TypedScript script
 
     GroovyExecutable(TypedScript script) {
         this.script = script
     }
 
     @Override
+    TypedScript getScript() {
+        return script
+    }
+
+    @Override
     String getName() {
-        return script.getScriptName();
+        return script.getScriptName()
     }
 
     void execute(File scriptFile, Map<String, Object> variables) {

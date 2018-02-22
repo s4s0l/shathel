@@ -2,6 +2,7 @@
 set -e
 ./gradlew :shathel-deployer:install
 
+export SHATHEL_SOLUTION_DOCKER_VERSION=17.12.0
 export SHATHEL_SOLUTION_FILE_BASE_DIR=$(pwd)/../shathel-stacks
 export SHATHEL_SOLUTION_FILE_ENV_BASE_DIR=$(pwd)/../shathel-envs
 export SHATHEL_DIR=$(pwd)/build/playground
@@ -22,8 +23,9 @@ export SHATHEL_ENV_VBOX_GAV=./virtualbox
 export SHATHEL_ENV_VBOX_FORCEFUL=true
 export SHATHEL_ENV_VBOX_DOMAIN=shathel-vbox
 export SHATHEL_ENV_VBOX_SAFEPASSWORD=HelloWorld
-export SHATHEL_ENV_VBOX_MANAGERS=2
-export SHATHEL_ENV_VBOX_WORKERS=1
+export SHATHEL_ENV_VBOX_MANAGERS=1
+export SHATHEL_ENV_VBOX_WORKERS=0
+
 
 
 export SHATHEL_ENV_AWS_TYPE=remote

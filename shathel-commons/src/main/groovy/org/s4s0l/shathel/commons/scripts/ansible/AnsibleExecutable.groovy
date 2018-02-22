@@ -27,6 +27,11 @@ class AnsibleExecutable implements NamedExecutable {
     }
 
     @Override
+    TypedScript getScript() {
+        return script
+    }
+
+    @Override
     String getName() {
         return script.getScriptName()
     }
@@ -71,7 +76,7 @@ class AnsibleExecutable implements NamedExecutable {
 
             extraVarsFile.text = JsonOutput.toJson(extraVarsFileContents)
             extraVarsFile.deleteOnExit()
-            def out = ansible.play(script.getBaseDirectory(),
+            def out = ansible.play(script.getScriptFileLocation().get().getParentFile(),
                     ansibleScriptContext,
                     env,
                     extraVarsFile,

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - debug: msg="{{ groups['shathel_manager_hosts'] }}"
+    - debug: msg="{{ groups['shathel_worker_hosts'] }}"
+    - file:
+         path: "{{shathel_env_target_dir}}"
+         state: directory
+    - copy: content="{{ extra_groovy_var }}" dest="{{shathel_env_target_dir}}/out-g-file.txt"

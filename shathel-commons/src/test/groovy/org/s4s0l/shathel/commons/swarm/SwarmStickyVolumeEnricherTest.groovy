@@ -4,7 +4,6 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import org.s4s0l.shathel.commons.core.environment.EnricherExecutableParams
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutable
 import org.s4s0l.shathel.commons.core.environment.ProvisionerExecutableParams
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel
 import org.s4s0l.shathel.commons.core.stack.StackDescription
@@ -82,7 +81,7 @@ class SwarmStickyVolumeEnricherTest extends Specification {
         StackDescription stackMock = Mockito.mock(StackDescription)
         Mockito.when(stackMock.getDeployName()).thenReturn("deployName")
 
-        def provisioners = new EnricherExecutableParams.Provisioners()
+        def provisioners = new EnricherExecutableParams.Provisioners(null, null, null)
 
         def model = ComposeFileModel.load("""
         version: "3.1"

@@ -1,0 +1,11 @@
+version: 1
+shathel-stack:
+  gav: org.s4s0l.shathel:d-ansible:1.0
+  enrichers:
+      inlined-ans:
+          target: DEPS
+          inline: |
+                provisioners.addAnsible('from-groovy/from-inline.yml', ['extra_groovy_var':'Groovy 2 ansible'])
+      ans:
+          target: DEPS
+          type: groovy

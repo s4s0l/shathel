@@ -1,6 +1,17 @@
 version: 1
 shathel-stack:
   gav: org.s4s0l.shathel:ansible:1.0
+  dependencies:
+    org.s4s0l.shathel:d-ansible:1.0:
+
+  enrichers:
+    inlined-ans:
+          target: SELF
+          inline: |
+                provisioners.addAnsible('from-groovy/from-inline.yml', ['extra_groovy_var':'Groovy 2 ansible'])
+    ans:
+          target: SELF
+          type: groovy
   pre-provisioners:
     test1:
       type: ansible

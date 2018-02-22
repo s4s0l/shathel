@@ -3,11 +3,10 @@ package org.s4s0l.shathel.commons.remoteswarm
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.ExecutableApiFacade
-import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider
-import org.s4s0l.shathel.commons.scripts.TypedScript
 import org.s4s0l.shathel.commons.scripts.ansible.AnsibleScriptContext
 import org.s4s0l.shathel.commons.scripts.terraform.TerraformScriptContext
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.utils.ExtensionContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory
 @CompileStatic
 class RemoteEnvironmentProcessorsFactory implements RemoteEnvironmentCallbackProcessors {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(RemoteEnvironmentProcessorsFactory.class);
+    final Logger LOGGER = LoggerFactory.getLogger(RemoteEnvironmentProcessorsFactory.class)
     private final ExtensionContext extensionContext
     private final ExecutableApiFacade facade
     private final RemoteEnvironmentPackageContext packageContext
@@ -30,7 +29,7 @@ class RemoteEnvironmentProcessorsFactory implements RemoteEnvironmentCallbackPro
         this.packageContext = packageContext
     }
 
-    RemoteEnvironmentProcessor create(TypedScript script) {
+    RemoteEnvironmentProcessor create(RemoteEnvironmentScript script) {
         def executor = ScriptExecutorProvider.findExecutor(extensionContext, script).orElseThrow {
             new RuntimeException("Unable to find executor of type ${script.type} used in script ${script.scriptName}")
         }

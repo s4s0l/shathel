@@ -4,9 +4,9 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContext
 import org.s4s0l.shathel.commons.remoteswarm.ProcessorCommand
-import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.s4s0l.shathel.commons.scripts.NamedExecutable
 import org.s4s0l.shathel.commons.scripts.TypedScript
+import org.s4s0l.shathel.commons.utils.ExecutableResults
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -17,13 +17,18 @@ import org.slf4j.LoggerFactory
 @CompileStatic
 class TerraformExecutable implements NamedExecutable {
     private static
-    final Logger LOGGER = LoggerFactory.getLogger(TerraformExecutable.class);
+    final Logger LOGGER = LoggerFactory.getLogger(TerraformExecutable.class)
     private final TypedScript script
     private final TerraformWrapper terraform
 
     TerraformExecutable(TypedScript script, TerraformWrapper terraform) {
         this.script = script
         this.terraform = terraform
+    }
+
+    @Override
+    TypedScript getScript() {
+        return script
     }
 
     @Override
