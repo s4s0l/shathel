@@ -17,7 +17,7 @@ public class StackTreeDescription {
 
 
     public boolean contains(StackReference other) {
-        return stream().filter(x -> x.getReference().isSameStack(other)).findFirst().isPresent();
+        return stream().anyMatch(x -> x.getReference().isSameStack(other));
     }
 
     private static class GraphNode {
