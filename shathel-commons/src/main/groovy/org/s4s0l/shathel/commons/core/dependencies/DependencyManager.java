@@ -43,32 +43,32 @@ public class DependencyManager {
     }
 
     public StackTreeDescription downloadDependencies(List<StackLocator> rootLocators,
-                                                     StackIntrospectionProvider.StackIntrospections stackIntrospections,
-                                                     boolean withOptional) {
-        StackTreeDescription.Builder builder = StackTreeDescription.builder();
+                                                     StackIntrospectionProvider.StackIntrospections stackIntrospections) {
+
+        StackTreeDescription.Builder builder = StackTreeDescription.builder(stackIntrospections);
         for (StackLocator rootLocator : rootLocators) {
             StackDescription desc = getStackDescription(dependenciesDir, rootLocator);
-            builder.addRootNode(desc);
-            addDependencies(desc, builder, stackIntrospections, withOptional);
+            builder.addRootNode(desc, true);
+            addDependencies(desc, builder, stackIntrospections);
         }
 
         stackIntrospections.getStacks().stream().map(StackIntrospection::getReference)
-                .filter(x -> !builder.containsInGraph(x))
                 .map(x -> getStackDescription(dependenciesDir, x, StackReference::getVersion))
-                .forEach(builder::addNeighbour);
+                .forEach(x -> {
+                    builder.addRootNode(x, false);
+                    addDependencies(x, builder, stackIntrospections);
+                });
 
         return builder.build();
     }
 
     private void addDependencies(StackDescription parent, StackTreeDescription.Builder builder,
-                                 StackIntrospectionProvider.StackIntrospections stackIntrospections, boolean withOptional) {
+                                 StackIntrospectionProvider.StackIntrospections stackIntrospections) {
         List<StackDependency> dependencies = parent.getDependencies();
         for (StackDependency dependency : dependencies) {
-            if (withOptional || !dependency.isOptional()) {
-                StackDescription depDesc = getStackDescription(dependenciesDir, dependency.getStackReference(), getOverrider(stackIntrospections));
-                builder.addNode(parent.getReference(), depDesc);
-                addDependencies(depDesc, builder, stackIntrospections, withOptional);
-            }
+            StackDescription depDesc = getStackDescription(dependenciesDir, dependency.getStackReference(), getOverrider(stackIntrospections));
+            builder.addNode(depDesc);
+            addDependencies(depDesc, builder, stackIntrospections);
         }
     }
 

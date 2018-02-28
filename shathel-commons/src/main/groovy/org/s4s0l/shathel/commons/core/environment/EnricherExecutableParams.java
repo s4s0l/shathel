@@ -1,8 +1,8 @@
 package org.s4s0l.shathel.commons.core.environment;
 
-import org.s4s0l.shathel.commons.core.Stack;
 import org.s4s0l.shathel.commons.core.model.ComposeFileModel;
 import org.s4s0l.shathel.commons.core.stack.StackDescription;
+import org.s4s0l.shathel.commons.core.stack.StackTreeDescription;
 import org.s4s0l.shathel.commons.scripts.NamedExecutable;
 import org.s4s0l.shathel.commons.scripts.ScriptExecutorProvider;
 import org.s4s0l.shathel.commons.scripts.TypedScript;
@@ -22,7 +22,7 @@ public class EnricherExecutableParams {
     private final StackDescription stack;
     private final ComposeFileModel model;
     private final Map<String, String> environment;
-    private final Stack.StackContext stackContext;
+    private final StackTreeDescription stackTree;
     private final Provisioners provisioners;
     private final boolean withOptional;
 
@@ -34,10 +34,44 @@ public class EnricherExecutableParams {
                 (StackDescription) map.get("stack"),
                 (ComposeFileModel) map.get("compose"),
                 (Map<String, String>) map.get("env"),
-                (Stack.StackContext) map.get("stackContext"),
+                (StackTreeDescription) map.get("stackTree"),
                 (Boolean) map.get("withOptional"),
                 (Provisioners) map.get("provisioners")
         );
+    }
+
+    private EnricherExecutableParams(Logger logger, EnvironmentContext environmentContext,
+                                     ExecutableApiFacade apiFacade,
+                                     StackDescription stack,
+                                     ComposeFileModel model,
+                                     Map<String, String> environment,
+                                     StackTreeDescription stackTree,
+                                     boolean withOptional,
+                                     Provisioners provisioners) {
+        this.logger = logger;
+        this.environmentContext = environmentContext;
+        this.apiFacade = apiFacade;
+        this.stack = stack;
+        this.model = model;
+        this.environment = environment;
+        this.stackTree = stackTree;
+        this.withOptional = withOptional;
+        this.provisioners = provisioners;
+    }
+
+
+    public EnricherExecutableParams(Logger logger, StackDescription stack, ComposeFileModel model,
+                                    Map<String, String> environment, StackTreeDescription stackTree,
+                                    boolean withOptional, Provisioners provisioners, Environment env) {
+        this.logger = logger;
+        this.environmentContext = env.getEnvironmentContext();
+        this.apiFacade = env.getEnvironmentApiFacade();
+        this.stack = stack;
+        this.model = model;
+        this.environment = environment;
+        this.stackTree = stackTree;
+        this.withOptional = withOptional;
+        this.provisioners = provisioners;
     }
 
     public Map<String, Object> toMap() {
@@ -47,46 +81,11 @@ public class EnricherExecutableParams {
         map.put("api", apiFacade);
         map.put("env", environment);
         map.put("stack", stack);
-        map.put("stackContext", stackContext);
+        map.put("stackTree", stackTree);
         map.put("compose", model);
         map.put("withOptional", withOptional);
         map.put("provisioners", provisioners);
         return map;
-    }
-
-
-    private EnricherExecutableParams(Logger logger, EnvironmentContext environmentContext,
-                                     ExecutableApiFacade apiFacade,
-                                     StackDescription stack,
-                                     ComposeFileModel model,
-                                     Map<String, String> environment,
-                                     Stack.StackContext stackContext,
-                                     boolean withOptional,
-                                     Provisioners provisioners) {
-        this.logger = logger;
-        this.environmentContext = environmentContext;
-        this.apiFacade = apiFacade;
-        this.stack = stack;
-        this.model = model;
-        this.environment = environment;
-        this.stackContext = stackContext;
-        this.withOptional = withOptional;
-        this.provisioners = provisioners;
-    }
-
-
-    public EnricherExecutableParams(Logger logger, StackDescription stack, ComposeFileModel model,
-                                    Map<String, String> environment, Stack.StackContext stackContext,
-                                    boolean withOptional, Provisioners provisioners) {
-        this.logger = logger;
-        this.environmentContext = stackContext.getEnvironment().getEnvironmentContext();
-        this.apiFacade = stackContext.getEnvironment().getEnvironmentApiFacade();
-        this.stack = stack;
-        this.model = model;
-        this.environment = environment;
-        this.stackContext = stackContext;
-        this.withOptional = withOptional;
-        this.provisioners = provisioners;
     }
 
     public boolean isWithOptional() {
@@ -115,8 +114,8 @@ public class EnricherExecutableParams {
         return environment;
     }
 
-    public Stack.StackContext getStackContext() {
-        return stackContext;
+    public StackTreeDescription getStackTree() {
+        return stackTree;
     }
 
     public Provisioners getProvisioners() {
