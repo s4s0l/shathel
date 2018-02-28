@@ -57,7 +57,6 @@ public class Stack {
 
     public static class StackContext {
         private final StackTreeDescription stackTreeDescription;
-        private final List<StackDescription> sidekicks;
         private final Environment environment;
         private final StackIntrospectionProvider.StackIntrospections introspections;
 
