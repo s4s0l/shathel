@@ -20,5 +20,15 @@ class DeployerIntegrationTest extends FeatureSpec with ShathelCommandLine {
         """
           |stack stop --name git@github.com/s4s0l/shathel-stacks:portainer:%version% --with-dependencies 1 --with-optional 1""")
     }
+
+    scenario("in local environment - running multiple at once") {
+      runScript(
+        """environment use local
+          |environment init
+          |stack start --name git@github.com/s4s0l/shathel-stacks:core:%version%,git@github.com/s4s0l/shathel-stacks:portainer:%version% --inspect 0""")
+      runScript(
+        """
+          |stack stop --name git@github.com/s4s0l/shathel-stacks:core:%version%,git@github.com/s4s0l/shathel-stacks:portainer:%version% --with-dependencies 1 --with-optional 1""")
+    }
   }
 }

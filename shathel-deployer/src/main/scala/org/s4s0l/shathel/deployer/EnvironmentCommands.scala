@@ -1,5 +1,6 @@
 package org.s4s0l.shathel.deployer
 
+import java.io.File
 import java.util.stream.Collectors
 
 import jline.console.ConsoleReader
@@ -51,8 +52,11 @@ class EnvironmentCommands(parametersCommands: ParametersCommands, storageCommand
       })
     shathel(builder().environment(environment).build().asJava, builder())(
       context => {
-        val (_, _, environment) = getEnvironment(context)
-        if (!environment.getEnvironmentContext.getSafeStorage.readValue("password-verification").isPresent) {
+        val (storage, _, shtlEnv) = getEnvironment(context)
+
+
+        val passExists = new File(shtlEnv.getEnvironmentContext.getSafeDirectory, "values/password-verification").exists()
+        if (passExists && !shtlEnv.getEnvironmentContext.getSafeStorage.readValue("password-verification").isPresent) {
           throw new RuntimeException("password invalid?")
         }
         ok()

@@ -4,7 +4,6 @@ import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
 import org.s4s0l.shathel.commons.utils.ExecWrapper
-import spock.lang.Specification
 import testutils.BaseIntegrationTest
 
 /**
@@ -56,6 +55,12 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         def command = stack.createStartCommand(false,environment)
 
         then:
+        /**
+         * dependency
+         *    |
+         *    |-> dependency2
+         *    |-> dependency3
+         */
         command.commands.size() == 3
 
         when:
@@ -76,6 +81,16 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command = stack.createStartCommand(false,environment)
 
         then:
+        /**
+         * dependency
+         *    |
+         *    |-> dependency1 (*) (new)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
         command.commands.size() == 1
 
         when:
@@ -96,32 +111,82 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command = stack.createStopCommand(true, false,environment)
 
         then:
-        command.commands.size() == 2 //todo: it should be only one because dependency2 is used by root stack...
+        /**
+         * dependency
+         *    |
+         *    |-> dependency1 (*) (to bee deleted)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
+        command.commands.size() == 1
 
         when:
         command = stack.createStopCommand(true, true,environment)
 
         then:
-        command.commands.size() == 4 //todo: same as above should be 1 also it shows it includes nonexistent stacks
+        /**
+         * dependency
+         *    |
+         *    |-> dependency1 (*) (to bee deleted)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
+        command.commands.size() == 1
 
         when:
         stack = solution.openStack( new StackReference("org.s4s0l.shathel:dependency:1.0"))
         command = stack.createStopCommand(false, false,environment)
 
         then:
+        /**
+         * dependency  (to bee deleted)
+         *    |
+         *    |-> dependency1 (*)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
         command.commands.size() == 1
 
         when:
         command = stack.createStopCommand(true, false,environment)
 
         then:
-        command.commands.size() == 3 //todo: should be 1 because 2&3 are still needed by dependency1
+        /**
+         * dependency  (to bee deleted)
+         *    |
+         *    |-> dependency1 (*)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
+        command.commands.size() == 1
 
         when:
         command = stack.createStopCommand(true, true,environment)
 
         then:
-        command.commands.size() == 5
+        /**
+         * dependency  (to bee deleted)
+         *    |
+         *    |-> dependency1 (*) (to bee deleted)
+         *    |      |
+         *    |      |-> dependency2 (to bee deleted)
+         *    |      |-> dependency3 (*) (to bee deleted)
+         *    |-> dependency2
+         *    |-> dependency3
+         */
+        command.commands.size() == 4
 
         when:
         solution.run(command)
@@ -149,6 +214,13 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         def command = stack.createStartCommand(true,environment)
 
         then:
+        /**
+         *    |-> dependency1 (*)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |      |-> dependency4 (*)
+         */
         command.commands.size() == 4
 
         when:
@@ -167,6 +239,20 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         command = stack.createStartCommand(true,environment)
 
         then:
+        /**
+         *
+         * dependency (new)
+         *    |
+         *    |-> dependency1 (*)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |      |-> dependency4 (*)
+         *    |-> dependency2
+         *    |-> dependency3
+         *    |-> dependency4 (*)
+         * @author Marcin Wielgus
+         */
         command.commands.size() == 1
 
         when:
@@ -178,6 +264,65 @@ class OptionalDependencyVariablesEnricherTest extends BaseIntegrationTest {
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY3")
         "present" == execInAnyTask(environment, "dependency_service", "printenv DEPENDENCY4")
         environment.getIntrospectionProvider().allStacks.stacks.size() == 5
+
+
+        when:
+        stack = solution.openStack(new StackReference("org.s4s0l.shathel:dependency:1.0"))
+        command = stack.createStopCommand(true, false, environment)
+
+        then:
+        /**
+         * dependency (to remove)
+         *    |
+         *    |-> dependency1 (*)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |      |-> dependency4 (*)
+         *    |-> dependency2
+         *    |-> dependency3 (not removed as needed by 1)
+         *    |-> dependency4 (*)
+         */
+        command.commands.size() == 1
+
+        when:
+        command = stack.createStopCommand(true, true, environment)
+
+        then:
+        /**
+         * dependency (to remove)
+         *    |
+         *    |-> dependency1 (*) (to remove)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |      |-> dependency4 (*)
+         *    |-> dependency2 (to remove)
+         *    |-> dependency3 (to remove)
+         *    |-> dependency4 (*) (to remove)
+         */
+        command.commands.size() == 5
+
+
+        when:
+        stack = solution.openStack(new StackReference("org.s4s0l.shathel:dependency1:1.0"))
+        command = stack.createStopCommand(true, true, environment)
+
+        then:
+        /**
+         * dependency
+         *    |
+         *    |-> dependency1 (*) (to remove)
+         *    |      |
+         *    |      |-> dependency2
+         *    |      |-> dependency3 (*)
+         *    |      |-> dependency4 (*) (to remove)
+         *    |-> dependency2
+         *    |-> dependency3
+         *    |-> dependency4 (*)
+         */
+        command.commands.size() == 2
+
 
         onEnd()
 

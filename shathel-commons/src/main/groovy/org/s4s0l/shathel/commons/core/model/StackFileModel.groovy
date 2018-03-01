@@ -7,14 +7,14 @@ import org.yaml.snakeyaml.Yaml
  */
 class StackFileModel implements Cloneable {
 
-    final Object parsedYml;
+    final Object parsedYml
 
     static StackFileModel load(File f) {
         return new StackFileModel(new Yaml().load(f.text))
     }
 
     static void dump(StackFileModel model, File f) {
-        f.text = new Yaml().dump(model.parsedYml);
+        f.text = new Yaml().dump(model.parsedYml)
     }
 
     StackFileModel(Object parsedYml) {
@@ -25,9 +25,9 @@ class StackFileModel implements Cloneable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    Object clone() throws CloneNotSupportedException {
         def yaml = new Yaml()
-        return new StackFileModel(yaml.load(yaml.dump(parsedYml)));
+        return new StackFileModel(yaml.load(yaml.dump(parsedYml)))
     }
 
     def setGav(String gav) {

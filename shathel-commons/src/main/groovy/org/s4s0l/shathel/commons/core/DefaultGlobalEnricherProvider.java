@@ -99,12 +99,10 @@ public class DefaultGlobalEnricherProvider implements GlobalEnricherProvider {
         @Override
         protected void execute(EnricherExecutableParams params) {
             StackDescription stack = params.getStack();
-            Stack.StackContext stackContext = params.getStackContext();
             stack.getDependencies().stream()
                     //searching for dependencies that will be present in runtime
-                    .filter(x -> params.isWithOptional() //if is with optional so everything will be
-                            || !x.isOptional() //not optional deps for sure will be
-                            || stackContext.getStackDescription(x.getStackReference()).isPresent() //at last existing in environment
+                    .filter(x -> params.isWithOptional() //if is with optional so everything will be present anyway
+                            || params.getStackTree().userNodesStream(false).anyMatch(aa -> aa.getStack().getReference().isSameStack(x.getStackReference()))//not optional deps for sure will be
                     ).forEach(x -> params.getEnvironment().putAll(x.getEnvs()));
         }
 

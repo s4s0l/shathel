@@ -10,7 +10,6 @@ import org.s4s0l.shathel.commons.utils.VersionComparator;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
@@ -43,29 +42,33 @@ public class DependencyManager {
                         .orElse(desc.getVersion());
     }
 
-    public StackTreeDescription downloadDependencies(StackLocator root, StackIntrospectionProvider.StackIntrospections stackIntrospections, boolean withOptional) {
-        StackDescription desc = getStackDescription(dependenciesDir, root);
-        StackTreeDescription.Builder builder = StackTreeDescription.builder(desc);
-        addDependencies(desc, builder, stackIntrospections, withOptional);
+    public StackTreeDescription downloadDependencies(List<StackLocator> rootLocators,
+                                                     StackIntrospectionProvider.StackIntrospections stackIntrospections) {
+
+        StackTreeDescription.Builder builder = StackTreeDescription.builder(stackIntrospections);
+        for (StackLocator rootLocator : rootLocators) {
+            StackDescription desc = getStackDescription(dependenciesDir, rootLocator);
+            builder.addRootNode(desc, true);
+            addDependencies(desc, builder, stackIntrospections);
+        }
+
+        stackIntrospections.getStacks().stream().map(StackIntrospection::getReference)
+                .map(x -> getStackDescription(dependenciesDir, x, StackReference::getVersion))
+                .forEach(x -> {
+                    builder.addRootNode(x, false);
+                    addDependencies(x, builder, stackIntrospections);
+                });
+
         return builder.build();
     }
 
-    public List<StackDescription> getSidekicks(StackTreeDescription tree, StackIntrospectionProvider.StackIntrospections stackIntrospections) {
-        return stackIntrospections.getStacks().stream().map(StackIntrospection::getReference)
-                .filter(x -> !tree.contains(x))
-                .map(x -> getStackDescription(dependenciesDir, x, StackReference::getVersion))
-                .collect(Collectors.toList());
-    }
-
     private void addDependencies(StackDescription parent, StackTreeDescription.Builder builder,
-                                 StackIntrospectionProvider.StackIntrospections stackIntrospections, boolean withOptional) {
+                                 StackIntrospectionProvider.StackIntrospections stackIntrospections) {
         List<StackDependency> dependencies = parent.getDependencies();
         for (StackDependency dependency : dependencies) {
-            if (withOptional || !dependency.isOptional()) {
-                StackDescription depDesc = getStackDescription(dependenciesDir, dependency.getStackReference(), getOverrider(stackIntrospections));
-                builder.addNode(parent.getReference(), depDesc);
-                addDependencies(depDesc, builder, stackIntrospections, withOptional);
-            }
+            StackDescription depDesc = getStackDescription(dependenciesDir, dependency.getStackReference(), getOverrider(stackIntrospections));
+            builder.addNode(depDesc);
+            addDependencies(depDesc, builder, stackIntrospections);
         }
     }
 
@@ -76,7 +79,7 @@ public class DependencyManager {
 
     private StackDescription getStackDescription(File dependenciesDir, StackLocator ref) {
         Optional<File> first = downloader.getDownloaders()
-                .map(it -> it.download( ref, dependenciesDir, forcefull))
+                .map(it -> it.download(ref, dependenciesDir, forcefull))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();

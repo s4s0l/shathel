@@ -33,6 +33,7 @@
 * shathel.solution.docker_user
 * shathel.solution.docker_pass
 * shathel.solution.docker_host
+* shathel.solution.dependenciesDir
 
 ## Environment level settings
 
@@ -40,12 +41,15 @@ We set them as shathel.env.{env}.net but they are accessible as shathel.env.net
 in enrichers
 
 * shathel.env.{env}.net
-* shathel.env.{env}.dependenciesDir
+
+FIXME: below does not work 
 * shathel.env.{env}.dataDir
 * shathel.env.{env}.safeDir
 * shathel.env.{env}.settingsDir
 * shathel.env.{env}.enrichedDir
 * shathel.env.{env}.tempDir
+FIXME: above does not work
+
 * shathel.env.{env}.pull
 * shathel.env.{env}.domain
 

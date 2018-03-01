@@ -14,7 +14,7 @@ import spock.lang.Specification
 class TestShathelRuleContractTest extends Specification {
 
     def cleanupSpec() {
-        setupSpec();
+        setupSpec()
     }
 
     def setupSpec() {
@@ -29,13 +29,13 @@ class TestShathelRuleContractTest extends Specification {
     def "Quick test run"() {
         given:
         System.setProperty(CommonParams.SHATHEL_ENV, "local")
-        System.setProperty("g", "src/test/resources/TestShathelRuleContractTest/mappings")
+        System.setProperty("shathel.plugin.local.override.mappings", "src/test/resources/TestShathelRuleContractTest/mappings")
         System.setProperty("shathel.plugin.local.override.current", "src/test/resources/TestShathelRuleContractTest/stack")
         System.setProperty("shathel.plugin.current.gav", "org.s4s0l.shathel:introspection:1.0")
         System.setProperty("shathel.plugin.current", LocalOverriderDownloader.CURRENT_PROJECT_LOCATION)
         System.setProperty("shathel.env.local.dependenciesDir", "build/.shathel-dependency-cache")
         System.setProperty(CommonParams.SHATHEL_DIR, "build/.shathel")
-        ArgumentCaptor<VerifierContextContract> argument = ArgumentCaptor.forClass(VerifierContextContract.class);
+        ArgumentCaptor<VerifierContextContract> argument = ArgumentCaptor.forClass(VerifierContextContract.class)
 
         def verifier = Mockito.mock(Verifier)
         Mockito.when(verifier.verify(Mockito.any())).thenReturn(true)

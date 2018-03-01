@@ -6,12 +6,11 @@ import org.s4s0l.shathel.commons.ExtensionContextsProvider;
 import org.s4s0l.shathel.commons.Shathel;
 import org.s4s0l.shathel.commons.core.CommonParams;
 import org.s4s0l.shathel.commons.core.Solution;
-import org.s4s0l.shathel.commons.core.Stack;
+import org.s4s0l.shathel.commons.core.Stacks;
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator;
 import org.s4s0l.shathel.commons.core.environment.Environment;
 import org.s4s0l.shathel.commons.core.environment.EnvironmentContextInternal;
 import org.s4s0l.shathel.commons.core.storage.Storage;
-import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
 
@@ -59,19 +58,19 @@ public interface TestShathelContract extends SchathelCreationCommonContract {
         return e;
     }
 
-    default Stack stack(String gav) {
+    default Stacks stack(String gav) {
         return solution().openStack( new StackLocator(gav));
     }
 
 
     default void start(String gav, boolean withOptional) {
-        Stack stack = stack(gav);
+        Stacks stack = stack(gav);
         solution().run(stack.createStartCommand(withOptional, environment()));
     }
 
 
     default void stop(String gav, boolean withDependencies, boolean withOptional) {
-        Stack stack = stack(gav);
+        Stacks stack = stack(gav);
         solution().run(stack.createStopCommand(withDependencies, withOptional,environment()));
     }
 

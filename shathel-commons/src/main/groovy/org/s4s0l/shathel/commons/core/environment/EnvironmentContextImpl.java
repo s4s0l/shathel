@@ -30,6 +30,11 @@ public class EnvironmentContextImpl implements EnvironmentContext {
     }
 
     @Override
+    public File getSafeDirectory() {
+        return storage.getSafeDirectory(environmentDescription.getParameters(), environmentDescription.getEnvironmentName());
+    }
+
+    @Override
     public String getEnvironmentName() {
         return environmentDescription.getEnvironmentName();
     }

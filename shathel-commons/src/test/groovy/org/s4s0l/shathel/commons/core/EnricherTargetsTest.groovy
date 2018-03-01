@@ -3,7 +3,6 @@ package org.s4s0l.shathel.commons.core
 import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.stack.StackReference
 import org.s4s0l.shathel.commons.docker.DockerWrapper
-import org.s4s0l.shathel.commons.utils.ExecWrapper
 import testutils.BaseIntegrationTest
 
 /**
@@ -57,7 +56,8 @@ class EnricherTargetsTest extends BaseIntegrationTest {
 
         then:
         command.commands.size() == 2
-        command.commands[0].enricherPreProvisioners.collect {it.name} == ["enricher2-self", "enricher1-all", "enricher3-all", "enricher3-allothers"]
+        command.commands[0].enricherPreProvisioners.collect { it.name } ==
+                ["enricher2-self", "enricher1-all", "enricher3-all", "enricher3-allothers"]
         command.commands[1].enricherPreProvisioners.collect {it.name} == ["enricher2-all", "enricher2-deps", "enricher2-allothers", "enricher1-self", "enricher3-all", "enricher3-allothers"]
 
 
