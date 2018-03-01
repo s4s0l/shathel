@@ -13,6 +13,7 @@ import org.s4s0l.shathel.commons.core.storage.Storage;
 import org.s4s0l.shathel.commons.utils.ExtensionContext;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -45,14 +46,20 @@ public class Solution {
 
         EnvironmentProvider environmentProvider = getExtensionContext()
                 .lookupOneMatching(EnvironmentProvider.class, x -> x.getType().equals(type))
-                .get();
+                .orElseGet(() -> {
+                    throw new RuntimeException("Unable to find provider for env type:" + type);
+                });
 
         String name = environmentDescription.getEnvironmentName();
 
         File safeDirectory = storage.getSafeDirectory(environmentDescription.getParameters(), name);
 
         LazyInitiableSafeStorage safeStorage = new LazyInitiableSafeStorage(() ->
-                getExtensionContext().lookupOne(SafeStorageProvider.class).get().getSafeStorage(safeDirectory, name));
+                getExtensionContext().lookupOne(SafeStorageProvider.class)
+                        .orElseGet(() -> {
+                            throw new RuntimeException("Unable to find SafeStorageProvider.");
+                        })
+                        .getSafeStorage(safeDirectory, name));
 
 
         EnvironmentContext environmentContext = new EnvironmentContextImpl(environmentDescription, solutionDescription,
@@ -66,22 +73,26 @@ public class Solution {
         return new SolutionDescription(params, model);
     }
 
-    public Stack openStack(StackReference reference) {
+    public Stacks openStack(StackReference reference) {
         return openStack(new StackLocator(reference));
     }
 
-    public Stack openStack(StackLocator reference) {
+    public Stacks openStack(StackLocator reference) {
+        return openStack(Collections.singletonList(reference));
+    }
+
+    public Stacks openStack(List<StackLocator> reference) {
 
         Boolean forcefulDownloader = getSolutionDescription().getParameters().getParameterAsBoolean("shathel.solution.forceful").orElse(false);
         DependencyManager dependencyManager = getDependencyManager(forcefulDownloader);
-        return new Stack(getExtensionContext(), reference, dependencyManager);
+        return new Stacks(getExtensionContext(), reference, dependencyManager);
     }
 
     public StackOperations getPurgeCommand(Environment environment) {
         List<StackIntrospection> rootStacks = environment.getIntrospectionProvider().getAllStacks().getRootStacks();
         StackOperations.Builder builder = StackOperations.builder(environment);
         for (StackIntrospection rootStack : rootStacks) {
-            Stack stack = openStack(rootStack.getReference());
+            Stacks stack = openStack(rootStack.getReference());
             StackOperations stopCommand = stack.createStopCommand(true, true, environment);
             builder.add(stopCommand.getCommands());
         }

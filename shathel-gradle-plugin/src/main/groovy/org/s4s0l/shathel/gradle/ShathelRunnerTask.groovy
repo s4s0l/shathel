@@ -8,7 +8,7 @@ import org.s4s0l.shathel.commons.Shathel
 import org.s4s0l.shathel.commons.core.CommonParams
 import org.s4s0l.shathel.commons.core.Parameters
 import org.s4s0l.shathel.commons.core.Solution
-import org.s4s0l.shathel.commons.core.Stack
+import org.s4s0l.shathel.commons.core.Stacks
 import org.s4s0l.shathel.commons.core.dependencies.LocalOverriderDownloader
 import org.s4s0l.shathel.commons.core.dependencies.StackLocator
 import org.s4s0l.shathel.commons.core.environment.Environment
@@ -27,13 +27,13 @@ class ShathelOperationTask extends DefaultTask {
         def dependencies = taskDependencies.getDependencies(this)
         def prepareTasks = dependencies.findAll { it instanceof ShathelPrepareTask }
         assert prepareTasks.size() == 1: "Operation tasks can be dependant only on one prepare task!"
-        ShathelPrepareTask prepareTask = prepareTasks.head()
+        ShathelPrepareTask prepareTask = prepareTasks.head() as ShathelPrepareTask
         return prepareTask.settings.to
     }
 
 
     ShathelExtension getExtension() {
-        ShathelExtension extension = project.extensions.findByName("shathel") ?: new ShathelExtension(project)
+        ShathelExtension extension = project.extensions.findByName("shathel") ?: new ShathelExtension(project) as ShathelExtension
         extension
     }
 
@@ -55,7 +55,7 @@ class ShathelOperationTask extends DefaultTask {
         environment
     }
 
-    static Stack getShathelCurrentStack(Solution solution) {
+    static Stacks getShathelCurrentStack(Solution solution) {
         return solution.openStack(new StackLocator(LocalOverriderDownloader.CURRENT_PROJECT_LOCATION))
     }
 
