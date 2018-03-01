@@ -4,6 +4,7 @@ import org.s4s0l.shathel.commons.core.model.StackFileModel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -121,5 +122,19 @@ public class StackDescriptionImpl implements StackDescription {
     @Override
     public Map<String, String> getMandatoryEnvs() {
         return fileModel.getMandatoryEnvs();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StackDescriptionImpl that = (StackDescriptionImpl) o;
+        return Objects.equals(getGav(), that.getGav());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getGav());
     }
 }

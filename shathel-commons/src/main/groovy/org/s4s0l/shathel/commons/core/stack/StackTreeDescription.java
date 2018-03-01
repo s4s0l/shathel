@@ -102,11 +102,21 @@ public class StackTreeDescription {
 
         Set<StackReference> doNotTouch = getSubTree(
                 stream().filter(it -> !toRemoveAllRefs.contains(it.getStack().getReference()))
-                , it -> true).stream().map(it -> it.getStack().getReference()).collect(Collectors.toSet());
+                , it -> !includeOptional || !it.isOptional()
+        ).stream().map(it -> it.getStack().getReference()).collect(Collectors.toSet());
 
         return toRemove.reverseStream()
                 .filter(it -> from.contains(it.getStack().getReference()) || !doNotTouch.contains(it.getStack().getReference()));
     }
+
+//    public Stream<StackTreeNode> getDirectDependencies(StackReference ref) {
+//        return findGraphNodeById(getGraphId(ref))
+//                .map(x -> graph.successors(x).stream().map(m -> (StackTreeNode) m))
+//                .orElseGet(() -> {
+//                    throw new RuntimeException("Reference " + ref + " not found in graph");
+//                });
+//
+//    }
 
     public Stream<StackTreeNode> userNodesStream(boolean includeOptional) {
         return getSubTree(
@@ -272,6 +282,8 @@ public class StackTreeDescription {
                     "id='" + id + '\'' +
                     '}';
         }
+
+
     }
 
 
@@ -336,6 +348,7 @@ public class StackTreeDescription {
             //we remove nodes in case older versions had different dependencies
             Set<Node> successors = new HashSet<>(graph.successors(nodeV));
             successors.forEach(it -> graph.removeEdge(nodeV, it));
+            assert graph.successors(nodeV).isEmpty();
 
             //we look for all stacks that can be dependant upon this and we add them
             stream()

@@ -66,7 +66,7 @@ class StackTreeDescriptionTest extends Specification {
             "${it.stack.name}:${it.stack.version}"
         }.collect(Collectors.toList())
 
-        ["d2:1.1", "d1:1.0", "d0:1.0"].reverse() == build.userNodesIsolatedDepsReverseStream(true).map {
+        ["d3:1.0", "d2:1.1", "d1:1.0", "d0:1.0"].reverse() == build.userNodesIsolatedDepsReverseStream(true).map {
             "${it.stack.name}:${it.stack.version}"
         }.collect(Collectors.toList())
 

@@ -146,11 +146,16 @@ public class StackEnricherExecutor {
 
 
     private List<StackEnricherDefinition> getEnricherDefinitions(StackDescription forStack) {
-        return Streams.concat(
+        Stream<StackDescription> stacks = Streams.concat(
                 stackTree.userNodesStream(withOptional),
                 stackTree.getSidekicks(forStack.getReference()).stream())
+                .map(StackTreeNode::getStack)
+                .distinct();
+
+
+        return stacks
                 .flatMap(stack ->
-                        stack.getStack().getEnricherDefinitions().stream())
+                        stack.getEnricherDefinitions().stream())
                 .filter(def -> def.isApplicableTo(forStack))
                 .collect(Collectors.toList());
     }
