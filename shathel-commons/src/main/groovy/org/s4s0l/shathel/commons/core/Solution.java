@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Wielgus
@@ -91,11 +92,9 @@ public class Solution {
     public StackOperations getPurgeCommand(Environment environment) {
         List<StackIntrospection> rootStacks = environment.getIntrospectionProvider().getAllStacks().getRootStacks();
         StackOperations.Builder builder = StackOperations.builder(environment);
-        for (StackIntrospection rootStack : rootStacks) {
-            Stacks stack = openStack(rootStack.getReference());
-            StackOperations stopCommand = stack.createStopCommand(true, true, environment);
-            builder.add(stopCommand.getCommands());
-        }
+        Stacks stack = openStack(rootStacks.stream().map(it -> new StackLocator(it.getReference())).collect(Collectors.toList()));
+        StackOperations stopCommand = stack.createStopCommand(true, true, environment);
+        builder.add(stopCommand.getCommands());
         return builder.build();
     }
 
