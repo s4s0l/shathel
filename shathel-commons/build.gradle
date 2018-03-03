@@ -12,7 +12,7 @@ repositories {
 }
 dependencies {
     compile "org.yaml:snakeyaml:1.16"
-    compile "org.slf4j:slf4j-api"
+    compile "org.slf4j:slf4j-api:1.7.22"
     compile 'com.google.guava:guava:21.0'
     compile 'commons-io:commons-io:2.3'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
