@@ -13,25 +13,20 @@ class EnvironmentDescriptionTest extends Specification {
     def "environment map should contain all not null parameters and globals matching env name prefix"() {
         given:
         def env = Parameters.fromMapWithSysPropAndEnv(['shathel.env.test.sysprop': 'sysprop'])
+        def parameters = ['file_prop': 'file', 'sysprop': 'file']
+        def envs = ['AAA': 'AAA_VALUE']
         EnvironmentDescription des = new EnvironmentDescription(
-                new SolutionDescription(env, new SolutionFileModel([version: 1, 'shathel-solution': [:]])), "test", "type", ['file_prop': 'file', 'sysprop': 'file'], ['AAA': 'AAA_VALUE'])
+                new SolutionDescription(env, new SolutionFileModel([version: 1, 'shathel-solution': [:]])), "test", "type", parameters, envs)
 
 
         when:
         def variabbles = des.getAsEnvironmentVariables()
 
         then:
-        variabbles == [
-                'SHATHEL_ENV_FILE_PROP' : 'file',
-                'SHATHEL_ENV_SYSPROP'   : 'sysprop',
-                'SHATHEL_ENV_ENVPROP'   : 'envprop',
-//                'SHATHEL_ENV_SIZE'      : '1',
-//                'SHATHEL_ENV_QUORUM'    : '1',
-//                'SHATHEL_ENV_MGM_SIZE'  : '1',
-//                'SHATHEL_ENV_MGM_QUORUM': '1',
-//                'SHATHEL_ENV_DOMAIN'    : 'localhost',
-                'AAA'                   : 'AAA_VALUE',
-        ]
+        variabbles['SHATHEL_ENV_FILE_PROP'] == 'file'
+        variabbles['SHATHEL_ENV_SYSPROP'] == 'sysprop'
+        variabbles['SHATHEL_ENV_ENVPROP'] == 'envprop'
+        variabbles['AAA'] == 'AAA_VALUE'
 
         when:
         def val = des.getEnvironmentParameter("File.prop")

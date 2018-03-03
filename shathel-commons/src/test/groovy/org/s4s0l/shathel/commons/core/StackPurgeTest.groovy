@@ -44,11 +44,11 @@ class StackPurgeTest extends BaseIntegrationTest {
 
         when:
 
-        def stack = solution.openStack( new StackReference("org.s4s0l.shathel:enricher3:1.0"))
-        def command = stack.createStartCommand(false,environment)
+        def stack = solution.openStack(new StackReference("org.s4s0l.shathel:enricher3:1.0"))
+        def command = stack.createStartCommand(false, environment)
         solution.run(command)
         stack = solution.openStack(new StackReference("org.s4s0l.shathel:enricher1:1.0"))
-        command = stack.createStartCommand(false,environment)
+        command = stack.createStartCommand(false, environment)
         solution.run(command)
 
         then:
@@ -56,14 +56,15 @@ class StackPurgeTest extends BaseIntegrationTest {
 
         when:
         def purgeCommand = solution.getPurgeCommand(environment)
-
+        def names = purgeCommand.commands.collect { it.description.name }
         then:
         purgeCommand.commands.collectEntries {
             [(it.description.name): it.type]
         } == ['enricher1', 'enricher2', 'enricher3'].collectEntries {
             [(it): StackCommand.Type.STOP]
         }
-        purgeCommand.commands[0].description.name != 'enricher1'
+        //1 is dependant on 2 so 2 cannot be stopped first
+        names.indexOf("enricher1") < names.indexOf("enricher2")
 
         when:
         solution.run(purgeCommand)
