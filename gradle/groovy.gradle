@@ -1,9 +1,11 @@
 apply plugin: 'groovy'
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy:2.4.7'
-    compile 'org.codehaus.groovy:groovy-json:2.4.7'
-    compile 'org.codehaus.groovy:groovy-templates:2.4.7'
+    compile 'org.codehaus.groovy:groovy:2.4.8'
+    compile 'org.codehaus.groovy:groovy-json:2.4.8'
+    compile 'org.codehaus.groovy:groovy-templates:2.4.8'
+    compile 'org.codehaus.groovy:groovy-xml:2.4.8'
+
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy'
     }
