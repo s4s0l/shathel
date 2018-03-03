@@ -21,7 +21,7 @@ dependencies {
     compile 'de.gesellix:docker-client:2017-02-23T20-38-38'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'org.apache.ivy:ivy:2.4.0'
-    testCompile "ch.qos.logback:logback-classic"
+    testCompile "ch.qos.logback:logback-classic:1.1.7"
 }
 
 
