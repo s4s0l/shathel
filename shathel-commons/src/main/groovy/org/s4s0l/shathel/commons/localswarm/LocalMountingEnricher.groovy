@@ -48,7 +48,7 @@ class LocalMountingEnricher extends EnricherExecutable {
                 provisioners.add("prepare-mount-dir:" + directoryToCopyTo.getAbsolutePath(), { ProvisionerExecutableParams context ->
                     try {
                         if (directoryToCopyTo.exists()) {
-                            params.getApiFacade().getManagerNodeWrapper().containerCreate(
+                            params.getApiFacade().getManagerNodeWrapper().containerCreateRun(
                                     "--rm -v " + directoryToCopyTo.getParentFile().getAbsolutePath() + ":/dir alpine rm -fR /dir/" + directoryToCopyTo.getName())
                         }
                         FileUtils.copyDirectory(directoryToCopyFrom, directoryToCopyTo)

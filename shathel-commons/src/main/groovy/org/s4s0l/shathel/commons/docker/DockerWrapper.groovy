@@ -407,6 +407,10 @@ class DockerWrapper {
         exec.executeForOutput("run $s").readLines().last()
     }
 
+    void containerCreateRun(String s) {
+        exec.executeForOutput("run $s").readLines()
+    }
+
     void imageDeleteByTag(String tag, boolean forceful) {
         exec.executeForOutput("image rm ${forceful ? '-f' : ''} ${tag}").trim().length() >= 12
     }
