@@ -33,7 +33,7 @@ public class CustomBanner implements BannerProvider {
 
     @Override
     public String getProviderName() {
-        return "Custom Banner Provider";
+        return "Shathel Deployer";
     }
 
 }
