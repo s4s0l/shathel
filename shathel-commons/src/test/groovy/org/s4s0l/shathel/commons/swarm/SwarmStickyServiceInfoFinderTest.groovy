@@ -10,8 +10,57 @@ import testutils.MockUtils
  */
 class SwarmStickyServiceInfoFinderTest extends Specification {
 
-
     @Unroll
+    def "should pick right nodes for servicesX: #desc"(String desc,
+                                                      String composeModel,
+                                                       List<String> serviceNames,
+                                                      List<String> expectedNodeNames) {
+        when:
+        def nodesWithLabels = [
+                (MockUtils.shathelManagerNode(1)): [
+                        "org.shathel.volume.cockroach_sqlpad-data": "true",
+                        "org.shathel.volume.letsencrypt_letsencrypt-data": "true",
+                        "org.shathel.volume.portainer_portainer-data": "true",
+                        "org.shathel.volume.registry_shathel-docker-registry-data": "true"
+
+                ],
+        ]
+        def applicableFor = new SwarmStickyServiceInfoFinder().getNodesApplicableFor(serviceNames, nodesWithLabels, ComposeFileModel.load(composeModel))
+
+        then:
+        applicableFor.nodeName as Set == expectedNodeNames as Set
+
+
+        where:
+        desc             | composeModel   | serviceNames                                                 | expectedNodeNames
+        "No constraints" | """
+        version: '3.4'
+        services:
+          spe:
+            image: project(:)
+            volumes:
+             - db:/spe/db/    
+             - logs:/spe/log/
+            ports:
+              - 8600:8600
+            deploy:
+              endpoint_mode: vip
+              mode: replicated
+              replicas: 1      
+              restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 2
+                window: 240s
+        volumes:
+          db:
+          logs:
+
+        """ | ['spe'] | ['manager-1']
+    }
+
+
+        @Unroll
     def "should pick right nodes for services: #desc"(String desc,
                                                       String composeModel, List<String> serviceNames,
                                                       List<String> expectedNodeNames) {

@@ -61,6 +61,12 @@ class SwarmStickyVolumeEnricher extends EnricherExecutable {
                         throw new RuntimeException("stack ${params.stack.deployName} cannot be run at any node, so unable to auto label some node, to make volume not floatable")
                     }
                     params.provisioners.add("sticky-volume-node-label:${labelForVolume}", getLabelingProvisioner(applicableNodes, labelForVolume))
+                    //we add this label here manually, otherwise multiple volumes would
+                    //exclude each other as labels required by tehem are not present at this moment
+
+                    applicableNodes.each { xx ->
+                        nodeLabels[xx][labelForVolume] =  "true"
+                    }
                 }
                 it.attachedServices.each { s ->
                     model.addConstraintToService(s, "node.labels.${labelForVolume} == true")

@@ -292,6 +292,33 @@ class SwarmStickyVolumeFinderTest extends Specification {
           volume1-data:
         """ | [new VolumeFound(volumeName: "volume1-data", attachedServices: ["service"])]
 
+        "Test from spe"      | """
+        version: '3.4'
+        services:
+          spe:
+            image: project(:)
+            volumes:
+             - db:/spe/db/    
+             - logs:/spe/log/
+            ports:
+              - 8600:8600
+            deploy:
+              endpoint_mode: vip
+              mode: replicated
+              replicas: 1      
+              restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 2
+                window: 240s
+        volumes:
+          db:
+          logs:
+        """ | [
+                new VolumeFound(volumeName: "db", attachedServices: ["spe"]),
+                new VolumeFound(volumeName: "logs", attachedServices: ["spe"])
+        ]
+
 
     }
 }
