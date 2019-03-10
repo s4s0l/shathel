@@ -279,7 +279,14 @@ class ComposeFileModel {
         if (service.networks == null) {
             service.networks = [networkName]
         } else {
-            service.networks << networkName
+            if (service.networks instanceof List) {
+                service.networks << networkName
+            }else if (service.networks instanceof Map){
+                service.networks << [(networkName) :[:]]
+            }else {
+                throw new Exception("in yml path service.networks is not list or map, dunno what to do for network ${networkName}")
+            }
+
         }
     }
 

@@ -93,6 +93,48 @@ class ComposeFileModelTest extends Specification {
         res.networks.network3.labels == [label:'value',nnn:'nnn']
     }
 
+    def "addNetworks"() {
+        given:
+        ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
+        version: "3"
+        services:
+          service1:
+            networks:
+          service2:
+            networks:
+                - one
+                - two
+          service3:
+            networks:
+                some3:
+                    aliases:
+                        - a1
+          service4:
+            networks:
+                - some4:
+        networks:
+            network1:
+                external: true 
+            network2:
+            network3:
+                labels:
+                    label: value          
+        """))
+
+        when:
+        x.addExternalNetworkAndAttachAllServices("testnetwork")
+        def dump = new Yaml().dump(x.parsedYml)
+        def res = new Yaml().load(dump)
+
+        then:
+        res.networks.testnetwork.external == true
+        res.services.service1.networks == ['testnetwork']
+        res.services.service2.networks == ['one', 'two', 'testnetwork']
+        res.services.service3.networks.some3.aliases == ['a1']
+        res.services.service3.networks.testnetwork == [:]
+        res.services.service4.networks[1] == 'testnetwork'
+    }
+
     def "Map mounts"() {
         given:
         ComposeFileModel x = new ComposeFileModel(new Yaml().load("""
