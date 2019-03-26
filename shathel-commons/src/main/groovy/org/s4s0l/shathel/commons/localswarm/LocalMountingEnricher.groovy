@@ -30,7 +30,6 @@ class LocalMountingEnricher extends EnricherExecutable {
             if (volume.startsWith("/shathel-data/")) {
                 String subDirName = stack.getReference().getName() + "/" + service + "/"
                 File subDir = new File(environmentContext.getDataDirectory(), subDirName)
-
                 String pathToCreate = volume.split(":")[0].replaceAll("/shathel-data/", subDir.getAbsolutePath() + "/")
                 provisioners.add("prepare-mount-dir:" + pathToCreate, { ProvisionerExecutableParams context -> new File(pathToCreate).mkdirs() })
                 return volume.replace("/shathel-data/", subDir.getAbsolutePath() + "/")
@@ -41,12 +40,11 @@ class LocalMountingEnricher extends EnricherExecutable {
 
                 String resultingMount = baseToPath + split[0].substring(2) + ":" + split[1]
 
-
-                final File directoryToCopyFrom = new File(stack.getStackResources().getComposeFileDirectory(), upperDir)
                 final File directoryToCopyTo = new File(baseToPath, upperDir)
 
                 provisioners.add("prepare-mount-dir:" + directoryToCopyTo.getAbsolutePath(), { ProvisionerExecutableParams context ->
                     try {
+                        final File directoryToCopyFrom = new File(new File(context.dir, "stack"), upperDir)
                         if (directoryToCopyTo.exists()) {
                             params.getApiFacade().getManagerNodeWrapper().containerCreateRun(
                                     "--rm -v " + directoryToCopyTo.getParentFile().getAbsolutePath() + ":/dir alpine rm -fR /dir/" + directoryToCopyTo.getName())

@@ -45,15 +45,20 @@ public class SwarmMountingEnricher extends EnricherExecutable {
                 String[] split = volume.split(":");
                 String remotePart = split[1];
                 File file = new File(stack.getStackResources().getComposeFileDirectory(), split[0]);
-                final File directoryToCopy;
                 String resultingMount = toPath + ":" + remotePart;
                 if (file.isFile()) {
                     resultingMount = toPath + "/" + file.getName() + ":" + remotePart;
-                    directoryToCopy = file.getParentFile();
-                } else {
-                    directoryToCopy = file;
                 }
-                provisioners.add("prepare-mount-dir:" + toPath, context -> prepareMounts(context.getCurrentNodes(), directoryToCopy, toPath));
+                provisioners.add("prepare-mount-dir:" + toPath, context -> {
+                    File srcfile = new File(new File(context.getDir(), "stack"), split[0]);
+                    final File directoryToCopy;
+                    if (srcfile.isFile()) {
+                        directoryToCopy = srcfile.getParentFile();
+                    } else {
+                        directoryToCopy = srcfile;
+                    }
+                    prepareMounts(context.getCurrentNodes(), directoryToCopy, toPath);
+                });
                 return resultingMount;
             } else {
                 return volume;
